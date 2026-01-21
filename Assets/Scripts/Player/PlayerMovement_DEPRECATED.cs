@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 
+[System.Obsolete("Replaced by PlayerController.cs")]
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement Parameters")]
@@ -17,6 +18,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Wall Jumping")]
     [SerializeField] private float wallJumpX;
     [SerializeField] private float wallJumpY;
+    private float wallJumpCooldown;
 
     [Header("Layers")]
     [SerializeField] private LayerMask groundLayer;
@@ -37,7 +39,8 @@ public class PlayerMovement : MonoBehaviour
         body = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         boxCollider = GetComponent<BoxCollider2D>();
-        body.freezeRotation = true; 
+        body.freezeRotation = true;
+        extraJumps = 0; // Force Single Jump per user request 
     }
 
     private void Update()
@@ -53,10 +56,15 @@ public class PlayerMovement : MonoBehaviour
         horizontalInput = Input.GetAxis("Horizontal");
 
         // Scale Logic
+        // Scale Logic
         if (horizontalInput > 0.01f)
             transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
         else if (horizontalInput < -0.01f)
             transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+        
+        // Anti-Disappear: Lock Z axis and ensure meaningful Scale
+        if (transform.localScale.x == 0) transform.localScale = new Vector3(1, transform.localScale.y, 1);
+        transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, 0);
 
         anim.SetBool("run", horizontalInput != 0);
         anim.SetBool("grounded", isGrounded());
@@ -67,15 +75,24 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.Space) && body.linearVelocity.y > 0)
             body.linearVelocity = new Vector2(body.linearVelocity.x, body.linearVelocity.y / 2);
 
-        if (onWall())
+        if (onWall() && !isGrounded())
         {
             body.gravityScale = 0;
-            body.linearVelocity = Vector2.zero;
+            // Wall Slide: Slowly slide down (Faster as requested: -2)
+            body.linearVelocity = new Vector2(0, -2); 
         }
         else
         {
-            body.gravityScale = 7;
-            body.linearVelocity = new Vector2(horizontalInput * speed, body.linearVelocity.y);
+            body.gravityScale = 3.5f; // Slower fall (was 7)
+
+            if (wallJumpCooldown > 0)
+            {
+                wallJumpCooldown -= Time.deltaTime;
+            }
+            else
+            {
+                body.linearVelocity = new Vector2(horizontalInput * speed, body.linearVelocity.y);
+            }
 
             if (isGrounded())
             {
@@ -119,7 +136,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void WallJump()
     {
-        body.AddForce(new Vector2(-Mathf.Sign(transform.localScale.x) * wallJumpX, wallJumpY));
+        body.linearVelocity = new Vector2(-Mathf.Sign(transform.localScale.x) * wallJumpX, wallJumpY);
+        wallJumpCooldown = 0.2f;
     }
     private bool isGrounded()
     {

@@ -8,18 +8,19 @@ public class DragonAttack : MonoBehaviour
     [SerializeField] private AudioClip fireballSound;
 
     private Animator anim;
-    private PlayerMovement playerMovement;
+
+    private PlayerController playerController;
     private float cooldownTimer = Mathf.Infinity;
 
     private void Awake()
     {
         anim = GetComponent<Animator>();
-        playerMovement = GetComponent<PlayerMovement>();
+        playerController = GetComponent<PlayerController>();
     }
 
     private void Update()
     {
-        if (Input.GetMouseButton(0) && cooldownTimer > attackCooldown && playerMovement.canAttack()
+        if (Input.GetMouseButton(0) && cooldownTimer > attackCooldown && playerController != null
             && Time.timeScale > 0)
             Attack();
 

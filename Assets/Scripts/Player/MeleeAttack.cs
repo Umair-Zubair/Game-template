@@ -13,18 +13,19 @@ public class MeleeAttack : MonoBehaviour
     [SerializeField] private AudioClip attackSound;
 
     private Animator anim;
-    private PlayerMovement playerMovement;
+    private PlayerController playerController;
     private float cooldownTimer = Mathf.Infinity;
 
     private void Awake()
     {
         anim = GetComponent<Animator>();
-        playerMovement = GetComponent<PlayerMovement>();
+        playerController = GetComponent<PlayerController>();
     }
 
     private void Update()
     {
-        if (Input.GetMouseButton(0) && cooldownTimer > attackCooldown && playerMovement.canAttack() 
+        // Removed strict canAttack() check to allow attacking while moving
+        if (Input.GetMouseButton(0) && cooldownTimer > attackCooldown && playerController != null
             && Time.timeScale > 0)
         {
             Attack();

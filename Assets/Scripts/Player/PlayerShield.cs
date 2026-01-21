@@ -7,13 +7,13 @@ public class PlayerShield : MonoBehaviour
     [SerializeField] private AudioClip blockHitSound;
 
     private Animator anim;
-    private PlayerMovement playerMovement;
+    private PlayerController playerController;
     private bool isBlocking;
 
     private void Awake()
     {
         anim = GetComponent<Animator>();
-        playerMovement = GetComponent<PlayerMovement>();
+        playerController = GetComponent<PlayerController>();
     }
 
     private void Update()
@@ -22,7 +22,7 @@ public class PlayerShield : MonoBehaviour
         if (Input.GetMouseButton(1))
         {
             // Only start blocking if we aren't already
-            if (!isBlocking && playerMovement.canAttack())
+            if (!isBlocking && playerController != null)
             {
                 StartBlock();
             }
@@ -38,7 +38,7 @@ public class PlayerShield : MonoBehaviour
     private void StartBlock()
     {
         isBlocking = true;
-        playerMovement.isBlocking = true; // Freeze Movement
+        // playerController.isBlocking = true; // TODO: Add blocking state to controller if needed
         anim.SetBool("block", true);
         if(blockSound != null) SoundManager.instance.PlaySound(blockSound);
     }
@@ -46,7 +46,7 @@ public class PlayerShield : MonoBehaviour
     private void StopBlock()
     {
         isBlocking = false;
-        playerMovement.isBlocking = false; // Unfreeze Movement
+        // playerController.isBlocking = false; // Unfreeze Movement
         anim.SetBool("block", false);
     }
 
