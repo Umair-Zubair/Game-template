@@ -9,6 +9,7 @@ public class MainMenuController : MonoBehaviour
 {
     [Header("Panels")]
     [SerializeField] private GameObject characterSelectPanel;
+    [SerializeField] private MenuManager menuManager; // Reference to disable when popup opens
 
     [Header("Audio")]
     [SerializeField] private AudioClip buttonClickSound;
@@ -56,6 +57,10 @@ public class MainMenuController : MonoBehaviour
 
         if (characterSelectPanel != null)
             characterSelectPanel.SetActive(true);
+        
+        // Disable main menu navigation
+        if (menuManager != null)
+            menuManager.enabled = false;
     }
 
     /// <summary>
@@ -67,6 +72,10 @@ public class MainMenuController : MonoBehaviour
 
         if (characterSelectPanel != null)
             characterSelectPanel.SetActive(false);
+        
+        // Re-enable main menu navigation
+        if (menuManager != null)
+            menuManager.enabled = true;
     }
 
     /// <summary>

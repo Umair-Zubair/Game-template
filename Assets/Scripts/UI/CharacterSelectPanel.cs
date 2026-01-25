@@ -10,11 +10,18 @@ public class CharacterSelectPanel : MonoBehaviour
     [Header("Character Buttons")]
     [SerializeField] private Button knightButton;
     [SerializeField] private Button dragonButton;
+    [SerializeField] private Button backButton;
 
     [Header("Selection Arrow")]
     [SerializeField] private RectTransform selectionArrow;
-    private const float KNIGHT_ARROW_Y = 157f;
-    private const float DRAGON_ARROW_Y = 58f;
+    
+    // Arrow Y positions for each option: 0=Knight, 1=Dragon, 2=Back
+    [SerializeField] private float knightArrowY = 157f;
+    [SerializeField] private float dragonArrowY = -73f;
+    [SerializeField] private float backArrowY = -200f; // User should adjust this in Inspector
+    
+    private int currentPosition = 0; // 0=Knight, 1=Dragon, 2=Back
+    private const int TOTAL_OPTIONS = 3;
 
     [Header("Selection Indicators (Optional)")]
     [Tooltip("Visual indicator that shows which character is selected (e.g., a border or highlight)")]
@@ -43,9 +50,66 @@ public class CharacterSelectPanel : MonoBehaviour
 
         if (dragonButton != null)
             dragonButton.onClick.AddListener(SelectDragon);
+        
+        if (backButton != null)
+            backButton.onClick.AddListener(Close);
 
-        // Show current selection if any
-        UpdateSelectionVisuals();
+        // Show current selection and update arrow
+        currentPosition = 0; // Start on Knight
+        UpdateArrowPosition();
+    }
+
+    private void Update()
+    {
+        // Handle Up/Down navigation
+        if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+            ChangePosition(-1);
+        if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+            ChangePosition(1);
+
+        // Handle Enter/E to select current option
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.E))
+            Interact();
+    }
+
+    private void ChangePosition(int change)
+    {
+        currentPosition += change;
+        
+        // Wrap around
+        if (currentPosition < 0)
+            currentPosition = TOTAL_OPTIONS - 1;
+        else if (currentPosition >= TOTAL_OPTIONS)
+            currentPosition = 0;
+        
+        PlaySelectSound();
+        UpdateArrowPosition();
+    }
+
+    private void UpdateArrowPosition()
+    {
+        if (selectionArrow == null) return;
+        
+        Vector2 arrowPos = selectionArrow.anchoredPosition;
+        switch (currentPosition)
+        {
+            case 0: arrowPos.y = knightArrowY; break;
+            case 1: arrowPos.y = dragonArrowY; break;
+            case 2: arrowPos.y = backArrowY; break;
+        }
+        selectionArrow.anchoredPosition = arrowPos;
+    }
+
+    private void Interact()
+    {
+        PlaySelectSound();
+        
+        switch (currentPosition)
+        {
+            case 0: SelectKnight(); break;
+            case 1: SelectDragon(); break;
+            case 2: Close(); break;
+        }
     }
 
     /// <summary>
@@ -88,9 +152,9 @@ public class CharacterSelectPanel : MonoBehaviour
         {
             Vector3 arrowPos = selectionArrow.anchoredPosition;
             if (selected == KNIGHT_INDEX)
-                arrowPos.y = KNIGHT_ARROW_Y;
+                arrowPos.y = knightArrowY;
             else if (selected == DRAGON_INDEX)
-                arrowPos.y = DRAGON_ARROW_Y;
+                arrowPos.y = dragonArrowY;
             selectionArrow.anchoredPosition = arrowPos;
         }
 
