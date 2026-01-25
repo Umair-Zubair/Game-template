@@ -12,8 +12,10 @@ public class UIManager : MonoBehaviour
 
     private void Awake()
     {
-        gameOverScreen.SetActive(false);
-        pauseScreen.SetActive(false);
+        if (gameOverScreen != null)
+            gameOverScreen.SetActive(false);
+        if (pauseScreen != null)
+            pauseScreen.SetActive(false);
     }
     private void Update()
     {

@@ -9,7 +9,10 @@ public class SoundManager : MonoBehaviour
     private void Awake()
     {
         soundSource = GetComponent<AudioSource>();
-        musicSource = transform.GetChild(0).GetComponent<AudioSource>();
+        
+        // Safely get music source from child if it exists
+        if (transform.childCount > 0)
+            musicSource = transform.GetChild(0).GetComponent<AudioSource>();
 
         //Keep this object even when we go to new scene
         if (instance == null)
@@ -21,9 +24,11 @@ public class SoundManager : MonoBehaviour
         else if (instance != null && instance != this)
             Destroy(gameObject);
 
-        //Assign initial volumes
-        ChangeMusicVolume(0);
-        ChangeSoundVolume(0);
+        //Assign initial volumes (only if sources exist)
+        if (musicSource != null)
+            ChangeMusicVolume(0);
+        if (soundSource != null)
+            ChangeSoundVolume(0);
     }
     public void PlaySound(AudioClip _sound)
     {

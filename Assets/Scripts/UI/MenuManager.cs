@@ -28,7 +28,7 @@ public class MenuManager : MonoBehaviour
     {
         currentPosition += _change;
 
-        if (_change != 0)
+        if (_change != 0 && SoundManager.instance != null)
             SoundManager.instance.PlaySound(changeSound);
 
         if (currentPosition < 0)
@@ -40,11 +40,13 @@ public class MenuManager : MonoBehaviour
     }
     private void AssignPosition()
     {
-        arrow.position = new Vector3(arrow.position.x, buttons[currentPosition].position.y);
+        if (arrow != null && buttons != null && buttons.Length > 0)
+            arrow.position = new Vector3(arrow.position.x, buttons[currentPosition].position.y);
     }
     private void Interact()
     {
-        SoundManager.instance.PlaySound(interactSound);
+        if (SoundManager.instance != null)
+            SoundManager.instance.PlaySound(interactSound);
 
         if (currentPosition == 0)
         {
