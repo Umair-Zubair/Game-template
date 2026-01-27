@@ -9,99 +9,107 @@ public class MainMenuController : MonoBehaviour
 {
     [Header("Panels")]
     [SerializeField] private GameObject characterSelectPanel;
-    [SerializeField] private MenuManager menuManager; // Reference to disable when popup opens
+    [SerializeField] private SelectionArrow mainMenuArrow;
 
     [Header("Audio")]
     [SerializeField] private AudioClip buttonClickSound;
 
     private const string SELECTED_CHARACTER_KEY = "SelectedCharacter";
+    
+    // Prevents crashes from rapid input
+    private bool isLoading = false;
+    private float lastInteractionTime = 0f;
+    private const float INTERACTION_COOLDOWN = 0.1f;
 
     private void Start()
     {
-        // Hide character selection panel on start
         if (characterSelectPanel != null)
             characterSelectPanel.SetActive(false);
 
-        // Ensure time is running (in case we came from a paused game)
         Time.timeScale = 1f;
+        isLoading = false;
     }
 
     /// <summary>
-    /// Called when Play button is clicked.
-    /// Checks if character is selected, then loads Level1.
+    /// Returns true if interaction is allowed (cooldown passed, not loading)
     /// </summary>
+    private bool CanInteract()
+    {
+        if (isLoading) return false;
+        if (Time.unscaledTime - lastInteractionTime < INTERACTION_COOLDOWN) return false;
+        lastInteractionTime = Time.unscaledTime;
+        return true;
+    }
+
     public void PlayGame()
     {
+        if (!CanInteract()) return;
+        
         Debug.Log("PlayGame called. Attempting to load Level1...");
         PlayButtonSound();
 
-        // Check if a character has been selected
         if (!PlayerPrefs.HasKey(SELECTED_CHARACTER_KEY))
         {
-            // No character selected - show selection panel
             Debug.Log("No character selected! Please select a character first.");
             ShowCharacterSelect();
             return;
         }
 
-        // Load the first level
+        // Prevent double-loading
+        isLoading = true;
         SceneManager.LoadScene("Level1");
     }
 
-    /// <summary>
-    /// Shows the character selection panel.
-    /// </summary>
     public void ShowCharacterSelect()
     {
+        if (!CanInteract()) return;
+        
         PlayButtonSound();
 
         if (characterSelectPanel != null)
             characterSelectPanel.SetActive(true);
         
-        // Disable main menu navigation
-        if (menuManager != null)
-            menuManager.enabled = false;
+        if (mainMenuArrow != null)
+            mainMenuArrow.enabled = false;
     }
 
-    /// <summary>
-    /// Hides the character selection panel.
-    /// </summary>
     public void HideCharacterSelect()
     {
+        if (!CanInteract()) return;
+        
         PlayButtonSound();
 
         if (characterSelectPanel != null)
             characterSelectPanel.SetActive(false);
         
-        // Re-enable main menu navigation
-        if (menuManager != null)
-            menuManager.enabled = true;
+        if (mainMenuArrow != null)
+            mainMenuArrow.enabled = true;
     }
 
-    /// <summary>
-    /// Adjusts sound volume (delegates to SoundManager).
-    /// </summary>
     public void SoundVolume()
     {
+        if (!CanInteract()) return;
+        
         PlayButtonSound();
-        SoundManager.instance.ChangeSoundVolume(0.2f);
+        if (SoundManager.instance != null)
+            SoundManager.instance.ChangeSoundVolume(0.2f);
     }
 
-    /// <summary>
-    /// Adjusts music volume (delegates to SoundManager).
-    /// </summary>
     public void MusicVolume()
     {
+        if (!CanInteract()) return;
+        
         PlayButtonSound();
-        SoundManager.instance.ChangeMusicVolume(0.2f);
+        if (SoundManager.instance != null)
+            SoundManager.instance.ChangeMusicVolume(0.2f);
     }
 
-    /// <summary>
-    /// Quits the application.
-    /// </summary>
     public void QuitGame()
     {
+        if (!CanInteract()) return;
+        
         PlayButtonSound();
+        isLoading = true; // Prevent further interactions
 
         Application.Quit();
 

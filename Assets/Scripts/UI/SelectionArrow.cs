@@ -1,60 +1,130 @@
 using UnityEngine;
-using UnityEngine.UI;
 
+/// <summary>
+/// Main menu selection arrow controller.
+/// Handles keyboard navigation for 5 menu options: Play, Character, Volume, Music, Quit
+/// </summary>
 public class SelectionArrow : MonoBehaviour
 {
-    [SerializeField] private RectTransform[] buttons;
+    [Header("Arrow Positions (X, Y)")]
+    [SerializeField] private Vector2 playArrowPos = new Vector2(-288f, 269f);
+    [SerializeField] private Vector2 characterArrowPos = new Vector2(-436f, 93f);
+    [SerializeField] private Vector2 volumeArrowPos = new Vector2(-328f, -31f);
+    [SerializeField] private Vector2 musicArrowPos = new Vector2(-328f, -151f);
+    [SerializeField] private Vector2 quitArrowPos = new Vector2(-188f, -287f);
+
+    [Header("Audio")]
     [SerializeField] private AudioClip changeSound;
     [SerializeField] private AudioClip interactSound;
+
+    [Header("References")]
+    [SerializeField] private MainMenuController mainMenuController;
+
     private RectTransform arrow;
-    private int currentPosition;
+    private int currentPosition = 0;
+    private const int TOTAL_OPTIONS = 5; // Play, Character, Volume, Music, Quit
+
+    // Menu option indices
+    private const int PLAY = 0;
+    private const int CHARACTER = 1;
+    private const int VOLUME = 2;
+    private const int MUSIC = 3;
+    private const int QUIT = 4;
 
     private void Awake()
     {
         arrow = GetComponent<RectTransform>();
     }
+
     private void OnEnable()
     {
         currentPosition = 0;
-        ChangePosition(0);
+        UpdateArrowPosition();
     }
+
     private void Update()
     {
-        //Change the position of the selection arrow
+        // Navigate Up/Down
         if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
             ChangePosition(-1);
         if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
             ChangePosition(1);
 
-        //Interact with current option
-        if (Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.E))
+        // Interact with current option
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.E))
             Interact();
     }
 
-    private void ChangePosition(int _change)
+    private void ChangePosition(int change)
     {
-        currentPosition += _change;
+        currentPosition += change;
 
-        if (_change != 0)
-            SoundManager.instance.PlaySound(changeSound);
-
+        // Wrap around
         if (currentPosition < 0)
-            currentPosition = buttons.Length - 1;
-        else if (currentPosition > buttons.Length - 1)
+            currentPosition = TOTAL_OPTIONS - 1;
+        else if (currentPosition >= TOTAL_OPTIONS)
             currentPosition = 0;
 
-        AssignPosition();
+        PlayChangeSound();
+        UpdateArrowPosition();
     }
-    private void AssignPosition()
+
+    private void UpdateArrowPosition()
     {
-        //Assign the Y position of the current option to the arrow (basically moving it up and down)
-        arrow.position = new Vector3(arrow.position.x, buttons[currentPosition].position.y);
+        if (arrow == null) return;
+
+        Vector2 targetPos = currentPosition switch
+        {
+            PLAY => playArrowPos,
+            CHARACTER => characterArrowPos,
+            VOLUME => volumeArrowPos,
+            MUSIC => musicArrowPos,
+            QUIT => quitArrowPos,
+            _ => playArrowPos
+        };
+
+        arrow.anchoredPosition = targetPos;
     }
+
     private void Interact()
     {
-        SoundManager.instance.PlaySound(interactSound);
+        PlayInteractSound();
 
-        //Access the button component on each option and call its function
-        buttons[currentPosition].GetComponent<Button>().onClick.Invoke();
+        if (mainMenuController == null)
+        {
+            Debug.LogError("MainMenuController is NOT assigned in SelectionArrow!");
+            return;
+        }
+
+        switch (currentPosition)
+        {
+            case PLAY:
+                mainMenuController.PlayGame();
+                break;
+            case CHARACTER:
+                mainMenuController.ShowCharacterSelect();
+                break;
+            case VOLUME:
+                mainMenuController.SoundVolume();
+                break;
+            case MUSIC:
+                mainMenuController.MusicVolume();
+                break;
+            case QUIT:
+                mainMenuController.QuitGame();
+                break;
+        }
+    }
+
+    private void PlayChangeSound()
+    {
+        if (changeSound != null && SoundManager.instance != null)
+            SoundManager.instance.PlaySound(changeSound);
+    }
+
+    private void PlayInteractSound()
+    {
+        if (interactSound != null && SoundManager.instance != null)
+            SoundManager.instance.PlaySound(interactSound);
     }
 }

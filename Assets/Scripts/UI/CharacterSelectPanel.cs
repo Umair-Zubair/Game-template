@@ -10,6 +10,7 @@ public class CharacterSelectPanel : MonoBehaviour
     [Header("Character Buttons")]
     [SerializeField] private Button knightButton;
     [SerializeField] private Button dragonButton;
+    [SerializeField] private Button newDragonButton;
     [SerializeField] private Button backButton;
 
     [Header("Selection Arrow")]
@@ -18,7 +19,7 @@ public class CharacterSelectPanel : MonoBehaviour
     // Arrow Y positions for each option: 0=Knight, 1=Dragon, 2=Back
     [SerializeField] private float knightArrowY = 157f;
     [SerializeField] private float dragonArrowY = -73f;
-    [SerializeField] private float backArrowY = -200f; // User should adjust this in Inspector
+    [SerializeField] private float backArrowY = -267f;
     
     private int currentPosition = 0; // 0=Knight, 1=Dragon, 2=Back
     private const int TOTAL_OPTIONS = 3;
@@ -33,7 +34,8 @@ public class CharacterSelectPanel : MonoBehaviour
     [SerializeField] private Image dragonPreviewImage;
 
     [Header("Audio")]
-    [SerializeField] private AudioClip selectSound;
+    [SerializeField] private AudioClip changeSound;
+    [SerializeField] private AudioClip interactSound;
 
     [Header("References")]
     [SerializeField] private MainMenuController mainMenuController;
@@ -41,6 +43,15 @@ public class CharacterSelectPanel : MonoBehaviour
     private const string SELECTED_CHARACTER_KEY = "SelectedCharacter";
     private const int DRAGON_INDEX = 0;
     private const int KNIGHT_INDEX = 1;
+    
+    // Cooldown protection
+    private float lastInteractionTime = 0f;
+    private const float INTERACTION_COOLDOWN = 0.15f;
+    
+    // Original scales for proper scaling
+    private Vector3 knightOriginalScale;
+    private Vector3 dragonOriginalScale;
+    private Vector3 newDragonOriginalScale;
 
     private void Start()
     {
@@ -53,6 +64,11 @@ public class CharacterSelectPanel : MonoBehaviour
         
         if (backButton != null)
             backButton.onClick.AddListener(Close);
+
+        // Store original scales
+        if (knightButton != null) knightOriginalScale = knightButton.transform.localScale;
+        if (dragonButton != null) dragonOriginalScale = dragonButton.transform.localScale;
+        if (newDragonButton != null) newDragonOriginalScale = newDragonButton.transform.localScale;
 
         // Show current selection and update arrow
         currentPosition = 0; // Start on Knight
@@ -71,6 +87,13 @@ public class CharacterSelectPanel : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.E))
             Interact();
     }
+    
+    private bool CanInteract()
+    {
+        if (Time.unscaledTime - lastInteractionTime < INTERACTION_COOLDOWN) return false;
+        lastInteractionTime = Time.unscaledTime;
+        return true;
+    }
 
     private void ChangePosition(int change)
     {
@@ -82,7 +105,7 @@ public class CharacterSelectPanel : MonoBehaviour
         else if (currentPosition >= TOTAL_OPTIONS)
             currentPosition = 0;
         
-        PlaySelectSound();
+        PlayChangeSound();
         UpdateArrowPosition();
     }
 
@@ -102,7 +125,9 @@ public class CharacterSelectPanel : MonoBehaviour
 
     private void Interact()
     {
-        PlaySelectSound();
+        if (!CanInteract()) return;
+        
+        PlayInteractSound();
         
         switch (currentPosition)
         {
@@ -112,6 +137,7 @@ public class CharacterSelectPanel : MonoBehaviour
         }
     }
 
+
     /// <summary>
     /// Selects the Knight character.
     /// </summary>
@@ -120,7 +146,7 @@ public class CharacterSelectPanel : MonoBehaviour
         PlayerPrefs.SetInt(SELECTED_CHARACTER_KEY, KNIGHT_INDEX);
         PlayerPrefs.Save();
 
-        PlaySelectSound();
+        PlayInteractSound();
         UpdateSelectionVisuals();
 
         Debug.Log("Knight selected!");
@@ -134,7 +160,7 @@ public class CharacterSelectPanel : MonoBehaviour
         PlayerPrefs.SetInt(SELECTED_CHARACTER_KEY, DRAGON_INDEX);
         PlayerPrefs.Save();
 
-        PlaySelectSound();
+        PlayInteractSound();
         UpdateSelectionVisuals();
 
         Debug.Log("Dragon selected!");
@@ -166,23 +192,19 @@ public class CharacterSelectPanel : MonoBehaviour
         if (dragonSelectedIndicator != null)
             dragonSelectedIndicator.SetActive(selected == DRAGON_INDEX);
 
-        // Optional: Adjust button colors or scale for better feedback
-        UpdateButtonVisual(knightButton, selected == KNIGHT_INDEX);
-        UpdateButtonVisual(dragonButton, selected == DRAGON_INDEX);
+        // Scale buttons - pass their original scales
+        UpdateButtonVisual(knightButton, knightOriginalScale, selected == KNIGHT_INDEX);
+        UpdateButtonVisual(dragonButton, dragonOriginalScale, selected == DRAGON_INDEX);
+        UpdateButtonVisual(newDragonButton, newDragonOriginalScale, selected == DRAGON_INDEX);
     }
 
-    private void UpdateButtonVisual(Button button, bool isSelected)
+    private void UpdateButtonVisual(Button button, Vector3 originalScale, bool isSelected)
     {
         if (button == null) return;
 
-        // Scale selected button slightly larger
-        float scale = isSelected ? 1.1f : 1.0f;
-        button.transform.localScale = Vector3.one * scale;
-
-        // You can also change colors here if desired
-        // ColorBlock colors = button.colors;
-        // colors.normalColor = isSelected ? Color.yellow : Color.white;
-        // button.colors = colors;
+        // Scale up 10% when selected, restore to original when not
+        float multiplier = isSelected ? 1.1f : 1.0f;
+        button.transform.localScale = originalScale * multiplier;
     }
 
     /// <summary>
@@ -218,10 +240,16 @@ public class CharacterSelectPanel : MonoBehaviour
         }
     }
 
-    private void PlaySelectSound()
+    private void PlayChangeSound()
     {
-        if (selectSound != null && SoundManager.instance != null)
-            SoundManager.instance.PlaySound(selectSound);
+        if (changeSound != null && SoundManager.instance != null)
+            SoundManager.instance.PlaySound(changeSound);
+    }
+
+    private void PlayInteractSound()
+    {
+        if (interactSound != null && SoundManager.instance != null)
+            SoundManager.instance.PlaySound(interactSound);
     }
 
     private void OnDestroy()
