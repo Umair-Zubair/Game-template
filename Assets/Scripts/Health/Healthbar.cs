@@ -23,7 +23,7 @@ public class Healthbar : MonoBehaviour
     {
         // Auto-find if missing
         if (playerHealth == null)
-            playerHealth = FindObjectOfType<Health>();
+            playerHealth = FindFirstObjectByType<Health>();
 
         if (playerHealth != null)
             totalhealthBar.fillAmount = playerHealth.currentHealth / 10;

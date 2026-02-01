@@ -24,7 +24,7 @@ public class Health : MonoBehaviour
         if (components == null || components.Length == 0)
         {
             List<Behaviour> foundComponents = new List<Behaviour>();
-            if (GetComponent<PlayerMovement>()) foundComponents.Add(GetComponent<PlayerMovement>());
+            if (GetComponent<PlayerController>()) foundComponents.Add(GetComponent<PlayerController>());
             if (GetComponent<MeleeAttack>()) foundComponents.Add(GetComponent<MeleeAttack>());
             if (GetComponent<DragonAttack>()) foundComponents.Add(GetComponent<DragonAttack>());
             if (GetComponent<PlayerShield>()) foundComponents.Add(GetComponent<PlayerShield>()); // <--- IMPORTANT
