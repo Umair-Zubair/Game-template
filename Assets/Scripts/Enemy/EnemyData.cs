@@ -42,10 +42,10 @@ public class EnemyData : ScriptableObject
     public float dodgeCooldown = 3f;
     
     [Tooltip("Range to detect incoming projectiles")]
-    public float projectileDetectionRange = 3f;
+    public float projectileDetectionRange = 5f;
     
     [Tooltip("Jump force for dodge jump")]
-    public float dodgeJumpForce = 10f;
+    public float dodgeJumpForce = 12f;
 
     [Header("Physics")]
     [Tooltip("Default gravity scale")]

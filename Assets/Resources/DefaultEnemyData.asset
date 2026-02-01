@@ -21,8 +21,11 @@ MonoBehaviour:
   attackCooldown: 1.5
   damage: 1
   dodgeDistance: 2
-  dodgeCooldown: 3
+  dodgeCooldown: 1
   projectileDetectionRange: 3
   dodgeJumpForce: 8
+  gravityScale: 2.5
+  fallGravityMultiplier: 1.5
+  maxFallSpeed: 20
   stunDuration: 0.5
   patrolIdleDuration: 1

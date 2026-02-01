@@ -220,35 +220,39 @@ public class EnemyController : MonoBehaviour
 
     public bool IncomingProjectileDetected()
     {
-        // 1. PRIMARY CHECK: designate Projectile Layer (still useful for performance)
-        Collider2D projectile = Physics2D.OverlapCircle(
-            transform.position,
-            Data.projectileDetectionRange,
-            projectileLayer
-        );
+        // SCAN NEARBY AREA for any player projectiles
+        Collider2D[] allNearby = Physics2D.OverlapCircleAll(transform.position, Data.projectileDetectionRange);
         
-        // 2. ROBUST FALLBACK: Scan nearby for anything that looks like a threat
-        // We use name and component checks to avoid crashing on missing tags/layers.
-        if (projectile == null)
+        foreach(var c in allNearby)
         {
-            Collider2D[] allNearby = Physics2D.OverlapCircleAll(transform.position, Data.projectileDetectionRange);
-            foreach(var c in allNearby)
+            // Ignore ourselves only
+            if (c.gameObject == gameObject) continue;
+            
+            // --- IGNORE ENEMY DAMAGE/PROJECTILES ---
+            if (c.GetComponent<EnemyProjectile>() != null || c.GetComponent<EnemyDamage>() != null)
             {
-                if (c.gameObject == gameObject || c.isTrigger) continue;
-                
-                // If it has a Projectile script or a suspicious name, it's a threat!
-                bool isProjectileComp = c.GetComponent<EnemyProjectile>() != null;
-                string n = c.name.ToLower();
-                
-                if (isProjectileComp || n.Contains("fire") || n.Contains("proj") || n.Contains("ball") || n.Contains("arrow"))
-                {
-                    projectile = c;
-                    break;
-                }
+                continue;
+            }
+
+            // --- DETECT PLAYER PROJECTILES ---
+            // Check for Projectile script (Player's fireball uses this)
+            Projectile playerProj = c.GetComponent<Projectile>();
+            if (playerProj != null)
+            {
+                Debug.Log($"[DETECTION] Found PLAYER threat: {c.name} at {c.transform.position}");
+                return true; 
+            }
+            
+            // Fallback: name-based detection for any "fireball" objects
+            string n = c.name.ToLower();
+            if (n.Contains("fireball") || n.Contains("player") && n.Contains("proj"))
+            {
+                Debug.Log($"[DETECTION] Found threat by NAME: {c.name}");
+                return true;
             }
         }
         
-        return projectile != null;
+        return false;
     }
 
     public int GetDirectionToPlayer()
@@ -264,7 +268,17 @@ public class EnemyController : MonoBehaviour
     public void MoveInDirection(int direction, float speed)
     {
         FaceDirection(direction);
-        transform.position += new Vector3(direction * speed * Time.deltaTime, 0, 0);
+        // --- FIX: Velocity-based movement ---
+        // We apply speed to X but preserve Y so gravity works correctly.
+        if (RB != null)
+        {
+            RB.linearVelocity = new Vector2(direction * speed, RB.linearVelocity.y);
+        }
+        else
+        {
+            // Fallback if RB is missing (though it shouldn't be)
+            transform.position += new Vector3(direction * speed * Time.deltaTime, 0, 0);
+        }
     }
 
     public void MoveTowardPlayer(float speed)
@@ -298,7 +312,11 @@ public class EnemyController : MonoBehaviour
     public void Stop()
     {
         if (RB != null)
-            RB.linearVelocity = Vector2.zero;
+        {
+            // --- FIX: ONLY STOP HORIZONTAL MOVEMENT ---
+            // If we set Y to 0, the enemy floats in the air.
+            RB.linearVelocity = new Vector2(0, RB.linearVelocity.y);
+        }
     }
 
     public void Jump(float jumpForce)
@@ -320,23 +338,16 @@ public class EnemyController : MonoBehaviour
 
     public bool IsGrounded()
     {
-        // Use a slightly narrower box to prevent catching on walls
-        float skinWidth = 0.1f;
-        Vector2 boxSize = new Vector2(Collider.bounds.size.x - skinWidth, 0.1f);
-        // Start center slightly INSIDE the collider to avoid Raycast/BoxCast issues starting on surface
-        Vector2 boxCenter = new Vector2(Collider.bounds.center.x, Collider.bounds.min.y + 0.05f);
-
+        // Better grounding check using BoxCast
+        float extraHeight = 0.15f;
         RaycastHit2D hit = Physics2D.BoxCast(
-            boxCenter,
-            boxSize,
-            0f,
-            Vector2.down,
-            0.15f,
+            Collider.bounds.center, 
+            Collider.bounds.size, 
+            0f, 
+            Vector2.down, 
+            extraHeight, 
             groundLayer
         );
-
-        Debug.Log($"[GROUNDED] BoxCast from {boxCenter}, size {boxSize}, hit: {hit.collider != null}, groundLayer: {groundLayer.value}");
-        
         return hit.collider != null;
     }
 
@@ -383,15 +394,9 @@ public class EnemyController : MonoBehaviour
     /// </summary>
     private void SelectNextAttackPattern()
     {
+        // Force single fire for consistency as requested by user
+        CurrentAttackPattern = AttackPattern.Single;
         attackCounter++;
-        
-        // Pattern cycle: Single, Single, Burst, Single, Single, Spread, repeat
-        if (attackCounter % 6 == 3)
-            CurrentAttackPattern = AttackPattern.Burst;
-        else if (attackCounter % 6 == 0)
-            CurrentAttackPattern = AttackPattern.Spread;
-        else
-            CurrentAttackPattern = AttackPattern.Single;
     }
 
     private IEnumerator ExecuteAttackPattern()

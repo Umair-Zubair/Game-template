@@ -33,9 +33,12 @@ public class DragonAttack : MonoBehaviour
         anim.SetTrigger("attack");
         cooldownTimer = 0;
 
-        fireballs[FindFireball()].transform.position = firePoint.position;
+        int index = FindFireball();
+        GameObject fireball = fireballs[index];
+        
+        fireball.transform.position = firePoint.position;
         // Ensure your Projectile script is set up to handle the direction
-        fireballs[FindFireball()].GetComponent<Projectile>().SetDirection(Mathf.Sign(transform.localScale.x));
+        fireball.GetComponent<Projectile>().SetDirection(Mathf.Sign(transform.localScale.x));
     }
     private int FindFireball()
     {

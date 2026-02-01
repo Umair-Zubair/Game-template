@@ -314,7 +314,7 @@ public class RetreatEnemyState : IEnemyState
 public class DodgeEnemyState : IEnemyState
 {
     private float dodgeTimer;
-    private const float DODGE_DURATION = 0.5f; // Time to wait before transitioning
+    private const float DODGE_DURATION = 0.4f; // Slightly shorter wait
 
     public void OnEnter(EnemyController enemy)
     {
@@ -330,8 +330,8 @@ public class DodgeEnemyState : IEnemyState
     {
         dodgeTimer += UnityEngine.Time.deltaTime;
 
-        // Wait for jump to clear the floor (0.2s) before checking if we landed
-        if (dodgeTimer >= DODGE_DURATION || (dodgeTimer > 0.2f && enemy.IsGrounded()))
+        // Transition back as soon as we land or timer expires
+        if (dodgeTimer >= DODGE_DURATION || (dodgeTimer > 0.15f && enemy.IsGrounded()))
         {
             // Dodge complete, return to chase or attack
             if (enemy.PlayerInAttackRange() && enemy.CanAttack())
