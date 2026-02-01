@@ -13,6 +13,13 @@ public class IdleEnemyState : IEnemyState
 
     public void OnUpdate(EnemyController enemy)
     {
+        // Transition to dodge if projectile detected
+        if (enemy.IncomingProjectileDetected() && enemy.CanDodge())
+        {
+            enemy.StateMachine.ChangeState(enemy.DodgeState, enemy);
+            return;
+        }
+
         // Transition to chase if player detected
         if (enemy.PlayerInDetectionRange())
         {
@@ -41,7 +48,14 @@ public class PatrolEnemyState : IEnemyState
 
     public void OnUpdate(EnemyController enemy)
     {
-        // Priority 1: Player detected -> Chase
+        // Priority 1: Incoming projectile -> Dodge
+        if (enemy.IncomingProjectileDetected() && enemy.CanDodge())
+        {
+            enemy.StateMachine.ChangeState(enemy.DodgeState, enemy);
+            return;
+        }
+
+        // Priority 2: Player detected -> Chase
         if (enemy.PlayerInDetectionRange())
         {
             enemy.StateMachine.ChangeState(enemy.ChaseState, enemy);
@@ -194,10 +208,16 @@ public class AttackEnemyState : IEnemyState
     {
         attackTimer += UnityEngine.Time.deltaTime;
 
+        // EMERGENCY DODGE during windup
+        if (!hasFired && enemy.IncomingProjectileDetected() && enemy.CanDodge())
+        {
+            enemy.StateMachine.ChangeState(enemy.DodgeState, enemy);
+            return;
+        }
+
         // Fire after animation delay
         if (!hasFired && attackTimer >= FIRE_DELAY)
         {
-            UnityEngine.Debug.Log($"[ATTACK STATE] Firing after {attackTimer:F2}s delay");
             enemy.ExecuteAttack();
             enemy.ResetAttackCooldown(); // Reset cooldown AFTER firing, not before
             hasFired = true;
@@ -206,7 +226,6 @@ public class AttackEnemyState : IEnemyState
         // Wait for attack to complete
         if (hasFired && !enemy.IsAttacking)
         {
-            UnityEngine.Debug.Log("[ATTACK STATE] Attack complete, transitioning...");
             // Attack complete, transition to appropriate state
             if (enemy.PlayerTooClose())
             {
@@ -299,20 +318,19 @@ public class DodgeEnemyState : IEnemyState
 
     public void OnEnter(EnemyController enemy)
     {
+        UnityEngine.Debug.Log("[DODGE STATE] Entered DodgeState! Attempting jump...");
         dodgeTimer = 0;
         enemy.ResetDodgeCooldown();
         
         // Jump to dodge!
         enemy.Jump(enemy.Data.dodgeJumpForce);
-        
-        UnityEngine.Debug.Log("[DODGE] Jumping to avoid projectile!");
     }
 
     public void OnUpdate(EnemyController enemy)
     {
         dodgeTimer += UnityEngine.Time.deltaTime;
 
-        // Wait for jump to complete or timeout
+        // Wait for jump to clear the floor (0.2s) before checking if we landed
         if (dodgeTimer >= DODGE_DURATION || (dodgeTimer > 0.2f && enemy.IsGrounded()))
         {
             // Dodge complete, return to chase or attack

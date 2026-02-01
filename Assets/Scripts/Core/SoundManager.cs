@@ -8,6 +8,9 @@ public class SoundManager : MonoBehaviour
 
     private void Awake()
     {
+        // Fix for DontDestroyOnLoad: Ensure we are at the root of the hierarchy
+        if (transform.parent != null) transform.SetParent(null);
+
         soundSource = GetComponent<AudioSource>();
         
         // Safely get music source from child if it exists

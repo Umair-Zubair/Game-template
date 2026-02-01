@@ -45,7 +45,17 @@ public class EnemyData : ScriptableObject
     public float projectileDetectionRange = 3f;
     
     [Tooltip("Jump force for dodge jump")]
-    public float dodgeJumpForce = 8f;
+    public float dodgeJumpForce = 10f;
+
+    [Header("Physics")]
+    [Tooltip("Default gravity scale")]
+    public float gravityScale = 2.0f;
+    
+    [Tooltip("Multiplier applied when falling for a snappier jump")]
+    public float fallGravityMultiplier = 1.2f;
+    
+    [Tooltip("Terminal velocity")]
+    public float maxFallSpeed = 20f;
 
     [Header("Stun")]
     [Tooltip("Duration of stun after being hit")]

@@ -12414,10 +12414,10 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 846652868}
+  - {fileID: 1893039546}
   - {fileID: 519420032}
   - {fileID: 668477925}
-  - {fileID: 1893039546}
-  - {fileID: 846652868}
   - {fileID: 1531825606}
   - {fileID: 218656635}
   m_Father: {fileID: 0}
@@ -12630,7 +12630,7 @@ MonoBehaviour:
     m_Bits: 1024
   projectileLayer:
     serializedVersion: 2
-    m_Bits: 1024
+    m_Bits: 1025
   groundLayer:
     serializedVersion: 2
     m_Bits: 256
@@ -12659,6 +12659,33 @@ MonoBehaviour:
   StunTimer: 0.5
   PatrolMovingLeft: 1
   PatrolIdleTimer: 1
+--- !u!50 &1729618512
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1729618497}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 4
 --- !u!1001 &1735797663
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13412,6 +13439,10 @@ PrefabInstance:
       propertyPath: 'components.Array.data[0]'
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 2320884371343920455, guid: 076bde4636103c540b8846bd470233c9, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2320884371343920477, guid: 076bde4636103c540b8846bd470233c9, type: 3}
       propertyPath: m_Enabled
       value: 0
@@ -13494,6 +13525,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2320884371343920474, guid: 076bde4636103c540b8846bd470233c9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1729618505}
+    - targetCorrespondingSourceObject: {fileID: 2320884371343920474, guid: 076bde4636103c540b8846bd470233c9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1729618512}
   m_SourcePrefab: {fileID: 100100000, guid: 076bde4636103c540b8846bd470233c9, type: 3}
 --- !u!1 &1836657495
 GameObject:

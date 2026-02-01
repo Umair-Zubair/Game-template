@@ -72,6 +72,8 @@ public class EnemyController : MonoBehaviour
     public bool IsAttacking { get; private set; } = false;
 
     private Vector3 initScale;
+    private Coroutine attackCoroutine;
+    private int lastAttackFrame = -1;
 
     #region Unity Lifecycle
 
@@ -82,7 +84,19 @@ public class EnemyController : MonoBehaviour
         Anim = GetComponent<Animator>();
         Collider = GetComponent<BoxCollider2D>();
         Health = GetComponent<Health>();
+
+        if (RB == null) UnityEngine.Debug.LogError("[ENEMY] Rigidbody2D MISSING! Add one to " + gameObject.name);
+        if (Collider == null) UnityEngine.Debug.LogError("[ENEMY] BoxCollider2D MISSING! Add one to " + gameObject.name);
+        else if (Collider.isTrigger) UnityEngine.Debug.LogWarning("[ENEMY] Collider is set to TRIGGER! Uncheck 'Is Trigger' so he doesn't fall through floor.");
         
+        // Match player physics initialization
+        if (RB != null)
+        {
+            RB.gravityScale = data.gravityScale;
+            RB.freezeRotation = true;
+            RB.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+        }
+
         initScale = transform.localScale;
 
         // Initialize state machine
@@ -103,6 +117,13 @@ public class EnemyController : MonoBehaviour
         if (playerObj != null)
             Player = playerObj.transform;
 
+        // Initialize timers so AI can act immediately
+        AttackCooldownTimer = data.attackCooldown;
+        DodgeCooldownTimer = data.dodgeCooldown;
+        
+        UnityEngine.Debug.Log($"[ENEMY] Ready! Attack CD: {AttackCooldownTimer}, Dodge CD: {DodgeCooldownTimer}");
+        UnityEngine.Debug.Log($"[ENEMY] Layers -> Ground: {LayerMask.LayerToName((int)Mathf.Log(groundLayer.value, 2))}, Projectile: {LayerMask.LayerToName((int)Mathf.Log(projectileLayer.value, 2))}");
+
         // Start in idle or patrol
         StateMachine.Initialize(PatrolState, this);
     }
@@ -111,11 +132,37 @@ public class EnemyController : MonoBehaviour
     {
         UpdateTimers();
         StateMachine.Update(this);
+        
+        // Debug current state
+        if (Time.frameCount % 60 == 0) // Log once per sec approx
+            UnityEngine.Debug.Log($"[AI] Current State: {StateMachine.CurrentState.GetType().Name}");
     }
 
     private void FixedUpdate()
     {
         StateMachine.FixedUpdate(this);
+        ApplyGravity();
+    }
+
+    private void ApplyGravity()
+    {
+        if (RB == null) return;
+
+        // Apply snappier falling physics like the player
+        if (RB.linearVelocity.y < 0)
+        {
+            RB.gravityScale = Data.gravityScale * Data.fallGravityMultiplier;
+        }
+        else
+        {
+            RB.gravityScale = Data.gravityScale;
+        }
+
+        // Clamp fall speed
+        if (RB.linearVelocity.y < -Data.maxFallSpeed)
+        {
+            RB.linearVelocity = new Vector2(RB.linearVelocity.x, -Data.maxFallSpeed);
+        }
     }
 
     private void UpdateTimers()
@@ -173,16 +220,32 @@ public class EnemyController : MonoBehaviour
 
     public bool IncomingProjectileDetected()
     {
-        // Check for player projectiles in detection range
+        // 1. PRIMARY CHECK: designate Projectile Layer (still useful for performance)
         Collider2D projectile = Physics2D.OverlapCircle(
             transform.position,
             Data.projectileDetectionRange,
             projectileLayer
         );
-
-        if (projectile != null)
+        
+        // 2. ROBUST FALLBACK: Scan nearby for anything that looks like a threat
+        // We use name and component checks to avoid crashing on missing tags/layers.
+        if (projectile == null)
         {
-            Debug.Log("[DODGE CHECK] Player projectile detected! Can dodge: " + CanDodge());
+            Collider2D[] allNearby = Physics2D.OverlapCircleAll(transform.position, Data.projectileDetectionRange);
+            foreach(var c in allNearby)
+            {
+                if (c.gameObject == gameObject || c.isTrigger) continue;
+                
+                // If it has a Projectile script or a suspicious name, it's a threat!
+                bool isProjectileComp = c.GetComponent<EnemyProjectile>() != null;
+                string n = c.name.ToLower();
+                
+                if (isProjectileComp || n.Contains("fire") || n.Contains("proj") || n.Contains("ball") || n.Contains("arrow"))
+                {
+                    projectile = c;
+                    break;
+                }
+            }
         }
         
         return projectile != null;
@@ -240,23 +303,41 @@ public class EnemyController : MonoBehaviour
 
     public void Jump(float jumpForce)
     {
-        if (RB != null && IsGrounded())
+        bool grounded = IsGrounded();
+        Debug.Log($"[JUMP] Jump called! Grounded: {grounded}, JumpForce: {jumpForce}, RB: {RB != null}");
+        
+        if (RB != null && grounded)
         {
+            // Reset vertical velocity for consistent jump height
             RB.linearVelocity = new Vector2(RB.linearVelocity.x, jumpForce);
+            Debug.Log($"[JUMP] Jump applied! New velocity: {RB.linearVelocity}");
+        }
+        else if (!grounded)
+        {
+            Debug.LogWarning("[JUMP] Cannot jump - NOT GROUNDED!");
         }
     }
 
     public bool IsGrounded()
     {
-        // Check if enemy is touching ground
-        return Physics2D.BoxCast(
-            Collider.bounds.center,
-            Collider.bounds.size,
+        // Use a slightly narrower box to prevent catching on walls
+        float skinWidth = 0.1f;
+        Vector2 boxSize = new Vector2(Collider.bounds.size.x - skinWidth, 0.1f);
+        // Start center slightly INSIDE the collider to avoid Raycast/BoxCast issues starting on surface
+        Vector2 boxCenter = new Vector2(Collider.bounds.center.x, Collider.bounds.min.y + 0.05f);
+
+        RaycastHit2D hit = Physics2D.BoxCast(
+            boxCenter,
+            boxSize,
             0f,
             Vector2.down,
-            0.1f,
+            0.15f,
             groundLayer
         );
+
+        Debug.Log($"[GROUNDED] BoxCast from {boxCenter}, size {boxSize}, hit: {hit.collider != null}, groundLayer: {groundLayer.value}");
+        
+        return hit.collider != null;
     }
 
     #endregion
@@ -284,8 +365,17 @@ public class EnemyController : MonoBehaviour
     /// </summary>
     public void ExecuteAttack()
     {
+        // SYNC GUARD: Prevent multiple calls in the same frame or if already attacking
+        if (IsAttacking || Time.frameCount == lastAttackFrame) return;
+        lastAttackFrame = Time.frameCount;
+
+        if (attackCoroutine != null)
+        {
+            StopCoroutine(attackCoroutine);
+        }
+        
         SelectNextAttackPattern();
-        StartCoroutine(ExecuteAttackPattern());
+        attackCoroutine = StartCoroutine(ExecuteAttackPattern());
     }
 
     /// <summary>
@@ -302,8 +392,6 @@ public class EnemyController : MonoBehaviour
             CurrentAttackPattern = AttackPattern.Spread;
         else
             CurrentAttackPattern = AttackPattern.Single;
-            
-        Debug.Log($"[ENEMY] Attack #{attackCounter}, Pattern: {CurrentAttackPattern}");
     }
 
     private IEnumerator ExecuteAttackPattern()
@@ -329,8 +417,12 @@ public class EnemyController : MonoBehaviour
                 FireSpreadProjectiles();
                 break;
         }
-
+        
+        // Wait a small buffer frame to ensure state transitions complete properly
+        yield return new WaitForSeconds(0.1f);
+        
         IsAttacking = false;
+        ResetAttackCooldown(); // Reset cooldown ONLY when the pattern is fully done
     }
 
     /// <summary>
@@ -338,8 +430,6 @@ public class EnemyController : MonoBehaviour
     /// </summary>
     public void FireSingleProjectile()
     {
-        Debug.Log($"[ENEMY] FireSingleProjectile() called! Stack: {System.Environment.StackTrace}");
-        
         if (attackSound != null)
             SoundManager.instance.PlaySound(attackSound);
 
@@ -348,8 +438,12 @@ public class EnemyController : MonoBehaviour
         {
             projectiles[index].transform.position = firePoint.position;
             projectiles[index].transform.rotation = Quaternion.identity;
-            projectiles[index].GetComponent<EnemyProjectile>()?.ActivateProjectile();
-            Debug.Log($"[ENEMY] Fireball {index} activated at {firePoint.position}");
+            
+            EnemyProjectile projScript = projectiles[index].GetComponent<EnemyProjectile>();
+            if (projScript != null)
+            {
+                projScript.ActivateProjectile();
+            }
         }
     }
 
@@ -413,19 +507,24 @@ public class EnemyController : MonoBehaviour
 
     public bool CanAttack()
     {
-        bool canAttack = AttackCooldownTimer >= Data.attackCooldown && !IsAttacking;
-        Debug.Log($"[COOLDOWN] CanAttack? {canAttack} (timer: {AttackCooldownTimer:F2} / {Data.attackCooldown}, IsAttacking: {IsAttacking})");
-        return canAttack;
+        return AttackCooldownTimer >= Data.attackCooldown && !IsAttacking;
     }
 
     public bool CanDodge()
     {
-        return DodgeCooldownTimer >= Data.dodgeCooldown;
+        bool onCooldown = DodgeCooldownTimer < Data.dodgeCooldown;
+        bool isBusy = IsAttacking;
+        
+        if (IncomingProjectileDetected() && (onCooldown || isBusy))
+        {
+            Debug.Log($"[CAN_DODGE] False. Cooldown: {DodgeCooldownTimer:F2}/{Data.dodgeCooldown} (OnCooldown: {onCooldown}), Busy: {isBusy}");
+        }
+        
+        return !onCooldown && !isBusy;
     }
 
     public void ResetAttackCooldown()
     {
-        Debug.Log("[COOLDOWN] Attack cooldown RESET to 0");
         AttackCooldownTimer = 0;
     }
 

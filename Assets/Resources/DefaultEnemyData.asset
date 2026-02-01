@@ -15,9 +15,9 @@ MonoBehaviour:
   patrolSpeed: 2
   chaseSpeed: 3.5
   retreatSpeed: 3
-  detectionRange: 10
-  attackRange: 8
-  retreatRange: 5
+  detectionRange: 15
+  attackRange: 10
+  retreatRange: 6
   attackCooldown: 1.5
   damage: 1
   dodgeDistance: 2
