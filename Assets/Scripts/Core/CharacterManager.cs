@@ -3,7 +3,7 @@ using UnityEngine;
 public class CharacterManager : MonoBehaviour
 {
     [Header("Characters")]
-    [SerializeField] private GameObject[] characterPrefabs; // 0: Dragon, 1: Knight
+    [SerializeField] private GameObject[] characterPrefabs; // 0: Blob Ranged, 1: Blob Melee
     [SerializeField] private Transform spawnPoint;
 
     [Header("Dependencies")]
@@ -14,9 +14,9 @@ public class CharacterManager : MonoBehaviour
     private void Start()
     {
         // Read selected character from PlayerPrefs (set by Main Menu)
-        // Default to Dragon (0) if no selection was made
+        // Default to Blob Ranged (0) if no selection was made
         int selectedCharacter = PlayerPrefs.GetInt(SELECTED_CHARACTER_KEY, 0);
-        Debug.Log($"CharacterManager: Spawning character at index {selectedCharacter} (0=Dragon, 1=Knight)");
+        Debug.Log($"CharacterManager: Spawning character at index {selectedCharacter} (0=Blob Ranged, 1=Blob Melee)");
         SpawnCharacter(selectedCharacter);
     }
 

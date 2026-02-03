@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 8515013598318051268}
   - component: {fileID: 6219983268898607016}
   - component: {fileID: 3326890727961253731}
-  - component: {fileID: 6209452418348471089}
   - component: {fileID: 4065782285153880019}
   - component: {fileID: 6734524273785198305}
   - component: {fileID: 215422135787915289}
@@ -210,32 +209,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &6209452418348471089
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1935310566284295070}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bad90225a3078c64db7ad940e9a90d3c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  speed: 10
-  jumpPower: 20
-  coyoteTime: 0.25
-  extraJumps: 1
-  wallJumpX: 0
-  wallJumpY: 0
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 256
-  wallLayer:
-    serializedVersion: 2
-    m_Bits: 512
-  jumpSound: {fileID: 8300000, guid: 4b53e1ebd5cc8f5439ab8622309e7abc, type: 3}
-  isBlocking: 0
 --- !u!114 &4065782285153880019
 MonoBehaviour:
   m_ObjectHideFlags: 0

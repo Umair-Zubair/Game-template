@@ -2357,7 +2357,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterManager
   characterPrefabs:
   - {fileID: 2495754272244540118, guid: 24c0db1709c28d64fb401edae19c3b54, type: 3}
-  - {fileID: 7340696841729341296, guid: 5a7d97501c540a0498c0048f787ba988, type: 3}
+  - {fileID: 1935310566284295070, guid: beaa6f07a815e2c4ea9e4dee9fe7a1ef, type: 3}
   spawnPoint: {fileID: 271092032}
   healthBar: {fileID: 27520355}
 --- !u!1 &221679101
