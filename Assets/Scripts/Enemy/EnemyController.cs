@@ -32,6 +32,14 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private GameObject[] projectiles;
     [SerializeField] private AudioClip attackSound;
 
+    [Header("Melee Attack")]
+    [Tooltip("Attack point for melee hitbox detection (leave empty for ranged enemies)")]
+    [SerializeField] private Transform meleeAttackPoint;
+    [Tooltip("Radius of melee attack detection")]
+    [SerializeField] private float meleeAttackRadius = 1.5f;
+    [Tooltip("Layer for player damage detection")]
+    [SerializeField] private LayerMask playerDamageLayer;
+
     [Header("Debug")]
     public bool DebugMode = true;
 
@@ -120,9 +128,6 @@ public class EnemyController : MonoBehaviour
         // Initialize timers so AI can act immediately
         AttackCooldownTimer = data.attackCooldown;
         DodgeCooldownTimer = data.dodgeCooldown;
-        
-        UnityEngine.Debug.Log($"[ENEMY] Ready! Attack CD: {AttackCooldownTimer}, Dodge CD: {DodgeCooldownTimer}");
-        UnityEngine.Debug.Log($"[ENEMY] Layers -> Ground: {LayerMask.LayerToName((int)Mathf.Log(groundLayer.value, 2))}, Projectile: {LayerMask.LayerToName((int)Mathf.Log(projectileLayer.value, 2))}");
 
         // Start in idle or patrol
         StateMachine.Initialize(PatrolState, this);
@@ -130,12 +135,18 @@ public class EnemyController : MonoBehaviour
 
     private void Update()
     {
+        // Keep looking for player if not found yet (handles spawn timing issues)
+        if (Player == null)
+        {
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj != null)
+            {
+                Player = playerObj.transform;
+            }
+        }
+
         UpdateTimers();
         StateMachine.Update(this);
-        
-        // Debug current state
-        if (Time.frameCount % 60 == 0) // Log once per sec approx
-            UnityEngine.Debug.Log($"[AI] Current State: {StateMachine.CurrentState.GetType().Name}");
     }
 
     private void FixedUpdate()
@@ -338,6 +349,12 @@ public class EnemyController : MonoBehaviour
 
     public bool IsGrounded()
     {
+        if (Collider == null)
+        {
+            Debug.LogError("[ENEMY] BoxCollider2D is NULL! Cannot check ground.");
+            return false;
+        }
+
         // Better grounding check using BoxCast
         float extraHeight = 0.15f;
         RaycastHit2D hit = Physics2D.BoxCast(
@@ -348,6 +365,7 @@ public class EnemyController : MonoBehaviour
             extraHeight, 
             groundLayer
         );
+
         return hit.collider != null;
     }
 
@@ -385,8 +403,18 @@ public class EnemyController : MonoBehaviour
             StopCoroutine(attackCoroutine);
         }
         
-        SelectNextAttackPattern();
-        attackCoroutine = StartCoroutine(ExecuteAttackPattern());
+        // Check if this is a melee or ranged enemy
+        if (meleeAttackPoint != null)
+        {
+            // Melee enemy - perform direct attack
+            attackCoroutine = StartCoroutine(ExecuteMeleeAttackPattern());
+        }
+        else
+        {
+            // Ranged enemy - use projectile patterns
+            SelectNextAttackPattern();
+            attackCoroutine = StartCoroutine(ExecuteAttackPattern());
+        }
     }
 
     /// <summary>
@@ -428,6 +456,58 @@ public class EnemyController : MonoBehaviour
         
         IsAttacking = false;
         ResetAttackCooldown(); // Reset cooldown ONLY when the pattern is fully done
+    }
+
+    /// <summary>
+    /// Execute melee attack pattern - performs hitbox detection
+    /// </summary>
+    private IEnumerator ExecuteMeleeAttackPattern()
+    {
+        IsAttacking = true;
+
+        // Wait for animation to reach attack frame (similar to ranged)
+        yield return new WaitForSeconds(0.3f);
+
+        // Perform melee attack hitbox detection
+        PerformMeleeAttack();
+
+        // Wait for attack animation to complete
+        yield return new WaitForSeconds(0.1f);
+
+        IsAttacking = false;
+        ResetAttackCooldown();
+    }
+
+    /// <summary>
+    /// Perform melee attack with hitbox detection
+    /// </summary>
+    private void PerformMeleeAttack()
+    {
+        if (attackSound != null)
+            SoundManager.instance.PlaySound(attackSound);
+
+        if (meleeAttackPoint == null)
+        {
+            Debug.LogWarning("[MELEE] meleeAttackPoint is null! Cannot perform melee attack.");
+            return;
+        }
+
+        // Detect all colliders in melee range
+        Collider2D[] hits = Physics2D.OverlapCircleAll(
+            meleeAttackPoint.position,
+            meleeAttackRadius,
+            playerDamageLayer
+        );
+
+        foreach (var hit in hits)
+        {
+            Health playerHealth = hit.GetComponent<Health>();
+            if (playerHealth != null)
+            {
+                playerHealth.TakeDamage(Data.damage);
+                Debug.Log($"[MELEE] Hit {hit.name} for {Data.damage} damage!");
+            }
+        }
     }
 
     /// <summary>
@@ -557,17 +637,23 @@ public class EnemyController : MonoBehaviour
 
     public void SetMoving(bool isMoving)
     {
-        Anim.SetBool("moving", isMoving);
+        if (Anim != null)
+            Anim.SetBool("moving", isMoving);
     }
 
     public void TriggerAttack()
     {
-        Anim.SetTrigger("rangedAttack");
+        if (Anim != null)
+        {
+            // For boss melee, trigger the rangedAttack parameter (reused for melee animation)
+            Anim.SetTrigger("rangedAttack");
+        }
     }
 
     public void TriggerHurt()
     {
-        Anim.SetTrigger("hurt");
+        if (Anim != null)
+            Anim.SetTrigger("hurt");
     }
 
     #endregion
@@ -601,6 +687,13 @@ public class EnemyController : MonoBehaviour
         // Projectile detection
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, data.projectileDetectionRange);
+
+        // Melee attack hitbox (if applicable)
+        if (meleeAttackPoint != null)
+        {
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawWireSphere(meleeAttackPoint.position, meleeAttackRadius);
+        }
     }
 
     #endregion
