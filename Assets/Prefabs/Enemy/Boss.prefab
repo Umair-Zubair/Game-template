@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 163554101761554095}
   - component: {fileID: 3719491896339903138}
   - component: {fileID: 1720379048511637555}
+  - component: {fileID: 5427193783232584199}
   m_Layer: 11
   m_Name: Boss
   m_TagString: Enemy
@@ -253,6 +254,7 @@ MonoBehaviour:
   AttackCooldownTimer: 0
   DodgeCooldownTimer: 0
   StunTimer: 0
+  ArtilleryCooldownTimer: 0
   PatrolMovingLeft: 1
   PatrolIdleTimer: 0
 --- !u!50 &1720379048511637555
@@ -282,3 +284,22 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
+--- !u!114 &5427193783232584199
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4303414237555634310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6da9a091a84b84e44be1bdd9177f5ec6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ArtilleryStrikeManager
+  poolSize: 10
+  spawnHeight: 12
+  horizontalSpread: 3
+  targetPlayer: 1
+  strikeAreaWidth: 10
+  strikeWarningSound: {fileID: 0}
+  strikeImpactSound: {fileID: 0}

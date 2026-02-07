@@ -60,6 +60,7 @@ public class EnemyController : MonoBehaviour
     public RetreatEnemyState RetreatState { get; private set; }
     public DodgeEnemyState DodgeState { get; private set; }
     public StunnedEnemyState StunnedState { get; private set; }
+    public ArtilleryStrikeEnemyState ArtilleryStrikeState { get; private set; }
 
     // Runtime
     public int FacingDirection { get; private set; } = -1; // -1 = left, 1 = right
@@ -69,6 +70,10 @@ public class EnemyController : MonoBehaviour
     public float AttackCooldownTimer;
     public float DodgeCooldownTimer;
     public float StunTimer;
+    public float ArtilleryCooldownTimer;
+    
+    // Artillery
+    private ArtilleryStrikeManager artilleryManager;
 
     // Patrol
     public bool PatrolMovingLeft = true;
@@ -116,6 +121,7 @@ public class EnemyController : MonoBehaviour
         RetreatState = new RetreatEnemyState();
         DodgeState = new DodgeEnemyState();
         StunnedState = new StunnedEnemyState();
+        ArtilleryStrikeState = new ArtilleryStrikeEnemyState();
     }
 
     private void Start()
@@ -128,6 +134,10 @@ public class EnemyController : MonoBehaviour
         // Initialize timers so AI can act immediately
         AttackCooldownTimer = data.attackCooldown;
         DodgeCooldownTimer = data.dodgeCooldown;
+        ArtilleryCooldownTimer = 0f; // Start ready to use
+
+        // Get artillery manager if present (for bosses)
+        artilleryManager = GetComponent<ArtilleryStrikeManager>();
 
         // Start in idle or patrol
         StateMachine.Initialize(PatrolState, this);
@@ -180,6 +190,7 @@ public class EnemyController : MonoBehaviour
     {
         AttackCooldownTimer += Time.deltaTime;
         DodgeCooldownTimer += Time.deltaTime;
+        ArtilleryCooldownTimer += Time.deltaTime;
         
         if (StunTimer > 0)
             StunTimer -= Time.deltaTime;
@@ -616,6 +627,20 @@ public class EnemyController : MonoBehaviour
     public void ResetDodgeCooldown()
     {
         DodgeCooldownTimer = 0;
+    }
+
+    /// <summary>
+    /// Check if this enemy can use artillery strikes (has manager + off cooldown)
+    /// Artillery cooldown is 8 seconds by default
+    /// </summary>
+    public bool CanUseArtillery()
+    {
+        return artilleryManager != null && ArtilleryCooldownTimer >= 8f && !IsAttacking;
+    }
+
+    public void ResetArtilleryCooldown()
+    {
+        ArtilleryCooldownTimer = 0;
     }
 
     /// <summary>
