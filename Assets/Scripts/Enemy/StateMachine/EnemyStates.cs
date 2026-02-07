@@ -142,14 +142,22 @@ public class ChaseEnemyState : IEnemyState
             return;
         }
 
-        // Priority 3: In attack range + can attack -> Attack
+        // Priority 3: Artillery strike available (bosses only) -> Artillery
+        if (enemy.CanUseArtillery())
+        {
+            enemy.ResetArtilleryCooldown();
+            enemy.StateMachine.ChangeState(enemy.ArtilleryStrikeState, enemy);
+            return;
+        }
+
+        // Priority 4: In attack range + can attack -> Attack
         if (enemy.PlayerInAttackRange() && enemy.CanAttack())
         {
             enemy.StateMachine.ChangeState(enemy.AttackState, enemy);
             return;
         }
 
-        // Priority 4: Player out of detection range -> Patrol
+        // Priority 5: Player out of detection range -> Patrol
         if (!enemy.PlayerInDetectionRange())
         {
             enemy.StateMachine.ChangeState(enemy.PatrolState, enemy);
@@ -393,4 +401,112 @@ public class StunnedEnemyState : IEnemyState
 
     public void OnFixedUpdate(EnemyController enemy) { }
     public void OnExit(EnemyController enemy) { }
+}
+
+// ============================================================================
+// ARTILLERY STRIKE STATE - Calls down artillery strikes from above
+// ============================================================================
+public class ArtilleryStrikeEnemyState : IEnemyState
+{
+    private float stateTimer;
+    private float strikeTimer;
+    private int strikesLaunched;
+    private bool animationTriggered;
+
+    // Configuration - can be adjusted
+    private const float WINDUP_DURATION = 0.5f;      // Time before strikes begin
+    private const float STRIKE_INTERVAL = 0.4f;      // Time between each strike
+    private const int TOTAL_STRIKES = 5;             // Number of artillery pieces
+    private const float STATE_DURATION = 3.5f;       // Total state duration
+
+    public void OnEnter(EnemyController enemy)
+    {
+        stateTimer = 0f;
+        strikeTimer = 0f;
+        strikesLaunched = 0;
+        animationTriggered = false;
+
+        enemy.Stop();
+        enemy.SetMoving(false);
+        enemy.FacePlayer();
+
+        // Trigger artillery animation (reuses attack trigger for now)
+        if (enemy.Anim != null)
+        {
+            enemy.Anim.SetTrigger("artilleryStrike");
+        }
+    }
+
+    public void OnUpdate(EnemyController enemy)
+    {
+        stateTimer += Time.deltaTime;
+
+        // Windup phase - boss raises arm/charges
+        if (stateTimer < WINDUP_DURATION)
+        {
+            return;
+        }
+
+        // Strike phase - spawn artillery
+        if (strikesLaunched < TOTAL_STRIKES)
+        {
+            strikeTimer += Time.deltaTime;
+
+            if (strikeTimer >= STRIKE_INTERVAL)
+            {
+                strikeTimer = 0f;
+                SpawnArtilleryStrike(enemy);
+                strikesLaunched++;
+            }
+        }
+
+        // State complete
+        if (stateTimer >= STATE_DURATION)
+        {
+            TransitionToNextState(enemy);
+        }
+    }
+
+    private void SpawnArtilleryStrike(EnemyController enemy)
+    {
+        // Get the ArtilleryStrikeManager from the enemy
+        ArtilleryStrikeManager manager = enemy.GetComponent<ArtilleryStrikeManager>();
+        if (manager != null)
+        {
+            manager.SpawnStrike();
+        }
+        else
+        {
+            Debug.LogWarning("[ARTILLERY] No ArtilleryStrikeManager found on enemy!");
+        }
+    }
+
+    private void TransitionToNextState(EnemyController enemy)
+    {
+        // Return to appropriate state based on player position
+        if (enemy.PlayerTooClose())
+        {
+            enemy.StateMachine.ChangeState(enemy.RetreatState, enemy);
+        }
+        else if (enemy.PlayerInAttackRange() && enemy.CanAttack())
+        {
+            enemy.StateMachine.ChangeState(enemy.AttackState, enemy);
+        }
+        else if (enemy.PlayerInDetectionRange())
+        {
+            enemy.StateMachine.ChangeState(enemy.ChaseState, enemy);
+        }
+        else
+        {
+            enemy.StateMachine.ChangeState(enemy.PatrolState, enemy);
+        }
+    }
+
+    public void OnFixedUpdate(EnemyController enemy) { }
+
+    public void OnExit(EnemyController enemy)
+    {
+        strikesLaunched = 0;
+        enemy.ResetAttackCooldown();
+    }
 }
