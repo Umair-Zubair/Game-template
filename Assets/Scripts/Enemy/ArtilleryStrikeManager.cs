@@ -6,6 +6,10 @@ using UnityEngine;
 /// </summary>
 public class ArtilleryStrikeManager : MonoBehaviour
 {
+    [Header("Artillery Prefab")]
+    [Tooltip("Drag your ArtilleryProjectile prefab here. If empty, creates basic projectiles at runtime.")]
+    [SerializeField] private GameObject artilleryPrefab;
+
     [Header("Artillery Settings")]
     [Tooltip("Number of artillery projectiles in the pool")]
     [SerializeField] private int poolSize = 10;
@@ -68,10 +72,27 @@ public class ArtilleryStrikeManager : MonoBehaviour
 
         for (int i = 0; i < poolSize; i++)
         {
-            GameObject projectileObj = new GameObject($"ArtilleryProjectile_{i}");
-            projectileObj.transform.SetParent(transform);
+            GameObject projectileObj;
             
-            ArtilleryProjectile projectile = projectileObj.AddComponent<ArtilleryProjectile>();
+            // Use prefab if provided, otherwise create basic object
+            if (artilleryPrefab != null)
+            {
+                projectileObj = Instantiate(artilleryPrefab, transform);
+                projectileObj.name = $"ArtilleryProjectile_{i}";
+            }
+            else
+            {
+                projectileObj = new GameObject($"ArtilleryProjectile_{i}");
+                projectileObj.transform.SetParent(transform);
+                projectileObj.AddComponent<ArtilleryProjectile>();
+            }
+            
+            ArtilleryProjectile projectile = projectileObj.GetComponent<ArtilleryProjectile>();
+            if (projectile == null)
+            {
+                projectile = projectileObj.AddComponent<ArtilleryProjectile>();
+            }
+            
             projectilePool[i] = projectile;
             projectileObj.SetActive(false);
         }

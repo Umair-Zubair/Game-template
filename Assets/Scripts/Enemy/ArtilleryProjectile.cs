@@ -6,11 +6,17 @@ using UnityEngine;
 /// </summary>
 public class ArtilleryProjectile : MonoBehaviour
 {
+    [Header("Sprite")]
+    [Tooltip("Drag your artillery sprite here. Leave empty to use placeholder box.")]
+    [SerializeField] private Sprite artillerySprite;
+    [Tooltip("Drag your warning indicator sprite here. Leave empty to use placeholder box.")]
+    [SerializeField] private Sprite warningSprite;
+
     [Header("Settings")]
     [SerializeField] private float fallSpeed = 15f;
     [SerializeField] private float damage = 1f;  // 1 heart of damage
     [SerializeField] private float lifetime = 5f;
-    [SerializeField] private Color boxColor = Color.red;
+    [SerializeField] private Color spriteColor = Color.white;
 
     [Header("Warning Indicator")]
     [SerializeField] private bool showWarning = true;
@@ -34,7 +40,7 @@ public class ArtilleryProjectile : MonoBehaviour
     }
 
     /// <summary>
-    /// Sets up the visual components (box placeholder)
+    /// Sets up the visual components
     /// </summary>
     private void SetupComponents()
     {
@@ -45,9 +51,9 @@ public class ArtilleryProjectile : MonoBehaviour
             spriteRenderer = gameObject.AddComponent<SpriteRenderer>();
         }
 
-        // Create a simple box sprite
-        spriteRenderer.sprite = CreateBoxSprite();
-        spriteRenderer.color = boxColor;
+        // Use custom sprite if provided, otherwise create placeholder box
+        spriteRenderer.sprite = artillerySprite != null ? artillerySprite : CreateBoxSprite();
+        spriteRenderer.color = spriteColor;
         spriteRenderer.sortingOrder = 10;
 
         // Setup collider
@@ -130,7 +136,8 @@ public class ArtilleryProjectile : MonoBehaviour
             warningObject = new GameObject("WarningIndicator");
             warningObject.transform.SetParent(transform);
             warningIndicator = warningObject.AddComponent<SpriteRenderer>();
-            warningIndicator.sprite = CreateBoxSprite();
+            // Use custom warning sprite if provided, otherwise use placeholder
+            warningIndicator.sprite = warningSprite != null ? warningSprite : CreateBoxSprite();
             warningIndicator.sortingOrder = 5;
         }
 

@@ -1402,6 +1402,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: Boss
       objectReference: {fileID: 0}
+    - target: {fileID: 5427193783232584199, guid: 5f1b7edff3194b143907d55e30ebe0e1, type: 3}
+      propertyPath: poolSize
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 5427193783232584199, guid: 5f1b7edff3194b143907d55e30ebe0e1, type: 3}
+      propertyPath: spawnHeight
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 5427193783232584199, guid: 5f1b7edff3194b143907d55e30ebe0e1, type: 3}
+      propertyPath: artilleryPrefab
+      value: 
+      objectReference: {fileID: 8006748505793623707, guid: da0961216c3954346b53ac448e0c5012, type: 3}
+    - target: {fileID: 5427193783232584199, guid: 5f1b7edff3194b143907d55e30ebe0e1, type: 3}
+      propertyPath: horizontalSpread
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
