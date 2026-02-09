@@ -296,6 +296,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6da9a091a84b84e44be1bdd9177f5ec6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ArtilleryStrikeManager
+  artilleryPrefab: {fileID: 8006748505793623707, guid: da0961216c3954346b53ac448e0c5012, type: 3}
   poolSize: 10
   spawnHeight: 12
   horizontalSpread: 3

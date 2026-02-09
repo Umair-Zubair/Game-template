@@ -1,37 +1,31 @@
 fileFormatVersion: 2
-guid: e95ea024d87711340a5fa2e986bb9cd7
+guid: c4e656f3bf99478478ec90624a551006
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7525959607099070681
-    second: boss-melee (1)_0
+      213: -3489850438019007118
+    second: boss-above attaack-Sheet_0
   - first:
-      213: 3532385670809801400
-    second: boss-melee (1)_1
+      213: 3453316889942740940
+    second: boss-above attaack-Sheet_1
   - first:
-      213: 9029273067661869953
-    second: boss-melee (1)_2
+      213: 6225272594352619035
+    second: boss-above attaack-Sheet_2
   - first:
-      213: 3550018698708455756
-    second: boss-melee (1)_3
+      213: 3507204536341405520
+    second: boss-above attaack-Sheet_3
   - first:
-      213: -8149926932338578181
-    second: boss-melee (1)_4
+      213: 3673291514224060437
+    second: boss-above attaack-Sheet_4
   - first:
-      213: 2206352470106250075
-    second: boss-melee (1)_5
+      213: -3055859688821039024
+    second: boss-above attaack-Sheet_5
   - first:
-      213: 8784308452097648550
-    second: boss-melee (1)_6
+      213: -2498077894952743138
+    second: boss-above attaack-Sheet_6
   - first:
-      213: 4668445596176840482
-    second: boss-melee (1)_7
-  - first:
-      213: 7115512752817673591
-    second: boss-melee (1)_8
-  - first:
-      213: -6807703498389971657
-    second: boss-melee (1)_9
+      213: -961431125129493237
+    second: boss-above attaack-Sheet_7
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -127,89 +121,177 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: boss-melee (1)_0
+      name: boss-above attaack-Sheet_0
       rect:
         serializedVersion: 2
         x: 11
-        y: 7
+        y: 18
         width: 36
-        height: 36
+        height: 26
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 727ebe09c9b6e8790800000000000000
-      internalID: -7525959607099070681
+      spriteID: 27db2a2448f819fc0800000000000000
+      internalID: -3489850438019007118
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: boss-melee (1)_1
+      name: boss-above attaack-Sheet_1
       rect:
         serializedVersion: 2
         x: 71
-        y: 7
-        width: 32
-        height: 51
+        y: 18
+        width: 36
+        height: 26
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 8b25c4e5d0e850130800000000000000
-      internalID: 3532385670809801400
+      spriteID: ccfc4e93a65acef20800000000000000
+      internalID: 3453316889942740940
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: boss-melee (1)_2
+      name: boss-above attaack-Sheet_2
       rect:
         serializedVersion: 2
         x: 131
-        y: 6
-        width: 44
-        height: 48
+        y: 18
+        width: 36
+        height: 26
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 183ccf1140c6e4d70800000000000000
-      internalID: 9029273067661869953
+      spriteID: b1ebc50117c946650800000000000000
+      internalID: 6225272594352619035
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: boss-melee (1)_4
+      name: boss-above attaack-Sheet_3
       rect:
         serializedVersion: 2
         x: 191
-        y: 9
-        width: 44
-        height: 42
+        y: 18
+        width: 39
+        height: 29
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: bfce19c92a4a5ee80800000000000000
-      internalID: -8149926932338578181
+      spriteID: 05f944f91f71ca030800000000000000
+      internalID: 3507204536341405520
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: boss-above attaack-Sheet_4
+      rect:
+        serializedVersion: 2
+        x: 251
+        y: 18
+        width: 41
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 51828c59b272af230800000000000000
+      internalID: 3673291514224060437
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: boss-above attaack-Sheet_5
+      rect:
+        serializedVersion: 2
+        x: 311
+        y: 18
+        width: 43
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 050e26cbdc76795d0800000000000000
+      internalID: -3055859688821039024
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: boss-above attaack-Sheet_6
+      rect:
+        serializedVersion: 2
+        x: 371
+        y: 18
+        width: 43
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e1f0612d36b055dd0800000000000000
+      internalID: -2498077894952743138
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: boss-above attaack-Sheet_7
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 18
+        width: 43
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b0507ae4c7f48a2f0800000000000000
+      internalID: -961431125129493237
       vertices: []
       indices: 
       edges: []
@@ -218,7 +300,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 102dcca2faeadcd40b0ae37531a328dd
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -228,16 +310,14 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      boss-melee (1)_0: -7525959607099070681
-      boss-melee (1)_1: 3532385670809801400
-      boss-melee (1)_2: 9029273067661869953
-      boss-melee (1)_3: 3550018698708455756
-      boss-melee (1)_4: -8149926932338578181
-      boss-melee (1)_5: 2206352470106250075
-      boss-melee (1)_6: 8784308452097648550
-      boss-melee (1)_7: 4668445596176840482
-      boss-melee (1)_8: 7115512752817673591
-      boss-melee (1)_9: -6807703498389971657
+      boss-above attaack-Sheet_0: -3489850438019007118
+      boss-above attaack-Sheet_1: 3453316889942740940
+      boss-above attaack-Sheet_2: 6225272594352619035
+      boss-above attaack-Sheet_3: 3507204536341405520
+      boss-above attaack-Sheet_4: 3673291514224060437
+      boss-above attaack-Sheet_5: -3055859688821039024
+      boss-above attaack-Sheet_6: -2498077894952743138
+      boss-above attaack-Sheet_7: -961431125129493237
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -235,7 +235,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8e26f534ea637349a0bc6f44b578ba9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
-  startingHealth: 3
+  startingHealth: 10
   components: []
 --- !u!114 &215422135787915289
 MonoBehaviour:
@@ -252,11 +252,17 @@ MonoBehaviour:
   attackCooldown: 0.5
   attackRange: 0.8
   damage: 1
+  jumpAttackHeight: 10
   attackPoint: {fileID: 9187540824957999514}
   enemyLayer:
     serializedVersion: 2
     m_Bits: 2048
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 256
   attackSound: {fileID: 8300000, guid: 184effc3eaf05c542afe1043d729dbc4, type: 3}
+  jumpAttackSound: {fileID: 0}
+  uppercutSound: {fileID: 0}
 --- !u!114 &5942990099113847507
 MonoBehaviour:
   m_ObjectHideFlags: 0

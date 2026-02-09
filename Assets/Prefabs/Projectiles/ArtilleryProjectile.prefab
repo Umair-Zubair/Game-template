@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5928936526952462246}
   - component: {fileID: 1225599906243580476}
   - component: {fileID: 2928379164263817325}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: ArtilleryProjectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}

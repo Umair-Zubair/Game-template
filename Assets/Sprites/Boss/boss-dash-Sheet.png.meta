@@ -1,37 +1,22 @@
 fileFormatVersion: 2
-guid: e95ea024d87711340a5fa2e986bb9cd7
+guid: 33634f66dfa4d43488d11f97f25ce87d
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7525959607099070681
-    second: boss-melee (1)_0
+      213: -7157718843183360787
+    second: boss-dash-Sheet_0
   - first:
-      213: 3532385670809801400
-    second: boss-melee (1)_1
+      213: -3612894711441755856
+    second: boss-dash-Sheet_1
   - first:
-      213: 9029273067661869953
-    second: boss-melee (1)_2
+      213: -2580256171238347073
+    second: boss-dash-Sheet_2
   - first:
-      213: 3550018698708455756
-    second: boss-melee (1)_3
+      213: -1640348259846298583
+    second: boss-dash-Sheet_3
   - first:
-      213: -8149926932338578181
-    second: boss-melee (1)_4
-  - first:
-      213: 2206352470106250075
-    second: boss-melee (1)_5
-  - first:
-      213: 8784308452097648550
-    second: boss-melee (1)_6
-  - first:
-      213: 4668445596176840482
-    second: boss-melee (1)_7
-  - first:
-      213: 7115512752817673591
-    second: boss-melee (1)_8
-  - first:
-      213: -6807703498389971657
-    second: boss-melee (1)_9
+      213: 3776479774806825717
+    second: boss-dash-Sheet_4
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -127,89 +112,111 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: boss-melee (1)_0
+      name: boss-dash-Sheet_0
       rect:
         serializedVersion: 2
         x: 11
-        y: 7
+        y: 18
         width: 36
-        height: 36
+        height: 26
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 727ebe09c9b6e8790800000000000000
-      internalID: -7525959607099070681
+      spriteID: de49fe5a2acaaac90800000000000000
+      internalID: -7157718843183360787
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: boss-melee (1)_1
+      name: boss-dash-Sheet_1
       rect:
         serializedVersion: 2
-        x: 71
-        y: 7
-        width: 32
-        height: 51
+        x: 64
+        y: 18
+        width: 43
+        height: 26
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 8b25c4e5d0e850130800000000000000
-      internalID: 3532385670809801400
+      spriteID: 03170a1e66b6cddc0800000000000000
+      internalID: -3612894711441755856
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: boss-melee (1)_2
+      name: boss-dash-Sheet_2
       rect:
         serializedVersion: 2
-        x: 131
-        y: 6
-        width: 44
-        height: 48
+        x: 126
+        y: 18
+        width: 41
+        height: 26
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 183ccf1140c6e4d70800000000000000
-      internalID: 9029273067661869953
+      spriteID: fbe24dbdea6113cd0800000000000000
+      internalID: -2580256171238347073
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: boss-melee (1)_4
+      name: boss-dash-Sheet_3
       rect:
         serializedVersion: 2
-        x: 191
-        y: 9
-        width: 44
-        height: 42
+        x: 186
+        y: 18
+        width: 41
+        height: 26
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: bfce19c92a4a5ee80800000000000000
-      internalID: -8149926932338578181
+      spriteID: 9246ee7d2ff4c39e0800000000000000
+      internalID: -1640348259846298583
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: boss-dash-Sheet_4
+      rect:
+        serializedVersion: 2
+        x: 245
+        y: 18
+        width: 42
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5fadec6b850c86430800000000000000
+      internalID: 3776479774806825717
       vertices: []
       indices: 
       edges: []
@@ -218,7 +225,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 102dcca2faeadcd40b0ae37531a328dd
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -228,16 +235,11 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      boss-melee (1)_0: -7525959607099070681
-      boss-melee (1)_1: 3532385670809801400
-      boss-melee (1)_2: 9029273067661869953
-      boss-melee (1)_3: 3550018698708455756
-      boss-melee (1)_4: -8149926932338578181
-      boss-melee (1)_5: 2206352470106250075
-      boss-melee (1)_6: 8784308452097648550
-      boss-melee (1)_7: 4668445596176840482
-      boss-melee (1)_8: 7115512752817673591
-      boss-melee (1)_9: -6807703498389971657
+      boss-dash-Sheet_0: -7157718843183360787
+      boss-dash-Sheet_1: -3612894711441755856
+      boss-dash-Sheet_2: -2580256171238347073
+      boss-dash-Sheet_3: -1640348259846298583
+      boss-dash-Sheet_4: 3776479774806825717
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
