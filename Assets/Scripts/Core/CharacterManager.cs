@@ -8,6 +8,7 @@ public class CharacterManager : MonoBehaviour
 
     [Header("Dependencies")]
     [SerializeField] private Healthbar healthBar;
+    [SerializeField] private StaminaBar staminaBar;
 
     private const string SELECTED_CHARACTER_KEY = "SelectedCharacter";
 
@@ -29,5 +30,8 @@ public class CharacterManager : MonoBehaviour
         if (healthBar != null) 
             healthBar.SetPlayer(newPlayer.GetComponent<Health>());
 
+        // 4. Tell the StaminaBar to check the new player
+        if (staminaBar != null)
+            staminaBar.SetPlayer(newPlayer.GetComponent<PlayerStamina>());
     }
 }

@@ -12,6 +12,9 @@ public class PlayerController : MonoBehaviour
     [HideInInspector] public Animator Anim;
     [HideInInspector] public BoxCollider2D Collider;
 
+    // Stamina — optional: auto-found on the same GameObject
+    public PlayerStamina Stamina { get; private set; }
+
     // State Machine
     public PlayerStateMachine StateMachine { get; private set; }
 
@@ -49,6 +52,7 @@ public class PlayerController : MonoBehaviour
         RB = GetComponent<Rigidbody2D>();
         Anim = GetComponent<Animator>();
         Collider = GetComponent<BoxCollider2D>();
+        Stamina = GetComponent<PlayerStamina>();  // Optional: null-safe throughout
         
         // Ensure proper setup
         RB.gravityScale = data.gravityScale;
@@ -224,6 +228,21 @@ public class PlayerController : MonoBehaviour
     }
 
     public PlayerData Data => data;
+
+    /// <summary>
+    /// Effective run speed, accounting for stamina exhaustion debuff.
+    /// States should use this instead of Data.runSpeed directly.
+    /// </summary>
+    public float EffectiveRunSpeed
+    {
+        get
+        {
+            float baseSpeed = data.runSpeed;
+            if (Stamina != null)
+                baseSpeed *= Stamina.SpeedMultiplier;
+            return baseSpeed;
+        }
+    }
 
     #endregion
 }

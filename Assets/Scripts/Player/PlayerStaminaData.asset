@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5843d07941707e4380e097814513341, type: 3}
+  m_Name: PlayerStaminaData
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerStaminaData
+  maxStamina: 100
+  regenRatePerSecond: 15
+  regenDelayAfterUse: 1.5
+  jumpCost: 15
+  attackCost: 20
+  airAttackCost: 25
+  rangedAttackCost: 18
+  jumpAttackCost: 30
+  uppercutCost: 25
+  exhaustedSpeedMultiplier: 0.5
+  exhaustionRecoveryThreshold: 20
+  allowActionsOnCooldownWhenExhausted: 0
+  exhaustedActionCooldownPenalty: 1
+  lowStaminaThreshold: 0.3

@@ -10,19 +10,26 @@ public class DragonAttack : MonoBehaviour
     private Animator anim;
 
     private PlayerController playerController;
+    private PlayerStamina stamina;
     private float cooldownTimer = Mathf.Infinity;
 
     private void Awake()
     {
         anim = GetComponent<Animator>();
         playerController = GetComponent<PlayerController>();
+        stamina = GetComponent<PlayerStamina>();
     }
 
     private void Update()
     {
         if (Input.GetMouseButton(0) && cooldownTimer > attackCooldown && playerController != null
             && Time.timeScale > 0)
-            Attack();
+        {
+            // Check stamina before firing
+            float cost = stamina != null ? stamina.Data.rangedAttackCost : 0f;
+            if (stamina == null || stamina.TryConsume(cost))
+                Attack();
+        }
 
         cooldownTimer += Time.deltaTime;
     }

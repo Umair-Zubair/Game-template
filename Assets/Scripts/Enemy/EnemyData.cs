@@ -64,4 +64,32 @@ public class EnemyData : ScriptableObject
     [Header("Patrol")]
     [Tooltip("Time to wait at patrol endpoints")]
     public float patrolIdleDuration = 1f;
+
+    [Header("Dash")]
+    [Tooltip("Horizontal speed during dash (units/sec)")]
+    public float dashSpeed = 14f;
+
+    [Tooltip("Total dash duration in seconds (should roughly match Dash.anim length)")]
+    public float dashDuration = 0.35f;
+
+    [Tooltip("Cooldown between dashes in seconds")]
+    public float dashCooldown = 5f;
+
+    [Tooltip("Minimum distance to player before AI considers dashing")]
+    public float dashMinRange = 3f;
+
+    [Tooltip("Maximum distance to player for dash to be considered")]
+    public float dashMaxRange = 8f;
+
+    [Tooltip("Damage dealt to player if dash connects")]
+    public int dashDamage = 1;
+
+    [Tooltip("Horizontal knockback force applied to player on dash hit")]
+    public float dashKnockbackForce = 8f;
+
+    [Tooltip("Whether the dash stops on collision with the player")]
+    public bool dashStopsOnPlayerHit = false;
+
+    [Tooltip("Whether the boss can be stunned out of a dash")]
+    public bool dashInterruptibleByStun = true;
 }

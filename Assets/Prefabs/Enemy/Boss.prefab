@@ -158,7 +158,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 0.6, y: 0.6}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -301,6 +301,6 @@ MonoBehaviour:
   spawnHeight: 12
   horizontalSpread: 3
   targetPlayer: 1
-  strikeAreaWidth: 10
+  strikeAreaWidth: 7
   strikeWarningSound: {fileID: 0}
-  strikeImpactSound: {fileID: 0}
+  strikeImpactSound: {fileID: 8300000, guid: e34b901bb1b9d2b439acf2d0458d485f, type: 3}

@@ -67,7 +67,8 @@ public class RunState : IPlayerState
 
     public void OnFixedUpdate(PlayerController player)
     {
-        player.SetVelocityX(player.HorizontalInput * player.Data.runSpeed);
+        // Use EffectiveRunSpeed to respect stamina exhaustion debuff
+        player.SetVelocityX(player.HorizontalInput * player.EffectiveRunSpeed);
     }
 
     public void OnExit(PlayerController player) { }
@@ -78,6 +79,20 @@ public class JumpState : IPlayerState
 {
     public void OnEnter(PlayerController player)
     {
+        // Consume stamina for the jump (if stamina system is present)
+        if (player.Stamina != null)
+        {
+            if (!player.Stamina.TryConsume(player.Stamina.Data.jumpCost))
+            {
+                // Not enough stamina — abort jump, fall back to idle/fall
+                if (player.IsGrounded())
+                    player.StateMachine.ChangeState(player.IdleState, player);
+                else
+                    player.StateMachine.ChangeState(player.FallState, player);
+                return;
+            }
+        }
+
         player.SetVelocityY(player.Data.jumpForce);
         player.Anim.SetTrigger("jump");
         player.Anim.SetBool("grounded", false);
@@ -97,7 +112,7 @@ public class JumpState : IPlayerState
 
     public void OnFixedUpdate(PlayerController player)
     {
-         player.SetVelocityX(player.HorizontalInput * player.Data.runSpeed);
+         player.SetVelocityX(player.HorizontalInput * player.EffectiveRunSpeed);
     }
 
     public void OnExit(PlayerController player) { }
@@ -136,7 +151,7 @@ public class FallState : IPlayerState
 
     public void OnFixedUpdate(PlayerController player)
     {
-         player.SetVelocityX(player.HorizontalInput * player.Data.runSpeed);
+         player.SetVelocityX(player.HorizontalInput * player.EffectiveRunSpeed);
          
          // Clamp Fall Speed
          if(player.RB.linearVelocity.y < -player.Data.maxFallSpeed)
@@ -229,7 +244,7 @@ public class WallJumpState : IPlayerState
         // Allow air control after the lock expires
         if (player.WallJumpLockCounter <= 0)
         {
-             player.SetVelocityX(player.HorizontalInput * player.Data.runSpeed);
+             player.SetVelocityX(player.HorizontalInput * player.EffectiveRunSpeed);
         }
     }
 

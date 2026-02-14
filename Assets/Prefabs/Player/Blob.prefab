@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 6734524273785198305}
   - component: {fileID: 215422135787915289}
   - component: {fileID: 5942990099113847507}
+  - component: {fileID: -4574390463783240606}
   m_Layer: 10
   m_Name: Blob
   m_TagString: Player
@@ -288,6 +289,19 @@ MonoBehaviour:
   CoyoteTimeCounter: 0
   JumpBufferCounter: 0
   WallJumpLockCounter: 0
+--- !u!114 &-4574390463783240606
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1935310566284295070}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a0795ae2410f3a4c8d876f187bf752e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerStamina
+  data: {fileID: 11400000, guid: 58a581b7729ef2b4da0e61ccef5fb02b, type: 2}
 --- !u!1 &8922233179843060491
 GameObject:
   m_ObjectHideFlags: 0

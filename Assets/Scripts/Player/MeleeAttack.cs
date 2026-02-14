@@ -20,6 +20,7 @@ public class MeleeAttack : MonoBehaviour
 
     private Animator anim;
     private PlayerController playerController;
+    private PlayerStamina stamina;
     private Rigidbody2D body;
     private BoxCollider2D boxCollider;
     private float cooldownTimer = Mathf.Infinity;
@@ -28,6 +29,7 @@ public class MeleeAttack : MonoBehaviour
     {
         anim = GetComponent<Animator>();
         playerController = GetComponent<PlayerController>();
+        stamina = GetComponent<PlayerStamina>();
         body = GetComponent<Rigidbody2D>();
         boxCollider = GetComponent<BoxCollider2D>();
     }
@@ -38,21 +40,31 @@ public class MeleeAttack : MonoBehaviour
         if (Input.GetMouseButton(0) && cooldownTimer > attackCooldown && playerController != null
             && Time.timeScale > 0)
         {
-            Attack();
+            // Determine stamina cost: air attacks cost more
+            float cost = IsGrounded()
+                ? (stamina != null ? stamina.Data.attackCost : 0f)
+                : (stamina != null ? stamina.Data.airAttackCost : 0f);
+
+            if (stamina == null || stamina.TryConsume(cost))
+                Attack();
         }
 
         // Jump Attack with F key (must be grounded)
         if (Input.GetKeyDown(KeyCode.F) && cooldownTimer > attackCooldown && playerController != null
             && Time.timeScale > 0 && IsGrounded())
         {
-            JumpAttack();
+            float cost = stamina != null ? stamina.Data.jumpAttackCost : 0f;
+            if (stamina == null || stamina.TryConsume(cost))
+                JumpAttack();
         }
 
         // Uppercut with right mouse button
         if (Input.GetMouseButtonDown(1) && cooldownTimer > attackCooldown && playerController != null
             && Time.timeScale > 0)
         {
-            Uppercut();
+            float cost = stamina != null ? stamina.Data.uppercutCost : 0f;
+            if (stamina == null || stamina.TryConsume(cost))
+                Uppercut();
         }
 
         cooldownTimer += Time.deltaTime;

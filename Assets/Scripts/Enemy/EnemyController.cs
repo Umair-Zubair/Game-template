@@ -61,6 +61,7 @@ public class EnemyController : MonoBehaviour
     public DodgeEnemyState DodgeState { get; private set; }
     public StunnedEnemyState StunnedState { get; private set; }
     public ArtilleryStrikeEnemyState ArtilleryStrikeState { get; private set; }
+    public DashEnemyState DashState { get; private set; }
 
     // Runtime
     public int FacingDirection { get; private set; } = -1; // -1 = left, 1 = right
@@ -71,6 +72,7 @@ public class EnemyController : MonoBehaviour
     public float DodgeCooldownTimer;
     public float StunTimer;
     public float ArtilleryCooldownTimer;
+    public float DashCooldownTimer;
     
     // Artillery
     private ArtilleryStrikeManager artilleryManager;
@@ -83,6 +85,7 @@ public class EnemyController : MonoBehaviour
     public AttackPattern CurrentAttackPattern { get; private set; } = AttackPattern.Single;
     private int attackCounter = 0;
     public bool IsAttacking { get; private set; } = false;
+    public bool IsDashing { get; set; } = false;
 
     private Vector3 initScale;
     private Coroutine attackCoroutine;
@@ -122,6 +125,7 @@ public class EnemyController : MonoBehaviour
         DodgeState = new DodgeEnemyState();
         StunnedState = new StunnedEnemyState();
         ArtilleryStrikeState = new ArtilleryStrikeEnemyState();
+        DashState = new DashEnemyState();
     }
 
     private void Start()
@@ -135,6 +139,7 @@ public class EnemyController : MonoBehaviour
         AttackCooldownTimer = data.attackCooldown;
         DodgeCooldownTimer = data.dodgeCooldown;
         ArtilleryCooldownTimer = 0f; // Start ready to use
+        DashCooldownTimer = data.dashCooldown; // Ready to dash immediately
 
         // Get artillery manager if present (for bosses)
         artilleryManager = GetComponent<ArtilleryStrikeManager>();
@@ -169,6 +174,13 @@ public class EnemyController : MonoBehaviour
     {
         if (RB == null) return;
 
+        // During a dash, disable gravity so the boss stays at the same height
+        if (IsDashing)
+        {
+            RB.gravityScale = 0f;
+            return;
+        }
+
         // Apply snappier falling physics like the player
         if (RB.linearVelocity.y < 0)
         {
@@ -191,6 +203,7 @@ public class EnemyController : MonoBehaviour
         AttackCooldownTimer += Time.deltaTime;
         DodgeCooldownTimer += Time.deltaTime;
         ArtilleryCooldownTimer += Time.deltaTime;
+        DashCooldownTimer += Time.deltaTime;
         
         if (StunTimer > 0)
             StunTimer -= Time.deltaTime;
@@ -644,16 +657,37 @@ public class EnemyController : MonoBehaviour
     }
 
     /// <summary>
+    /// Check if this enemy can perform a dash (off cooldown, not busy, player in range band)
+    /// </summary>
+    public bool CanDash()
+    {
+        if (IsDashing || IsAttacking) return false;
+        if (DashCooldownTimer < Data.dashCooldown) return false;
+
+        float dist = GetDistanceToPlayer();
+        return dist >= Data.dashMinRange && dist <= Data.dashMaxRange;
+    }
+
+    public void ResetDashCooldown()
+    {
+        DashCooldownTimer = 0;
+    }
+
+    /// <summary>
     /// Called when this enemy takes damage. Triggers StunnedState.
     /// Wire this to Health.TakeDamage or call from animation event.
     /// </summary>
     public void OnTakeDamage()
     {
         // Only stun if not already stunned
-        if (StateMachine.CurrentState != StunnedState)
-        {
-            StateMachine.ChangeState(StunnedState, this);
-        }
+        if (StateMachine.CurrentState == StunnedState)
+            return;
+
+        // If dashing, check whether dash is interruptible
+        if (IsDashing && !Data.dashInterruptibleByStun)
+            return;
+
+        StateMachine.ChangeState(StunnedState, this);
     }
 
     #endregion

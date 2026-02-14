@@ -13,12 +13,14 @@ public class Health : MonoBehaviour
     [SerializeField] private Behaviour[] components; 
 
     private PlayerShield playerShield;
+    private PlayerStamina playerStamina;
 
     private void Awake()
     {
         currentHealth = startingHealth;
         anim = GetComponent<Animator>();
         playerShield = GetComponent<PlayerShield>();
+        playerStamina = GetComponent<PlayerStamina>();
 
         // 1. Auto-Find all scripts so you don't have to drag them
         if (components == null || components.Length == 0)
@@ -27,7 +29,8 @@ public class Health : MonoBehaviour
             if (GetComponent<PlayerController>()) foundComponents.Add(GetComponent<PlayerController>());
             if (GetComponent<MeleeAttack>()) foundComponents.Add(GetComponent<MeleeAttack>());
             if (GetComponent<DragonAttack>()) foundComponents.Add(GetComponent<DragonAttack>());
-            if (GetComponent<PlayerShield>()) foundComponents.Add(GetComponent<PlayerShield>()); // <--- IMPORTANT
+            if (GetComponent<PlayerShield>()) foundComponents.Add(GetComponent<PlayerShield>());
+            if (GetComponent<PlayerStamina>()) foundComponents.Add(GetComponent<PlayerStamina>());
             components = foundComponents.ToArray();
         }
     }
@@ -77,6 +80,10 @@ public class Health : MonoBehaviour
         AddHealth(startingHealth);
         anim.ResetTrigger("die");
         anim.Play("Idle");
+
+        // Reset stamina to full on respawn
+        if (playerStamina != null)
+            playerStamina.ResetStamina();
 
         foreach (Behaviour component in components)
             if(component != null) component.enabled = true;

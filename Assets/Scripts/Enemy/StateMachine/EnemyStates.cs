@@ -150,14 +150,21 @@ public class ChaseEnemyState : IEnemyState
             return;
         }
 
-        // Priority 4: In attack range + can attack -> Attack
+        // Priority 4: Dash available + player in dash range -> Dash
+        if (enemy.CanDash())
+        {
+            enemy.StateMachine.ChangeState(enemy.DashState, enemy);
+            return;
+        }
+
+        // Priority 5: In attack range + can attack -> Attack
         if (enemy.PlayerInAttackRange() && enemy.CanAttack())
         {
             enemy.StateMachine.ChangeState(enemy.AttackState, enemy);
             return;
         }
 
-        // Priority 5: Player out of detection range -> Patrol
+        // Priority 6: Player out of detection range -> Patrol
         if (!enemy.PlayerInDetectionRange())
         {
             enemy.StateMachine.ChangeState(enemy.PatrolState, enemy);
@@ -401,6 +408,176 @@ public class StunnedEnemyState : IEnemyState
 
     public void OnFixedUpdate(EnemyController enemy) { }
     public void OnExit(EnemyController enemy) { }
+}
+
+// ============================================================================
+// DASH STATE - Rapid directional charge toward the player
+// ============================================================================
+public class DashEnemyState : IEnemyState
+{
+    private float dashTimer;
+    private int dashDirection;
+    private Vector2 startPosition;
+    private bool hasHitPlayer;
+
+    public void OnEnter(EnemyController enemy)
+    {
+        dashTimer = 0f;
+        hasHitPlayer = false;
+
+        // Lock direction at start — commit to it for the full dash
+        dashDirection = enemy.GetDirectionToPlayer();
+        enemy.FaceDirection(dashDirection);
+        startPosition = enemy.transform.position;
+
+        // Stop vertical velocity so gravity doesn't pull us mid-dash
+        if (enemy.RB != null)
+        {
+            enemy.RB.linearVelocity = new Vector2(0f, 0f);
+        }
+
+        enemy.SetMoving(false);
+        enemy.IsDashing = true;
+
+        // Trigger dash animation
+        if (enemy.Anim != null)
+        {
+            enemy.Anim.SetTrigger("dash");
+        }
+
+        if (enemy.DebugMode)
+            Debug.Log($"[DASH] Started! Direction: {dashDirection}, Speed: {enemy.Data.dashSpeed}, Duration: {enemy.Data.dashDuration}");
+    }
+
+    public void OnUpdate(EnemyController enemy)
+    {
+        dashTimer += Time.deltaTime;
+
+        // --- Dash movement (time-based, not frame-based) ---
+        if (enemy.RB != null)
+        {
+            // Drive horizontal velocity; zero out vertical to keep dash flat
+            enemy.RB.linearVelocity = new Vector2(dashDirection * enemy.Data.dashSpeed, 0f);
+        }
+
+        // --- Collision: check for player hit ---
+        if (!hasHitPlayer && enemy.Player != null)
+        {
+            float distToPlayer = Vector2.Distance(enemy.transform.position, enemy.Player.position);
+            if (distToPlayer <= 1.2f) // Contact threshold
+            {
+                OnDashHitPlayer(enemy);
+            }
+        }
+
+        // --- Wall check: stop if we hit geometry ---
+        if (IsBlockedByWall(enemy))
+        {
+            if (enemy.DebugMode)
+                Debug.Log("[DASH] Blocked by wall — ending early.");
+            TransitionOut(enemy);
+            return;
+        }
+
+        // --- Duration complete ---
+        if (dashTimer >= enemy.Data.dashDuration)
+        {
+            TransitionOut(enemy);
+        }
+    }
+
+    public void OnFixedUpdate(EnemyController enemy) { }
+
+    public void OnExit(EnemyController enemy)
+    {
+        enemy.IsDashing = false;
+        enemy.Stop();
+        enemy.ResetDashCooldown();
+
+        if (enemy.DebugMode)
+        {
+            float distanceTravelled = Vector2.Distance(startPosition, enemy.transform.position);
+            Debug.Log($"[DASH] Ended. Distance travelled: {distanceTravelled:F2}");
+        }
+    }
+
+    // ---- Private helpers ----
+
+    private void OnDashHitPlayer(EnemyController enemy)
+    {
+        hasHitPlayer = true;
+
+        // Apply damage
+        if (enemy.Player != null)
+        {
+            Health playerHealth = enemy.Player.GetComponent<Health>();
+            if (playerHealth != null)
+            {
+                playerHealth.TakeDamage(enemy.Data.dashDamage);
+                if (enemy.DebugMode)
+                    Debug.Log($"[DASH] Hit player for {enemy.Data.dashDamage} damage!");
+            }
+
+            // Apply knockback
+            Rigidbody2D playerRB = enemy.Player.GetComponent<Rigidbody2D>();
+            if (playerRB != null)
+            {
+                Vector2 knockback = new Vector2(dashDirection * enemy.Data.dashKnockbackForce, enemy.Data.dashKnockbackForce * 0.3f);
+                playerRB.linearVelocity = knockback;
+            }
+        }
+
+        // Optionally stop on hit
+        if (enemy.Data.dashStopsOnPlayerHit)
+        {
+            TransitionOut(enemy);
+        }
+    }
+
+    private bool IsBlockedByWall(EnemyController enemy)
+    {
+        if (enemy.Collider == null) return false;
+
+        // Horizontal raycast in dash direction
+        float castDistance = 0.2f;
+        RaycastHit2D hit = Physics2D.BoxCast(
+            enemy.Collider.bounds.center,
+            new Vector2(enemy.Collider.bounds.size.x * 0.9f, enemy.Collider.bounds.size.y * 0.8f),
+            0f,
+            new Vector2(dashDirection, 0),
+            castDistance,
+            LayerMask.GetMask("Default") // Ground/wall layers — adjust if your walls use a custom layer
+        );
+
+        return hit.collider != null && hit.collider.gameObject != enemy.gameObject;
+    }
+
+    private void TransitionOut(EnemyController enemy)
+    {
+        // Player may have died mid-dash
+        if (enemy.Player == null)
+        {
+            enemy.StateMachine.ChangeState(enemy.PatrolState, enemy);
+            return;
+        }
+
+        if (enemy.PlayerTooClose())
+        {
+            enemy.StateMachine.ChangeState(enemy.RetreatState, enemy);
+        }
+        else if (enemy.PlayerInAttackRange() && enemy.CanAttack())
+        {
+            enemy.StateMachine.ChangeState(enemy.AttackState, enemy);
+        }
+        else if (enemy.PlayerInDetectionRange())
+        {
+            enemy.StateMachine.ChangeState(enemy.ChaseState, enemy);
+        }
+        else
+        {
+            enemy.StateMachine.ChangeState(enemy.PatrolState, enemy);
+        }
+    }
 }
 
 // ============================================================================
