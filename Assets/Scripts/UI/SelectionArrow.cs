@@ -7,7 +7,7 @@ using UnityEngine;
 public class SelectionArrow : MonoBehaviour
 {
     [Header("Arrow Positions (X, Y)")]
-    [SerializeField] private Vector2 playArrowPos = new Vector2(-288f, 269f);
+    [SerializeField] private Vector2 playArrowPos = new Vector2(-379f, 264f);
     [SerializeField] private Vector2 characterArrowPos = new Vector2(-436f, 93f);
     [SerializeField] private Vector2 volumeArrowPos = new Vector2(-328f, -31f);
     [SerializeField] private Vector2 musicArrowPos = new Vector2(-328f, -151f);
