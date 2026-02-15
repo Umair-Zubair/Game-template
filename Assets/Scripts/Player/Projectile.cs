@@ -6,41 +6,49 @@ public class Projectile : MonoBehaviour
     private float direction;
     private bool hit;
     private float lifetime;
-
     private Animator anim;
     private BoxCollider2D boxCollider;
-    private Transform parentHolder; // To remember the holder
 
     private void Awake()
     {
         anim = GetComponent<Animator>();
         boxCollider = GetComponent<BoxCollider2D>();
-        parentHolder = transform.parent; // Remember who spawned us
     }
 
     private void Update()
     {
         if (hit) return;
 
-        // --- FIX: RESTORED DIRECTION MATH ---
-        // We MUST multiply by direction. 
-        // Why? Because changing Scale flips the picture, but NOT the movement axis.
         float movementSpeed = speed * Time.deltaTime * direction;
-        
         transform.Translate(movementSpeed, 0, 0);
 
         lifetime += Time.deltaTime;
-        if (lifetime > 5) Deactivate();
+        if (lifetime > 5) gameObject.SetActive(false);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         hit = true;
         boxCollider.enabled = false;
-        anim.SetTrigger("explode");
+        
+        // Only trigger explode animation if animator exists and has the trigger
+        if (anim != null)
+        {
+            foreach (AnimatorControllerParameter param in anim.parameters)
+            {
+                if (param.name == "explode")
+                {
+                    anim.SetTrigger("explode");
+                    break;
+                }
+            }
+        }
 
         if (collision.tag == "Enemy")
-             collision.GetComponent<Health>()?.TakeDamage(1);
+            collision.GetComponent<Health>()?.TakeDamage(1);
+        
+        // Deactivate immediately after hit (or after animation if you add one later)
+        Deactivate();
     }
 
     public void SetDirection(float _direction)
@@ -51,11 +59,10 @@ public class Projectile : MonoBehaviour
         hit = false;
         boxCollider.enabled = true;
 
-        // --- FIX: DETACH ---
-        // Detach from player so turning around doesn't flip the fireball mid-air
+        // CRITICAL: Detach from parent so player rotation doesn't affect us mid-flight
         transform.SetParent(null);
 
-        // Flip the Sprite
+        // Flip sprite based on direction
         float localScaleX = transform.localScale.x;
         if (Mathf.Sign(localScaleX) != _direction)
             localScaleX = -localScaleX;
@@ -66,8 +73,5 @@ public class Projectile : MonoBehaviour
     private void Deactivate()
     {
         gameObject.SetActive(false);
-        // Re-attach to player so we carry the ammo to the next room
-        if (parentHolder != null)
-            transform.SetParent(parentHolder);
     }
 }
