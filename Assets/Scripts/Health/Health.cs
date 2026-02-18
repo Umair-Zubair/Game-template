@@ -6,6 +6,9 @@ public class Health : MonoBehaviour
     [Header("Health")]
     [SerializeField] private float startingHealth;
     public float currentHealth { get; private set; }
+
+    /// <summary>Layer 2 AI: Fired when this object takes damage. Arg = actual damage applied (after shield).</summary>
+    public System.Action<float> OnDamageTaken;
     private Animator anim;
     private bool dead;
 
@@ -46,6 +49,7 @@ public class Health : MonoBehaviour
 
         // 3. Apply Damage
         currentHealth = Mathf.Clamp(currentHealth - _damage, 0, startingHealth);
+        OnDamageTaken?.Invoke(_damage); // Layer 2: notify trackers
 
         if (currentHealth > 0)
         {

@@ -18,6 +18,12 @@ public class MeleeAttack : MonoBehaviour
     [SerializeField] private AudioClip jumpAttackSound;
     [SerializeField] private AudioClip uppercutSound;
 
+    // ---- Layer 2 AI: Behavior tracking events ----
+    /// <summary>Fired whenever the player performs any attack. Arg = attack type string.</summary>
+    public System.Action<string> OnAttackPerformed;
+    /// <summary>Fired when an attack successfully hits an enemy. Arg = damage dealt.</summary>
+    public System.Action<float> OnDamageDealt;
+
     private Animator anim;
     private PlayerController playerController;
     private PlayerStamina stamina;
@@ -77,6 +83,7 @@ public class MeleeAttack : MonoBehaviour
         
         anim.SetTrigger("attack");
         cooldownTimer = 0;
+        OnAttackPerformed?.Invoke("melee"); // Layer 2: notify tracker
 
         // Detect enemies in range
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayer);
@@ -86,9 +93,15 @@ public class MeleeAttack : MonoBehaviour
         {
             // Check for Health on the object or its parent
             if(enemy.GetComponent<Health>() != null)
+            {
                 enemy.GetComponent<Health>().TakeDamage(damage);
+                OnDamageDealt?.Invoke(damage); // Layer 2: notify tracker
+            }
             else if(enemy.GetComponentInParent<Health>() != null)
+            {
                 enemy.GetComponentInParent<Health>().TakeDamage(damage);
+                OnDamageDealt?.Invoke(damage); // Layer 2: notify tracker
+            }
         }
     }
 
@@ -99,6 +112,7 @@ public class MeleeAttack : MonoBehaviour
         
         anim.SetTrigger("jumpAttack");
         cooldownTimer = 0;
+        OnAttackPerformed?.Invoke("jumpAttack"); // Layer 2: notify tracker
 
         // Apply upward force to simulate jump
         if (body != null)
@@ -114,9 +128,15 @@ public class MeleeAttack : MonoBehaviour
         {
             // Check for Health on the object or its parent
             if(enemy.GetComponent<Health>() != null)
+            {
                 enemy.GetComponent<Health>().TakeDamage(damage);
+                OnDamageDealt?.Invoke(damage); // Layer 2: notify tracker
+            }
             else if(enemy.GetComponentInParent<Health>() != null)
+            {
                 enemy.GetComponentInParent<Health>().TakeDamage(damage);
+                OnDamageDealt?.Invoke(damage); // Layer 2: notify tracker
+            }
         }
     }
 
@@ -127,6 +147,7 @@ public class MeleeAttack : MonoBehaviour
         
         anim.SetTrigger("uppercut");
         cooldownTimer = 0;
+        OnAttackPerformed?.Invoke("uppercut"); // Layer 2: notify tracker
 
         // Detect enemies in range
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayer);
@@ -136,9 +157,15 @@ public class MeleeAttack : MonoBehaviour
         {
             // Check for Health on the object or its parent
             if(enemy.GetComponent<Health>() != null)
+            {
                 enemy.GetComponent<Health>().TakeDamage(damage);
+                OnDamageDealt?.Invoke(damage); // Layer 2: notify tracker
+            }
             else if(enemy.GetComponentInParent<Health>() != null)
+            {
                 enemy.GetComponentInParent<Health>().TakeDamage(damage);
+                OnDamageDealt?.Invoke(damage); // Layer 2: notify tracker
+            }
         }
     }
 

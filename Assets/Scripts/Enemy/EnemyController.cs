@@ -91,6 +91,23 @@ public class EnemyController : MonoBehaviour
     private Coroutine attackCoroutine;
     private int lastAttackFrame = -1;
 
+    // ---- Layer 2: Heuristic Adaptation ----
+    private AdaptationProfile activeProfile;
+
+    /// <summary>Apply a new adaptation profile from HeuristicAdaptationManager.</summary>
+    public void ApplyAdaptationProfile(AdaptationProfile profile) { activeProfile = profile; }
+
+    // Effective values — states use these instead of Data.X directly
+    public float EffectiveChaseSpeed    => Mathf.Clamp(Data.chaseSpeed    * (activeProfile?.chaseSpeedMultiplier    ?? 1f), Data.chaseSpeed    * AdaptationProfile.MinSpeedMultiplier,    Data.chaseSpeed    * AdaptationProfile.MaxSpeedMultiplier);
+    public float EffectiveRetreatRange  => Mathf.Clamp(Data.retreatRange  * (activeProfile?.retreatRangeMultiplier  ?? 1f), Data.retreatRange  * 0.3f, Data.retreatRange  * 3f);
+    public float EffectiveRetreatSpeed  => Mathf.Clamp(Data.retreatSpeed  * (activeProfile?.retreatSpeedMultiplier  ?? 1f), Data.retreatSpeed  * AdaptationProfile.MinSpeedMultiplier,    Data.retreatSpeed  * AdaptationProfile.MaxSpeedMultiplier);
+    public float EffectiveAttackCooldown=> Mathf.Clamp(Data.attackCooldown * (activeProfile?.attackCooldownMultiplier ?? 1f), Data.attackCooldown * AdaptationProfile.MinCooldownMultiplier, Data.attackCooldown * AdaptationProfile.MaxCooldownMultiplier);
+    public float EffectiveDodgeCooldown => Mathf.Clamp(Data.dodgeCooldown  * (activeProfile?.dodgeCooldownMultiplier  ?? 1f), Data.dodgeCooldown  * AdaptationProfile.MinCooldownMultiplier, Data.dodgeCooldown  * AdaptationProfile.MaxCooldownMultiplier);
+
+    // Priority bonuses for ChaseState scoring
+    public float DashPriorityBonus      => activeProfile?.dashPriorityBonus      ?? 0f;
+    public float ArtilleryPriorityBonus => activeProfile?.artilleryPriorityBonus ?? 0f;
+
     #region Unity Lifecycle
 
     private void Awake()
@@ -616,17 +633,19 @@ public class EnemyController : MonoBehaviour
 
     public bool CanAttack()
     {
-        return AttackCooldownTimer >= Data.attackCooldown && !IsAttacking;
+        // Layer 2: compare against EffectiveAttackCooldown (adapted by HeuristicAdaptationManager)
+        return AttackCooldownTimer >= EffectiveAttackCooldown && !IsAttacking;
     }
 
     public bool CanDodge()
     {
-        bool onCooldown = DodgeCooldownTimer < Data.dodgeCooldown;
+        // Layer 2: compare against EffectiveDodgeCooldown (adapted by HeuristicAdaptationManager)
+        bool onCooldown = DodgeCooldownTimer < EffectiveDodgeCooldown;
         bool isBusy = IsAttacking;
         
         if (IncomingProjectileDetected() && (onCooldown || isBusy))
         {
-            Debug.Log($"[CAN_DODGE] False. Cooldown: {DodgeCooldownTimer:F2}/{Data.dodgeCooldown} (OnCooldown: {onCooldown}), Busy: {isBusy}");
+            Debug.Log($"[CAN_DODGE] False. Cooldown: {DodgeCooldownTimer:F2}/{EffectiveDodgeCooldown:F2} (OnCooldown: {onCooldown}), Busy: {isBusy}");
         }
         
         return !onCooldown && !isBusy;

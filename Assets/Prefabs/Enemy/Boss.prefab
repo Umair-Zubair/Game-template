@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 3719491896339903138}
   - component: {fileID: 1720379048511637555}
   - component: {fileID: 5427193783232584199}
+  - component: {fileID: 1023385282180125014}
   m_Layer: 11
   m_Name: Boss
   m_TagString: Enemy
@@ -255,6 +256,7 @@ MonoBehaviour:
   DodgeCooldownTimer: 0
   StunTimer: 0
   ArtilleryCooldownTimer: 0
+  DashCooldownTimer: 0
   PatrolMovingLeft: 1
   PatrolIdleTimer: 0
 --- !u!50 &1720379048511637555
@@ -304,3 +306,22 @@ MonoBehaviour:
   strikeAreaWidth: 7
   strikeWarningSound: {fileID: 0}
   strikeImpactSound: {fileID: 8300000, guid: e34b901bb1b9d2b439acf2d0458d485f, type: 3}
+--- !u!114 &1023385282180125014
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4303414237555634310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39a7a431a52cde2499a258892350c5d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HeuristicAdaptationManager
+  evaluationInterval: 5
+  transitionDuration: 2
+  aggressiveThreshold: 0.65
+  defensiveThreshold: 0.35
+  aerialThreshold: 0.4
+  rangedThreshold: 0.5
+  DebugMode: 1

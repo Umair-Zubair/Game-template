@@ -128,50 +128,54 @@ public class ChaseEnemyState : IEnemyState
     {
         float distanceToPlayer = enemy.GetDistanceToPlayer();
         
-        // Priority 1: Player too close -> Retreat
+        // Priority 1: Player too close → Retreat (always highest priority)
         if (enemy.PlayerTooClose())
         {
             enemy.StateMachine.ChangeState(enemy.RetreatState, enemy);
             return;
         }
 
-        // Priority 2: Incoming projectile + can dodge -> Dodge
+        // Priority 2: Incoming projectile + can dodge → Dodge
         if (enemy.IncomingProjectileDetected() && enemy.CanDodge())
         {
             enemy.StateMachine.ChangeState(enemy.DodgeState, enemy);
             return;
         }
 
-        // Priority 3: Artillery strike available (bosses only) -> Artillery
-        if (enemy.CanUseArtillery())
+        // ---- Layer 2: Scored priority for special actions ----
+        // Base scores are 1.0; adaptation profiles add bonuses to promote preferred actions.
+        float dashScore      = enemy.CanDash()         ? 1f + enemy.DashPriorityBonus      : 0f;
+        float artilleryScore = enemy.CanUseArtillery() ? 1f + enemy.ArtilleryPriorityBonus : 0f;
+        float attackScore    = (enemy.PlayerInAttackRange() && enemy.CanAttack()) ? 1f : 0f;
+
+        // Pick the highest-scoring available action
+        if (dashScore > 0f && dashScore >= artilleryScore && dashScore >= attackScore)
+        {
+            enemy.StateMachine.ChangeState(enemy.DashState, enemy);
+            return;
+        }
+
+        if (artilleryScore > 0f && artilleryScore >= dashScore && artilleryScore >= attackScore)
         {
             enemy.ResetArtilleryCooldown();
             enemy.StateMachine.ChangeState(enemy.ArtilleryStrikeState, enemy);
             return;
         }
 
-        // Priority 4: Dash available + player in dash range -> Dash
-        if (enemy.CanDash())
-        {
-            enemy.StateMachine.ChangeState(enemy.DashState, enemy);
-            return;
-        }
-
-        // Priority 5: In attack range + can attack -> Attack
-        if (enemy.PlayerInAttackRange() && enemy.CanAttack())
+        if (attackScore > 0f)
         {
             enemy.StateMachine.ChangeState(enemy.AttackState, enemy);
             return;
         }
 
-        // Priority 6: Player out of detection range -> Patrol
+        // Priority: Player out of detection range → Patrol
         if (!enemy.PlayerInDetectionRange())
         {
             enemy.StateMachine.ChangeState(enemy.PatrolState, enemy);
             return;
         }
 
-        // Maintain optimal distance - stop early to stay at range
+        // Maintain optimal distance — stop early to stay at range
         enemy.FacePlayer();
         
         // Keep a buffer zone before attack range (80% of attack range)
@@ -179,11 +183,11 @@ public class ChaseEnemyState : IEnemyState
         
         if (distanceToPlayer > stoppingDistance)
         {
-            enemy.MoveTowardPlayer(enemy.Data.chaseSpeed);
+            enemy.MoveTowardPlayer(enemy.EffectiveChaseSpeed); // Layer 2: uses adapted speed
         }
         else
         {
-            // In optimal position - stop and wait for attack cooldown
+            // In optimal position — stop and wait for attack cooldown
             enemy.Stop();
             enemy.SetMoving(false);
         }
@@ -284,7 +288,7 @@ public class RetreatEnemyState : IEnemyState
     {
         retreatTimer += Time.deltaTime;
 
-        // Priority 1: Incoming projectile + can dodge -> Dodge
+        // Priority 1: Incoming projectile + can dodge → Dodge
         if (enemy.IncomingProjectileDetected() && enemy.CanDodge())
         {
             enemy.StateMachine.ChangeState(enemy.DodgeState, enemy);
@@ -292,7 +296,8 @@ public class RetreatEnemyState : IEnemyState
         }
 
         // Stop retreating if far enough or timed out
-        if (!enemy.PlayerTooClose() || retreatTimer >= MAX_RETREAT_TIME)
+        // Layer 2: uses EffectiveRetreatRange so adaptation can widen/narrow the safe zone
+        if (enemy.GetDistanceToPlayer() > enemy.EffectiveRetreatRange || retreatTimer >= MAX_RETREAT_TIME)
         {
             // Check if we can attack
             if (enemy.PlayerInAttackRange() && enemy.CanAttack())
@@ -312,7 +317,7 @@ public class RetreatEnemyState : IEnemyState
 
         // Keep retreating
         enemy.FacePlayer();
-        enemy.MoveAwayFromPlayer(enemy.Data.retreatSpeed);
+        enemy.MoveAwayFromPlayer(enemy.EffectiveRetreatSpeed); // Layer 2: uses adapted speed
     }
 
     public void OnFixedUpdate(EnemyController enemy) { }
