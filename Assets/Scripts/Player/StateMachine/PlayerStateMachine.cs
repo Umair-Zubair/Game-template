@@ -36,5 +36,5 @@ public class PlayerStateMachine
 // Simple static helper for optional debugging
 public static class GlobalData
 {
-    public static bool DebugMode = true; 
+    public static bool DebugMode = false; 
 }

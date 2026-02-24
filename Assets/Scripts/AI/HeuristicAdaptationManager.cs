@@ -11,17 +11,17 @@ public class HeuristicAdaptationManager : MonoBehaviour
 {
     [Header("Evaluation Settings")]
     [Tooltip("How often (seconds) to re-evaluate the player's style and update the boss profile.")]
-    [SerializeField] private float evaluationInterval = 5f;
+    [SerializeField] private float evaluationInterval = 3f;
 
     [Tooltip("How long (seconds) to smoothly lerp between old and new profile multipliers.")]
-    [SerializeField] private float transitionDuration = 2f;
+    [SerializeField] private float transitionDuration = 1f;
 
     [Header("Classification Thresholds")]
     [Tooltip("Aggression score above this = AGGRESSIVE player style.")]
-    [SerializeField] private float aggressiveThreshold = 0.65f;
+    [SerializeField] private float aggressiveThreshold = 0.50f;
 
-    [Tooltip("Block rate above this = DEFENSIVE player style.")]
-    [SerializeField] private float defensiveThreshold = 0.35f;
+    [Tooltip("Aggression score BELOW this = DEFENSIVE/EVASIVE player style (far away, not attacking).")]
+    [SerializeField] private float passiveThreshold = 0.20f;
 
     [Tooltip("Jump attack ratio above this = AERIAL player style.")]
     [SerializeField] private float aerialThreshold = 0.4f;
@@ -38,6 +38,7 @@ public class HeuristicAdaptationManager : MonoBehaviour
 
     // ---- State ----
     private float evaluationTimer;
+    [SerializeField, Header("Runtime Info (read-only)")] 
     private PlayerStyle currentStyle = PlayerStyle.Balanced;
     private AdaptationProfile currentProfile;
     private AdaptationProfile targetProfile;
@@ -62,10 +63,10 @@ public class HeuristicAdaptationManager : MonoBehaviour
 
     private void Start()
     {
-        // Find tracker on player
+        // Try to find tracker — may not exist yet if player is spawned dynamically
         tracker = FindFirstObjectByType<PlayerBehaviorTracker>();
         if (tracker == null)
-            Debug.LogWarning("[HeuristicAdaptation] No PlayerBehaviorTracker found in scene. Adaptation disabled.");
+            Debug.LogWarning("[HeuristicAdaptation] PlayerBehaviorTracker not found yet — will retry each frame.");
 
         // Apply default profile immediately
         boss?.ApplyAdaptationProfile(currentProfile);
@@ -73,7 +74,17 @@ public class HeuristicAdaptationManager : MonoBehaviour
 
     private void Update()
     {
-        if (tracker == null || boss == null) return;
+        // Retry finding tracker if player was spawned after this script's Start()
+        if (tracker == null)
+        {
+            tracker = FindFirstObjectByType<PlayerBehaviorTracker>();
+            if (tracker != null && DebugMode)
+                Debug.Log("[HeuristicAdaptation] PlayerBehaviorTracker found — adaptation active.");
+            else
+                return; // Still not found, check next frame
+        }
+
+        if (boss == null) return;
 
         // --- Periodic re-evaluation ---
         evaluationTimer += Time.deltaTime;
@@ -103,13 +114,19 @@ public class HeuristicAdaptationManager : MonoBehaviour
     private void EvaluateAndAdapt()
     {
         PlayerProfile profile = tracker.Profile;
+
+        // Always log scores so we can see what the system is computing
+        if (DebugMode)
+            Debug.Log($"[ADAPT] Scores: aggro={profile.aggressionScore:F2} " +
+                      $"aerial={profile.aerialRatio:F2} atkFreq={profile.attackFrequency:F2}/s avgDist={profile.averageDistance:F1} → {currentStyle}");
+
         PlayerStyle newStyle = ClassifyPlayerStyle(profile);
 
         if (newStyle != currentStyle)
         {
             if (DebugMode)
                 Debug.Log($"[HeuristicAdaptation] Style change: {currentStyle} → {newStyle} " +
-                          $"| Aggression: {profile.aggressionScore:F2} | BlockRate: {profile.blockRate:F2} " +
+                          $"| Aggression: {profile.aggressionScore:F2} " +
                           $"| AerialRatio: {profile.aerialRatio:F2} | AttackFreq: {profile.attackFrequency:F2}/s");
 
             currentStyle = newStyle;
@@ -128,8 +145,8 @@ public class HeuristicAdaptationManager : MonoBehaviour
         if (p.aggressionScore >= aggressiveThreshold)
             return PlayerStyle.Aggressive;
 
-        // 2. Defensive: high block rate
-        if (p.blockRate >= defensiveThreshold)
+        // 2. Defensive/Evasive: very low aggression (far away + not attacking)
+        if (p.aggressionScore <= passiveThreshold && p.averageDistance > 5f)
             return PlayerStyle.Defensive;
 
         // 3. Aerial: lots of jump attacks

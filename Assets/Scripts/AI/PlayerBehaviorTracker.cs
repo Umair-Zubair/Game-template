@@ -12,7 +12,7 @@ public class PlayerBehaviorTracker : MonoBehaviour
 {
     [Header("Tracking Configuration")]
     [Tooltip("Duration of the rolling window in seconds. Older events are discarded.")]
-    [SerializeField] private float windowDuration = 10f;
+    [SerializeField] private float windowDuration = 3f;
 
     [Tooltip("How often (seconds) to sample distance and block state.")]
     [SerializeField] private float sampleInterval = 0.5f;
@@ -211,8 +211,8 @@ public class PlayerBehaviorTracker : MonoBehaviour
             : 999f;
 
         // --- Aggression score: composite of attack freq + closeness ---
-        // Normalize attack freq (assume 2 attacks/sec = very aggressive)
-        float normalizedFreq = Mathf.Clamp01(p.attackFrequency / 2f);
+        // Normalize attack freq (assume 1 attack/sec = very aggressive, matching melee cooldown)
+        float normalizedFreq = Mathf.Clamp01(p.attackFrequency / 1f);
         // Normalize closeness (0 = far, 1 = very close; assume 3 units = close)
         float normalizedCloseness = Mathf.Clamp01(1f - (p.averageDistance / 10f));
         p.aggressionScore = (normalizedFreq * 0.6f) + (normalizedCloseness * 0.4f);

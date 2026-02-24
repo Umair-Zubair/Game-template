@@ -334,7 +334,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b34023dc9e319b84ba5df2b57ab8dac2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerBehaviorTracker
-  windowDuration: 10
+  windowDuration: 3
   sampleInterval: 0.5
   DebugMode: 1
 --- !u!1 &3421595607434747571

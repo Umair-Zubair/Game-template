@@ -3736,7 +3736,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -313, y: -165}
+  m_AnchoredPosition: {x: -470, y: 88}
   m_SizeDelta: {x: 120, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2073194925
@@ -3751,8 +3751,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9630f417ebee56499a07fcab498dad1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playArrowPos: {x: -288, y: 269}
-  characterArrowPos: {x: -436, y: 93}
+  playArrowPos: {x: -363, y: 269}
+  characterArrowPos: {x: -470, y: 93}
   volumeArrowPos: {x: -359, y: -31}
   musicArrowPos: {x: -313, y: -151}
   quitArrowPos: {x: -188, y: -287}
@@ -3779,7 +3779,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 0869b1e96aac6d34cb086976dc7af826, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ade4790a2fb9f0c42a64afd9684d0dff, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
