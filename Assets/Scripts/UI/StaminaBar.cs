@@ -34,11 +34,8 @@ public class StaminaBar : MonoBehaviour
     [Tooltip("Optional background / total bar image.")]
     [SerializeField] private Image totalStaminaBar;
 
-    [Tooltip("Optional border image. Assign any Image with a border sprite — it will auto-stretch to frame the bar with the specified padding.")]
+    [Tooltip("Optional border / frame image. Pure decoration — position and size it yourself in the scene.")]
     [SerializeField] private Image borderImage;
-
-    [Tooltip("How many pixels the border extends beyond the bar on each side.")]
-    [SerializeField] private float borderPadding = 2f;
 
     // ──────────────────────────────────────────────
     //  Visual Tuning
@@ -79,9 +76,6 @@ public class StaminaBar : MonoBehaviour
         }
         if (totalStaminaBar != null)
             totalStaminaBar.fillAmount = 1f;
-
-        // Auto-configure border to frame the bar
-        ConfigureBorder();
 
         // Auto-find if not assigned
         if (playerStamina == null)
@@ -206,31 +200,4 @@ public class StaminaBar : MonoBehaviour
         img.preserveAspect = false;
     }
 
-    /// <summary>
-    /// Stretches the border image to cover the bar area plus padding on every side.
-    /// The border becomes a child of this GameObject, anchors stretch to fill,
-    /// and offsets are set so it extends beyond the bar by <see cref="borderPadding"/> pixels.
-    /// </summary>
-    private void ConfigureBorder()
-    {
-        if (borderImage == null) return;
-
-        // Re-parent under this object so it always follows the bar
-        borderImage.transform.SetParent(transform, false);
-
-        // Make sure the border renders on top of everything else in this bar
-        borderImage.transform.SetAsLastSibling();
-
-        // Stretch anchors to fill parent completely
-        RectTransform rt = borderImage.rectTransform;
-        rt.anchorMin = Vector2.zero;
-        rt.anchorMax = Vector2.one;
-
-        // Expand outward by padding on each side (negative offsets = bigger than parent)
-        rt.offsetMin = new Vector2(-borderPadding, -borderPadding); // left, bottom
-        rt.offsetMax = new Vector2(borderPadding, borderPadding);   // right, top
-
-        // Border is decoration only — don't block raycasts
-        borderImage.raycastTarget = false;
-    }
 }
