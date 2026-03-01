@@ -42,11 +42,10 @@ public class MeleeAttack : MonoBehaviour
 
     private void Update()
     {
-        // Regular attack with left mouse button
+        // LMB — Regular melee attack
         if (Input.GetMouseButton(0) && cooldownTimer > attackCooldown && playerController != null
             && Time.timeScale > 0)
         {
-            // Determine stamina cost: air attacks cost more
             float cost = IsGrounded()
                 ? (stamina != null ? stamina.Data.attackCost : 0f)
                 : (stamina != null ? stamina.Data.airAttackCost : 0f);
@@ -55,7 +54,7 @@ public class MeleeAttack : MonoBehaviour
                 Attack();
         }
 
-        // Jump Attack with F key (must be grounded)
+        // F key — Jump Attack (grounded only)
         if (Input.GetKeyDown(KeyCode.F) && cooldownTimer > attackCooldown && playerController != null
             && Time.timeScale > 0 && IsGrounded())
         {
@@ -64,7 +63,7 @@ public class MeleeAttack : MonoBehaviour
                 JumpAttack();
         }
 
-        // Uppercut with right mouse button
+        // RMB — Uppercut
         if (Input.GetMouseButtonDown(1) && cooldownTimer > attackCooldown && playerController != null
             && Time.timeScale > 0)
         {
@@ -78,93 +77,78 @@ public class MeleeAttack : MonoBehaviour
 
     private void Attack()
     {
-        if(attackSound != null)
+        if (attackSound != null)
             SoundManager.instance.PlaySound(attackSound);
-        
+
         anim.SetTrigger("attack");
         cooldownTimer = 0;
-        OnAttackPerformed?.Invoke("melee"); // Layer 2: notify tracker
+        OnAttackPerformed?.Invoke("melee");
 
-        // Detect enemies in range
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayer);
-
-        // Damage them
         foreach (Collider2D enemy in hitEnemies)
         {
-            // Check for Health on the object or its parent
-            if(enemy.GetComponent<Health>() != null)
+            if (enemy.GetComponent<Health>() != null)
             {
                 enemy.GetComponent<Health>().TakeDamage(damage);
-                OnDamageDealt?.Invoke(damage); // Layer 2: notify tracker
+                OnDamageDealt?.Invoke(damage);
             }
-            else if(enemy.GetComponentInParent<Health>() != null)
+            else if (enemy.GetComponentInParent<Health>() != null)
             {
                 enemy.GetComponentInParent<Health>().TakeDamage(damage);
-                OnDamageDealt?.Invoke(damage); // Layer 2: notify tracker
+                OnDamageDealt?.Invoke(damage);
             }
         }
     }
 
     private void JumpAttack()
     {
-        if(jumpAttackSound != null)
+        if (jumpAttackSound != null)
             SoundManager.instance.PlaySound(jumpAttackSound);
-        
+
         anim.SetTrigger("jumpAttack");
         cooldownTimer = 0;
-        OnAttackPerformed?.Invoke("jumpAttack"); // Layer 2: notify tracker
+        OnAttackPerformed?.Invoke("jumpAttack");
 
-        // Apply upward force to simulate jump
         if (body != null)
-        {
             body.linearVelocity = new Vector2(body.linearVelocity.x, jumpAttackHeight);
-        }
 
-        // Detect enemies in range
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayer);
-
-        // Damage them
         foreach (Collider2D enemy in hitEnemies)
         {
-            // Check for Health on the object or its parent
-            if(enemy.GetComponent<Health>() != null)
+            if (enemy.GetComponent<Health>() != null)
             {
                 enemy.GetComponent<Health>().TakeDamage(damage);
-                OnDamageDealt?.Invoke(damage); // Layer 2: notify tracker
+                OnDamageDealt?.Invoke(damage);
             }
-            else if(enemy.GetComponentInParent<Health>() != null)
+            else if (enemy.GetComponentInParent<Health>() != null)
             {
                 enemy.GetComponentInParent<Health>().TakeDamage(damage);
-                OnDamageDealt?.Invoke(damage); // Layer 2: notify tracker
+                OnDamageDealt?.Invoke(damage);
             }
         }
     }
 
     private void Uppercut()
     {
-        if(uppercutSound != null)
+        if (uppercutSound != null)
             SoundManager.instance.PlaySound(uppercutSound);
-        
+
         anim.SetTrigger("uppercut");
         cooldownTimer = 0;
-        OnAttackPerformed?.Invoke("uppercut"); // Layer 2: notify tracker
+        OnAttackPerformed?.Invoke("uppercut");
 
-        // Detect enemies in range
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayer);
-
-        // Damage them
         foreach (Collider2D enemy in hitEnemies)
         {
-            // Check for Health on the object or its parent
-            if(enemy.GetComponent<Health>() != null)
+            if (enemy.GetComponent<Health>() != null)
             {
                 enemy.GetComponent<Health>().TakeDamage(damage);
-                OnDamageDealt?.Invoke(damage); // Layer 2: notify tracker
+                OnDamageDealt?.Invoke(damage);
             }
-            else if(enemy.GetComponentInParent<Health>() != null)
+            else if (enemy.GetComponentInParent<Health>() != null)
             {
                 enemy.GetComponentInParent<Health>().TakeDamage(damage);
-                OnDamageDealt?.Invoke(damage); // Layer 2: notify tracker
+                OnDamageDealt?.Invoke(damage);
             }
         }
     }

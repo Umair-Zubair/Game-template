@@ -240,7 +240,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
   startingHealth: 10
-  components: []
+  components:
+  - {fileID: 8841481591266507717}
+  - {fileID: 215422135787915289}
+  - {fileID: 0}
+  - {fileID: 6734524273785198305}
 --- !u!114 &215422135787915289
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -320,8 +324,10 @@ MonoBehaviour:
   attackCooldown: 0.25
   firePoint: {fileID: 1536905393314150678}
   projectilePrefab: {fileID: 4519657756946598641, guid: f0257222a83835345b2869ae2660686b, type: 3}
+  jumpProjectilePrefab: {fileID: 956519626503882403, guid: 8b04470e21848d84e9ab31dc970598e4, type: 3}
   poolSize: 10
   projectileSound: {fileID: 8300000, guid: 11f2fb8c24ab53741939b255bda4aab3, type: 3}
+  jumpProjectileSound: {fileID: 0}
 --- !u!114 &8560838530970542007
 MonoBehaviour:
   m_ObjectHideFlags: 0

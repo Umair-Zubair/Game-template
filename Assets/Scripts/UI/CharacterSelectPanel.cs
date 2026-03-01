@@ -3,29 +3,27 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Manages the character selection panel.
-/// Handles Knight/Dragon selection and saves to PlayerPrefs.
+/// Saves the selected character index to PlayerPrefs.
+/// CharacterManager in the game scene handles spawning the correct prefab.
 /// </summary>
 public class CharacterSelectPanel : MonoBehaviour
 {
     [Header("Character Buttons")]
     [SerializeField] private Button blobMeleeButton;
     [SerializeField] private Button blobRangedButton;
-    [SerializeField] private Button newDragonButton; // Keeping this for now as it seems to be an extra button mentioned in comments
     [SerializeField] private Button backButton;
 
     [Header("Selection Arrow")]
     [SerializeField] private RectTransform selectionArrow;
-    
-    // Arrow Y positions for each option: 0=Blob Melee, 1=Blob Ranged, 2=Back
+
     [SerializeField] private float blobMeleeArrowY = 157f;
     [SerializeField] private float blobRangedArrowY = -73f;
     [SerializeField] private float backArrowY = -267f;
-    
+
     private int currentPosition = 0; // 0=Blob Melee, 1=Blob Ranged, 2=Back
     private const int TOTAL_OPTIONS = 3;
 
     [Header("Selection Indicators (Optional)")]
-    [Tooltip("Visual indicator that shows which character is selected (e.g., a border or highlight)")]
     [SerializeField] private GameObject blobMeleeSelectedIndicator;
     [SerializeField] private GameObject blobRangedSelectedIndicator;
 
@@ -44,55 +42,45 @@ public class CharacterSelectPanel : MonoBehaviour
     private const string SELECTED_CHARACTER_KEY = "SelectedCharacter";
     private const int BLOB_RANGED_INDEX = 0;
     private const int BLOB_MELEE_INDEX = 1;
-    
-    // Cooldown protection
+
     private float lastInteractionTime = 0f;
     private const float INTERACTION_COOLDOWN = 0.15f;
-    
-    // Original scales for proper scaling
+
     private Vector3 blobMeleeOriginalScale;
     private Vector3 blobRangedOriginalScale;
-    private Vector3 newDragonOriginalScale;
 
     private void Start()
     {
-        // Wire up button listeners
         if (blobMeleeButton != null)
             blobMeleeButton.onClick.AddListener(SelectBlobMelee);
 
         if (blobRangedButton != null)
             blobRangedButton.onClick.AddListener(SelectBlobRanged);
-        
+
         if (backButton != null)
             backButton.onClick.AddListener(Close);
 
-        // Store original scales
         if (blobMeleeButton != null) blobMeleeOriginalScale = blobMeleeButton.transform.localScale;
         if (blobRangedButton != null) blobRangedOriginalScale = blobRangedButton.transform.localScale;
-        if (newDragonButton != null) newDragonOriginalScale = newDragonButton.transform.localScale;
 
-        // Apply color to Ranged Blob preview
         if (blobRangedPreviewImage != null)
             blobRangedPreviewImage.color = blobRangedColor;
 
-        // Show current selection and update arrow
-        currentPosition = 0; // Start on Blob Melee
+        currentPosition = 0;
         UpdateArrowPosition();
     }
 
     private void Update()
     {
-        // Handle Up/Down navigation
         if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
             ChangePosition(-1);
         if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
             ChangePosition(1);
 
-        // Handle Enter/E to select current option
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.E))
             Interact();
     }
-    
+
     private bool CanInteract()
     {
         if (Time.unscaledTime - lastInteractionTime < INTERACTION_COOLDOWN) return false;
@@ -103,13 +91,12 @@ public class CharacterSelectPanel : MonoBehaviour
     private void ChangePosition(int change)
     {
         currentPosition += change;
-        
-        // Wrap around
+
         if (currentPosition < 0)
             currentPosition = TOTAL_OPTIONS - 1;
         else if (currentPosition >= TOTAL_OPTIONS)
             currentPosition = 0;
-        
+
         PlayChangeSound();
         UpdateArrowPosition();
     }
@@ -117,7 +104,7 @@ public class CharacterSelectPanel : MonoBehaviour
     private void UpdateArrowPosition()
     {
         if (selectionArrow == null) return;
-        
+
         Vector2 arrowPos = selectionArrow.anchoredPosition;
         switch (currentPosition)
         {
@@ -131,9 +118,9 @@ public class CharacterSelectPanel : MonoBehaviour
     private void Interact()
     {
         if (!CanInteract()) return;
-        
+
         PlayInteractSound();
-        
+
         switch (currentPosition)
         {
             case 0: SelectBlobMelee(); break;
@@ -142,10 +129,11 @@ public class CharacterSelectPanel : MonoBehaviour
         }
     }
 
+    // ────────────────────────────────────────────────────────────────────────
+    //  Character Selection — just write to PlayerPrefs.
+    //  CharacterManager reads this on game scene load and spawns the right prefab.
+    // ────────────────────────────────────────────────────────────────────────
 
-    /// <summary>
-    /// Selects the Blob Melee character.
-    /// </summary>
     public void SelectBlobMelee()
     {
         PlayerPrefs.SetInt(SELECTED_CHARACTER_KEY, BLOB_MELEE_INDEX);
@@ -154,12 +142,9 @@ public class CharacterSelectPanel : MonoBehaviour
         PlayInteractSound();
         UpdateSelectionVisuals();
 
-        Debug.Log("Blob Melee selected!");
+        Debug.Log("[CharacterSelect] Blob Melee selected.");
     }
 
-    /// <summary>
-    /// Selects the Blob Ranged character.
-    /// </summary>
     public void SelectBlobRanged()
     {
         PlayerPrefs.SetInt(SELECTED_CHARACTER_KEY, BLOB_RANGED_INDEX);
@@ -168,56 +153,47 @@ public class CharacterSelectPanel : MonoBehaviour
         PlayInteractSound();
         UpdateSelectionVisuals();
 
-        Debug.Log("Blob Ranged selected!");
+        Debug.Log("[CharacterSelect] Blob Ranged selected.");
     }
 
-    /// <summary>
-    /// Updates the visual indicators to show which character is selected.
-    /// </summary>
+    // ────────────────────────────────────────────────────────────────────────
+    //  Visuals
+    // ────────────────────────────────────────────────────────────────────────
+
     private void UpdateSelectionVisuals()
     {
         int selected = PlayerPrefs.GetInt(SELECTED_CHARACTER_KEY, -1);
 
-        // Move the selection arrow
         if (selectionArrow != null)
         {
-            Vector3 arrowPos = selectionArrow.anchoredPosition;
-            if (selected == BLOB_MELEE_INDEX)
-                arrowPos.y = blobMeleeArrowY;
-            else if (selected == BLOB_RANGED_INDEX)
-                arrowPos.y = blobRangedArrowY;
+            Vector2 arrowPos = selectionArrow.anchoredPosition;
+            arrowPos.y = selected == BLOB_MELEE_INDEX ? blobMeleeArrowY : blobRangedArrowY;
             selectionArrow.anchoredPosition = arrowPos;
         }
 
-        // Update indicators
         if (blobMeleeSelectedIndicator != null)
             blobMeleeSelectedIndicator.SetActive(selected == BLOB_MELEE_INDEX);
 
         if (blobRangedSelectedIndicator != null)
             blobRangedSelectedIndicator.SetActive(selected == BLOB_RANGED_INDEX);
 
-        // Update colors
         if (blobRangedPreviewImage != null)
             blobRangedPreviewImage.color = blobRangedColor;
 
-        // Scale buttons - pass their original scales
         UpdateButtonVisual(blobMeleeButton, blobMeleeOriginalScale, selected == BLOB_MELEE_INDEX);
         UpdateButtonVisual(blobRangedButton, blobRangedOriginalScale, selected == BLOB_RANGED_INDEX);
-        UpdateButtonVisual(newDragonButton, newDragonOriginalScale, selected == BLOB_RANGED_INDEX);
     }
 
     private void UpdateButtonVisual(Button button, Vector3 originalScale, bool isSelected)
     {
         if (button == null) return;
-
-        // Scale up 10% when selected, restore to original when not
-        float multiplier = isSelected ? 1.1f : 1.0f;
-        button.transform.localScale = originalScale * multiplier;
+        button.transform.localScale = originalScale * (isSelected ? 1.1f : 1.0f);
     }
 
-    /// <summary>
-    /// Closes the character selection panel.
-    /// </summary>
+    // ────────────────────────────────────────────────────────────────────────
+    //  Panel Control
+    // ────────────────────────────────────────────────────────────────────────
+
     public void Close()
     {
         if (mainMenuController != null)
@@ -226,27 +202,23 @@ public class CharacterSelectPanel : MonoBehaviour
             gameObject.SetActive(false);
     }
 
-    /// <summary>
-    /// Confirms selection and starts the game.
-    /// </summary>
     public void ConfirmAndPlay()
     {
         if (!PlayerPrefs.HasKey(SELECTED_CHARACTER_KEY))
         {
-            Debug.LogWarning("Please select a character first!");
+            Debug.LogWarning("[CharacterSelect] No character selected!");
             return;
         }
 
         if (mainMenuController != null)
-        {
-            Debug.Log("Calling MainMenuController.PlayGame()...");
             mainMenuController.PlayGame();
-        }
         else
-        {
-            Debug.LogError("MainMenuController is NOT assigned in CharacterSelectPanel! Please assign it in the Inspector.");
-        }
+            Debug.LogError("MainMenuController not assigned in CharacterSelectPanel!");
     }
+
+    // ────────────────────────────────────────────────────────────────────────
+    //  Audio
+    // ────────────────────────────────────────────────────────────────────────
 
     private void PlayChangeSound()
     {
@@ -262,7 +234,6 @@ public class CharacterSelectPanel : MonoBehaviour
 
     private void OnDestroy()
     {
-        // Clean up listeners
         if (blobMeleeButton != null)
             blobMeleeButton.onClick.RemoveListener(SelectBlobMelee);
 

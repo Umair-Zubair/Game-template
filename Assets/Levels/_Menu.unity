@@ -568,7 +568,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterSelectPanel
   blobMeleeButton: {fileID: 996694523}
   blobRangedButton: {fileID: 631170731}
-  newDragonButton: {fileID: 851132211}
   backButton: {fileID: 119995746}
   selectionArrow: {fileID: 51564551}
   blobMeleeArrowY: 157
