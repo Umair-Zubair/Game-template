@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5843d07941707e4380e097814513341, type: 3}
   m_Name: PlayerStaminaData
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStaminaData
-  maxStamina: 100
+  maxStamina: 10000
   regenRatePerSecond: 15
   regenDelayAfterUse: 1.5
   jumpCost: 15
   attackCost: 20
+  comboAttackCost: 30
   airAttackCost: 25
   rangedAttackCost: 18
   jumpAttackCost: 30

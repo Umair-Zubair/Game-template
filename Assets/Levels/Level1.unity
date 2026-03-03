@@ -1636,6 +1636,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Boss
       objectReference: {fileID: 0}
+    - target: {fileID: 4303414237555634310, guid: 5f1b7edff3194b143907d55e30ebe0e1, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5427193783232584199, guid: 5f1b7edff3194b143907d55e30ebe0e1, type: 3}
       propertyPath: poolSize
       value: 8

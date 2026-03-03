@@ -724,7 +724,7 @@ public class EnemyController : MonoBehaviour
         if (Anim != null)
         {
             // For boss melee, trigger the rangedAttack parameter (reused for melee animation)
-            Anim.SetTrigger("rangedAttack");
+            // Anim.SetTrigger("rangedAttack");
         }
     }
 
