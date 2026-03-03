@@ -1,0 +1,3994 @@
+fileFormatVersion: 2
+guid: 43874630a328bf743a4b2da6c2e65a3c
+AssetOrigin:
+  serializedVersion: 1
+  productId: 332542
+  packageName: Voidborn Goddess
+  packageVersion: 1.0
+  assetPath: Assets/Voidborn Goddes/Sprite/Voidborn Goddess-SpriteSheet.png
+  uploadId: 786928
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 8161392755375268392
+    second: Voidborn Goddess-SpriteSheet_0
+  - first:
+      213: -4145478867158919824
+    second: Voidborn Goddess-SpriteSheet_1
+  - first:
+      213: -775405694734029054
+    second: Voidborn Goddess-SpriteSheet_2
+  - first:
+      213: 4619208969202795328
+    second: Voidborn Goddess-SpriteSheet_3
+  - first:
+      213: -5915520341691285266
+    second: Voidborn Goddess-SpriteSheet_4
+  - first:
+      213: -1005250043846737753
+    second: Voidborn Goddess-SpriteSheet_5
+  - first:
+      213: -2514377554385366128
+    second: Voidborn Goddess-SpriteSheet_6
+  - first:
+      213: -4616609406463933407
+    second: Voidborn Goddess-SpriteSheet_7
+  - first:
+      213: -6069340449666270875
+    second: Voidborn Goddess-SpriteSheet_8
+  - first:
+      213: 8916606196611037757
+    second: Voidborn Goddess-SpriteSheet_9
+  - first:
+      213: -8377046834115921051
+    second: Voidborn Goddess-SpriteSheet_10
+  - first:
+      213: 3065555905143999339
+    second: Voidborn Goddess-SpriteSheet_11
+  - first:
+      213: 7306391289463500163
+    second: Voidborn Goddess-SpriteSheet_12
+  - first:
+      213: -5308805285082968807
+    second: Voidborn Goddess-SpriteSheet_13
+  - first:
+      213: -2423439272494466377
+    second: Voidborn Goddess-SpriteSheet_14
+  - first:
+      213: 3090967886204347204
+    second: Voidborn Goddess-SpriteSheet_15
+  - first:
+      213: 1957043493802644820
+    second: Voidborn Goddess-SpriteSheet_16
+  - first:
+      213: -3148603087566981107
+    second: Voidborn Goddess-SpriteSheet_17
+  - first:
+      213: -676043708361559593
+    second: Voidborn Goddess-SpriteSheet_18
+  - first:
+      213: 7175127143146969577
+    second: Voidborn Goddess-SpriteSheet_19
+  - first:
+      213: -1945857909451172658
+    second: Voidborn Goddess-SpriteSheet_20
+  - first:
+      213: 1842137235066579086
+    second: Voidborn Goddess-SpriteSheet_21
+  - first:
+      213: -392583279995406099
+    second: Voidborn Goddess-SpriteSheet_22
+  - first:
+      213: 593276741052027979
+    second: Voidborn Goddess-SpriteSheet_23
+  - first:
+      213: -7146783641081536313
+    second: Voidborn Goddess-SpriteSheet_24
+  - first:
+      213: 8958607778572031087
+    second: Voidborn Goddess-SpriteSheet_25
+  - first:
+      213: 8337702217875509378
+    second: Voidborn Goddess-SpriteSheet_26
+  - first:
+      213: 1142931702461709755
+    second: Voidborn Goddess-SpriteSheet_27
+  - first:
+      213: -2130565495136745645
+    second: Voidborn Goddess-SpriteSheet_28
+  - first:
+      213: -3280507406818710760
+    second: Voidborn Goddess-SpriteSheet_29
+  - first:
+      213: 8296851351273505496
+    second: Voidborn Goddess-SpriteSheet_30
+  - first:
+      213: -2021509041581443666
+    second: Voidborn Goddess-SpriteSheet_31
+  - first:
+      213: -7295618326806572603
+    second: Voidborn Goddess-SpriteSheet_32
+  - first:
+      213: -2646821780648177808
+    second: Voidborn Goddess-SpriteSheet_33
+  - first:
+      213: 8168096911185529003
+    second: Voidborn Goddess-SpriteSheet_34
+  - first:
+      213: -8244036202796234222
+    second: Voidborn Goddess-SpriteSheet_35
+  - first:
+      213: 8293081643813679341
+    second: Voidborn Goddess-SpriteSheet_36
+  - first:
+      213: 8655701865728063980
+    second: Voidborn Goddess-SpriteSheet_37
+  - first:
+      213: 7530622041894937176
+    second: Voidborn Goddess-SpriteSheet_38
+  - first:
+      213: 2868911474855017883
+    second: Voidborn Goddess-SpriteSheet_39
+  - first:
+      213: 5084005975203352993
+    second: Voidborn Goddess-SpriteSheet_40
+  - first:
+      213: -1251351908809511220
+    second: Voidborn Goddess-SpriteSheet_41
+  - first:
+      213: 701075664047281439
+    second: Voidborn Goddess-SpriteSheet_42
+  - first:
+      213: 6392934083969437529
+    second: Voidborn Goddess-SpriteSheet_43
+  - first:
+      213: -388824126003865808
+    second: Voidborn Goddess-SpriteSheet_44
+  - first:
+      213: -6531105927564349842
+    second: Voidborn Goddess-SpriteSheet_45
+  - first:
+      213: -7594455820818865400
+    second: Voidborn Goddess-SpriteSheet_46
+  - first:
+      213: -2968774513006278788
+    second: Voidborn Goddess-SpriteSheet_47
+  - first:
+      213: 2347728859837526908
+    second: Voidborn Goddess-SpriteSheet_48
+  - first:
+      213: 5833477176976374132
+    second: Voidborn Goddess-SpriteSheet_49
+  - first:
+      213: 1258831390313210448
+    second: Voidborn Goddess-SpriteSheet_50
+  - first:
+      213: -7986875097857310109
+    second: Voidborn Goddess-SpriteSheet_51
+  - first:
+      213: 728904567941529621
+    second: Voidborn Goddess-SpriteSheet_52
+  - first:
+      213: 4861185031027291693
+    second: Voidborn Goddess-SpriteSheet_53
+  - first:
+      213: -304413281204291577
+    second: Voidborn Goddess-SpriteSheet_54
+  - first:
+      213: -276511730833624697
+    second: Voidborn Goddess-SpriteSheet_55
+  - first:
+      213: 1702303096433174746
+    second: Voidborn Goddess-SpriteSheet_56
+  - first:
+      213: 5297192247185403462
+    second: Voidborn Goddess-SpriteSheet_57
+  - first:
+      213: 2393035834902253561
+    second: Voidborn Goddess-SpriteSheet_58
+  - first:
+      213: 696812265864569584
+    second: Voidborn Goddess-SpriteSheet_59
+  - first:
+      213: 3580144286378856305
+    second: Voidborn Goddess-SpriteSheet_60
+  - first:
+      213: 2093934862889203029
+    second: Voidborn Goddess-SpriteSheet_61
+  - first:
+      213: 1465509166013185147
+    second: Voidborn Goddess-SpriteSheet_62
+  - first:
+      213: -6023519426093631531
+    second: Voidborn Goddess-SpriteSheet_63
+  - first:
+      213: -5766845758066510715
+    second: Voidborn Goddess-SpriteSheet_64
+  - first:
+      213: -2782545114569233687
+    second: Voidborn Goddess-SpriteSheet_65
+  - first:
+      213: -6979858879486442107
+    second: Voidborn Goddess-SpriteSheet_66
+  - first:
+      213: -6423952045325418370
+    second: Voidborn Goddess-SpriteSheet_67
+  - first:
+      213: -3564409614812579504
+    second: Voidborn Goddess-SpriteSheet_68
+  - first:
+      213: 8687400101550201560
+    second: Voidborn Goddess-SpriteSheet_69
+  - first:
+      213: -1191205711115846720
+    second: Voidborn Goddess-SpriteSheet_70
+  - first:
+      213: -8865971485943487893
+    second: Voidborn Goddess-SpriteSheet_71
+  - first:
+      213: 4718168033227205809
+    second: Voidborn Goddess-SpriteSheet_72
+  - first:
+      213: 4348471727596262644
+    second: Voidborn Goddess-SpriteSheet_73
+  - first:
+      213: -1390011029117809454
+    second: Voidborn Goddess-SpriteSheet_74
+  - first:
+      213: -6847770564266998621
+    second: Voidborn Goddess-SpriteSheet_75
+  - first:
+      213: 1910020208953798454
+    second: Voidborn Goddess-SpriteSheet_76
+  - first:
+      213: 334291521103434756
+    second: Voidborn Goddess-SpriteSheet_77
+  - first:
+      213: 2102535409024246263
+    second: Voidborn Goddess-SpriteSheet_78
+  - first:
+      213: 8562530584472348454
+    second: Voidborn Goddess-SpriteSheet_79
+  - first:
+      213: 4132342992987362631
+    second: Voidborn Goddess-SpriteSheet_80
+  - first:
+      213: 1176381635573797033
+    second: Voidborn Goddess-SpriteSheet_81
+  - first:
+      213: -3167788455633026009
+    second: Voidborn Goddess-SpriteSheet_82
+  - first:
+      213: 6618697911058731204
+    second: Voidborn Goddess-SpriteSheet_83
+  - first:
+      213: -5025882906806227916
+    second: Voidborn Goddess-SpriteSheet_84
+  - first:
+      213: 3669168109831838925
+    second: Voidborn Goddess-SpriteSheet_85
+  - first:
+      213: 1281536119465705354
+    second: Voidborn Goddess-SpriteSheet_86
+  - first:
+      213: -7410106882891133417
+    second: Voidborn Goddess-SpriteSheet_87
+  - first:
+      213: -7183304869860029850
+    second: Voidborn Goddess-SpriteSheet_88
+  - first:
+      213: -3331444876116910840
+    second: Voidborn Goddess-SpriteSheet_89
+  - first:
+      213: -1435993708719810907
+    second: Voidborn Goddess-SpriteSheet_90
+  - first:
+      213: 7995824024428061953
+    second: Voidborn Goddess-SpriteSheet_91
+  - first:
+      213: -3022653794834392630
+    second: Voidborn Goddess-SpriteSheet_92
+  - first:
+      213: -6076983508315505876
+    second: Voidborn Goddess-SpriteSheet_93
+  - first:
+      213: -6722418145742265362
+    second: Voidborn Goddess-SpriteSheet_94
+  - first:
+      213: -1776416151028155639
+    second: Voidborn Goddess-SpriteSheet_95
+  - first:
+      213: 9193949740918159105
+    second: Voidborn Goddess-SpriteSheet_96
+  - first:
+      213: -4441852494946011012
+    second: Voidborn Goddess-SpriteSheet_97
+  - first:
+      213: -5638196399620837613
+    second: Voidborn Goddess-SpriteSheet_98
+  - first:
+      213: -1013972141902307858
+    second: Voidborn Goddess-SpriteSheet_99
+  - first:
+      213: 5576743200180955872
+    second: Voidborn Goddess-SpriteSheet_100
+  - first:
+      213: 539167021112425220
+    second: Voidborn Goddess-SpriteSheet_101
+  - first:
+      213: -5225616037625151070
+    second: Voidborn Goddess-SpriteSheet_102
+  - first:
+      213: 544272130218849077
+    second: Voidborn Goddess-SpriteSheet_103
+  - first:
+      213: 6392359960972622957
+    second: Voidborn Goddess-SpriteSheet_104
+  - first:
+      213: -593506881492853823
+    second: Voidborn Goddess-SpriteSheet_105
+  - first:
+      213: -8555393423997901640
+    second: Voidborn Goddess-SpriteSheet_106
+  - first:
+      213: 6387514432525764687
+    second: Voidborn Goddess-SpriteSheet_107
+  - first:
+      213: -3026975837335923367
+    second: Voidborn Goddess-SpriteSheet_108
+  - first:
+      213: -8721093810419490251
+    second: Voidborn Goddess-SpriteSheet_109
+  - first:
+      213: -6146896408967737115
+    second: Voidborn Goddess-SpriteSheet_110
+  - first:
+      213: 2563995036299331894
+    second: Voidborn Goddess-SpriteSheet_111
+  - first:
+      213: 2843219092198814251
+    second: Voidborn Goddess-SpriteSheet_112
+  - first:
+      213: -8551646811118517939
+    second: Voidborn Goddess-SpriteSheet_113
+  - first:
+      213: 4607555823813633
+    second: Voidborn Goddess-SpriteSheet_114
+  - first:
+      213: 1645713819748846716
+    second: Voidborn Goddess-SpriteSheet_115
+  - first:
+      213: -2778375560887712292
+    second: Voidborn Goddess-SpriteSheet_116
+  - first:
+      213: 2784469435607875911
+    second: Voidborn Goddess-SpriteSheet_117
+  - first:
+      213: 3941517451602643337
+    second: Voidborn Goddess-SpriteSheet_118
+  - first:
+      213: -1035243330852099963
+    second: Voidborn Goddess-SpriteSheet_119
+  - first:
+      213: -8549212392737827729
+    second: Voidborn Goddess-SpriteSheet_120
+  - first:
+      213: 704467692434383980
+    second: Voidborn Goddess-SpriteSheet_121
+  - first:
+      213: -302381985749922021
+    second: Voidborn Goddess-SpriteSheet_122
+  - first:
+      213: -4680278911907671577
+    second: Voidborn Goddess-SpriteSheet_123
+  - first:
+      213: -296145788545440846
+    second: Voidborn Goddess-SpriteSheet_124
+  - first:
+      213: -8440958939644414317
+    second: Voidborn Goddess-SpriteSheet_125
+  - first:
+      213: -4655717981356690944
+    second: Voidborn Goddess-SpriteSheet_126
+  - first:
+      213: -3090741516888447882
+    second: Voidborn Goddess-SpriteSheet_127
+  - first:
+      213: 5392507682240767195
+    second: Voidborn Goddess-SpriteSheet_128
+  - first:
+      213: 7212738531400171127
+    second: Voidborn Goddess-SpriteSheet_129
+  - first:
+      213: -2373004179931674276
+    second: Voidborn Goddess-SpriteSheet_130
+  - first:
+      213: -936801603860202254
+    second: Voidborn Goddess-SpriteSheet_131
+  - first:
+      213: -5149996772163699412
+    second: Voidborn Goddess-SpriteSheet_132
+  - first:
+      213: -5424698401980678914
+    second: Voidborn Goddess-SpriteSheet_133
+  - first:
+      213: 7732336612947314223
+    second: Voidborn Goddess-SpriteSheet_134
+  - first:
+      213: -4655643329217048503
+    second: Voidborn Goddess-SpriteSheet_135
+  - first:
+      213: -7606724062575966551
+    second: Voidborn Goddess-SpriteSheet_136
+  - first:
+      213: -7290827101045634164
+    second: Voidborn Goddess-SpriteSheet_137
+  - first:
+      213: -4140855506901193267
+    second: Voidborn Goddess-SpriteSheet_138
+  - first:
+      213: -2923682570340608114
+    second: Voidborn Goddess-SpriteSheet_139
+  - first:
+      213: -1343401090779563694
+    second: Voidborn Goddess-SpriteSheet_140
+  - first:
+      213: 2625363142929629439
+    second: Voidborn Goddess-SpriteSheet_141
+  - first:
+      213: 7349669516910181626
+    second: Voidborn Goddess-SpriteSheet_142
+  - first:
+      213: -982826918206587183
+    second: Voidborn Goddess-SpriteSheet_143
+  - first:
+      213: 8264693561130565183
+    second: Voidborn Goddess-SpriteSheet_144
+  - first:
+      213: 1389505746764611786
+    second: Voidborn Goddess-SpriteSheet_145
+  - first:
+      213: 499024477098574790
+    second: Voidborn Goddess-SpriteSheet_146
+  - first:
+      213: -2390202507642587549
+    second: Voidborn Goddess-SpriteSheet_147
+  - first:
+      213: -3870188187425701237
+    second: Voidborn Goddess-SpriteSheet_148
+  - first:
+      213: 994589330316333029
+    second: Voidborn Goddess-SpriteSheet_149
+  - first:
+      213: -3434329431691182638
+    second: Voidborn Goddess-SpriteSheet_150
+  - first:
+      213: 6712916336834402212
+    second: Voidborn Goddess-SpriteSheet_151
+  - first:
+      213: -5293171991115516442
+    second: Voidborn Goddess-SpriteSheet_152
+  - first:
+      213: 3038720627546922048
+    second: Voidborn Goddess-SpriteSheet_153
+  - first:
+      213: 1450362092726448879
+    second: Voidborn Goddess-SpriteSheet_154
+  - first:
+      213: -5924195514371013307
+    second: Voidborn Goddess-SpriteSheet_155
+  - first:
+      213: 9147019987322173744
+    second: Voidborn Goddess-SpriteSheet_156
+  - first:
+      213: -4062393129482606277
+    second: Voidborn Goddess-SpriteSheet_157
+  - first:
+      213: 7456988356487504172
+    second: Voidborn Goddess-SpriteSheet_158
+  - first:
+      213: -2975257300706756212
+    second: Voidborn Goddess-SpriteSheet_159
+  - first:
+      213: 274999828199995108
+    second: Voidborn Goddess-SpriteSheet_160
+  - first:
+      213: -1722061789467268229
+    second: Voidborn Goddess-SpriteSheet_161
+  - first:
+      213: -2967704180482987557
+    second: Voidborn Goddess-SpriteSheet_162
+  - first:
+      213: -7081390435838910845
+    second: Voidborn Goddess-SpriteSheet_163
+  - first:
+      213: -692095821357470871
+    second: Voidborn Goddess-SpriteSheet_164
+  - first:
+      213: 450284363940450575
+    second: Voidborn Goddess-SpriteSheet_165
+  - first:
+      213: -5642740717354760174
+    second: Voidborn Goddess-SpriteSheet_166
+  - first:
+      213: -3022985477465107706
+    second: Voidborn Goddess-SpriteSheet_167
+  - first:
+      213: -8329461248412758736
+    second: Voidborn Goddess-SpriteSheet_168
+  - first:
+      213: -6818597844790623577
+    second: Voidborn Goddess-SpriteSheet_169
+  - first:
+      213: -689273707002414130
+    second: Voidborn Goddess-SpriteSheet_170
+  - first:
+      213: 4598053011559435810
+    second: Voidborn Goddess-SpriteSheet_171
+  - first:
+      213: 1700982178617281381
+    second: Voidborn Goddess-SpriteSheet_172
+  - first:
+      213: -5916246324188959993
+    second: Voidborn Goddess-SpriteSheet_173
+  - first:
+      213: -8147193499398716659
+    second: Voidborn Goddess-SpriteSheet_174
+  - first:
+      213: 8501311698181492108
+    second: Voidborn Goddess-SpriteSheet_175
+  - first:
+      213: 6437301320712670173
+    second: Voidborn Goddess-SpriteSheet_176
+  - first:
+      213: 15343394936264805
+    second: Voidborn Goddess-SpriteSheet_177
+  - first:
+      213: 42453864725269009
+    second: Voidborn Goddess-SpriteSheet_178
+  - first:
+      213: 5500902098835362150
+    second: Voidborn Goddess-SpriteSheet_179
+  - first:
+      213: 1682487501569486110
+    second: Voidborn Goddess-SpriteSheet_180
+  - first:
+      213: -7563276541826685422
+    second: Voidborn Goddess-SpriteSheet_181
+  - first:
+      213: 2979636103705994902
+    second: Voidborn Goddess-SpriteSheet_182
+  - first:
+      213: -430838608029228408
+    second: Voidborn Goddess-SpriteSheet_183
+  - first:
+      213: 2306191270333696414
+    second: Voidborn Goddess-SpriteSheet_184
+  - first:
+      213: 9042733650763514126
+    second: Voidborn Goddess-SpriteSheet_185
+  - first:
+      213: 1152945559116626565
+    second: Voidborn Goddess-SpriteSheet_186
+  - first:
+      213: -8874716596207607003
+    second: Voidborn Goddess-SpriteSheet_187
+  - first:
+      213: 2525946526102244701
+    second: Voidborn Goddess-SpriteSheet_188
+  - first:
+      213: 1884669548666707209
+    second: Voidborn Goddess-SpriteSheet_189
+  - first:
+      213: -243266071218195912
+    second: Voidborn Goddess-SpriteSheet_190
+  - first:
+      213: 7628205745582895751
+    second: Voidborn Goddess-SpriteSheet_191
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 8192
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 8192
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1209
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 822e6985877134170800000000000000
+      internalID: 8161392755375268392
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_1
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 1209
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0759a1b1fec4876c0800000000000000
+      internalID: -4145478867158919824
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_2
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 1209
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 20f209001a43d35f0800000000000000
+      internalID: -775405694734029054
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_3
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 1209
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 04381a8751aba1040800000000000000
+      internalID: 4619208969202795328
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_4
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 1209
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee0c4eb4799d7eda0800000000000000
+      internalID: -5915520341691285266
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_5
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 1209
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7a0c1124962ac02f0800000000000000
+      internalID: -1005250043846737753
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_6
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 1209
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 09315af9fe22b1dd0800000000000000
+      internalID: -2514377554385366128
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_7
+      rect:
+        serializedVersion: 2
+        x: 966
+        y: 1209
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1248df464328eefb0800000000000000
+      internalID: -4616609406463933407
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_8
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1116
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5697bbc840f55cba0800000000000000
+      internalID: -6069340449666270875
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_9
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 1116
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d3a3c07f7162ebb70800000000000000
+      internalID: 8916606196611037757
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_10
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 1116
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 56bb5b1b940cebb80800000000000000
+      internalID: -8377046834115921051
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_11
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 1116
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b6b853d8ada0b8a20800000000000000
+      internalID: 3065555905143999339
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_12
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 1116
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 38dea76ba24856560800000000000000
+      internalID: 7306391289463500163
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_13
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 1116
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 91dc9e078b55356b0800000000000000
+      internalID: -5308805285082968807
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_14
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 1116
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7ba7c3452d63e5ed0800000000000000
+      internalID: -2423439272494466377
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_15
+      rect:
+        serializedVersion: 2
+        x: 966
+        y: 1116
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 443a9557ae255ea20800000000000000
+      internalID: 3090967886204347204
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_16
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1023
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 455981250b0d82b10800000000000000
+      internalID: 1957043493802644820
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_17
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 1023
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d083fd28c2aed44d0800000000000000
+      internalID: -3148603087566981107
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_18
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 1023
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7d1b87e34d53e96f0800000000000000
+      internalID: -676043708361559593
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_19
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 1023
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9e9d9890f1c239360800000000000000
+      internalID: 7175127143146969577
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_20
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 1023
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ec457cb7a8ceef4e0800000000000000
+      internalID: -1945857909451172658
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_21
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 1023
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e88e9a32e06909910800000000000000
+      internalID: 1842137235066579086
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_22
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 1023
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: de8bd1b36934d8af0800000000000000
+      internalID: -392583279995406099
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_23
+      rect:
+        serializedVersion: 2
+        x: 966
+        y: 1023
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b4458eb7d0ebb3800800000000000000
+      internalID: 593276741052027979
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_24
+      rect:
+        serializedVersion: 2
+        x: 1104
+        y: 1023
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7c023cac42681dc90800000000000000
+      internalID: -7146783641081536313
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_25
+      rect:
+        serializedVersion: 2
+        x: 1242
+        y: 1023
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f6456d35f4e535c70800000000000000
+      internalID: 8958607778572031087
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_26
+      rect:
+        serializedVersion: 2
+        x: 1380
+        y: 1023
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 280d47bfdf775b370800000000000000
+      internalID: 8337702217875509378
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_27
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 930
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bbd33cfe3528cdf00800000000000000
+      internalID: 1142931702461709755
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_28
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 930
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3578bab68f5be62e0800000000000000
+      internalID: -2130565495136745645
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_29
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 930
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 81b6885f4eb4972d0800000000000000
+      internalID: -3280507406818710760
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_30
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 930
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8d280ea6856542370800000000000000
+      internalID: 8296851351273505496
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_31
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 837
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ea53c42bc3822f3e0800000000000000
+      internalID: -2021509041581443666
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_32
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 837
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5c15ddd19c1c0ca90800000000000000
+      internalID: -7295618326806572603
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_33
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 837
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 07fc2bc2d99944bd0800000000000000
+      internalID: -2646821780648177808
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_34
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 837
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ba8cd224dd8ea5170800000000000000
+      internalID: 8168096911185529003
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_35
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 837
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 21aced890cc479d80800000000000000
+      internalID: -8244036202796234222
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_36
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 744
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: de0b3d001d1f61370800000000000000
+      internalID: 8293081643813679341
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_37
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 744
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ce9386cacfa3f1870800000000000000
+      internalID: 8655701865728063980
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_38
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 744
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 852efd029d4228860800000000000000
+      internalID: 7530622041894937176
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_39
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 744
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b9d76c649cb60d720800000000000000
+      internalID: 2868911474855017883
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_40
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 744
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1a195fb8f740e8640800000000000000
+      internalID: 5084005975203352993
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_41
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 744
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ccee662a11e42aee0800000000000000
+      internalID: -1251351908809511220
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_42
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f15953c1a98bab900800000000000000
+      internalID: 701075664047281439
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_43
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 95f4c7b9da348b850800000000000000
+      internalID: 6392934083969437529
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_44
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0371079748e9a9af0800000000000000
+      internalID: -388824126003865808
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_45
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e6e241d13c9dc55a0800000000000000
+      internalID: -6531105927564349842
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_46
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 803a1b90ba21b9690800000000000000
+      internalID: -7594455820818865400
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_47
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c7707064f4bccc6d0800000000000000
+      internalID: -2968774513006278788
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_48
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c737c8f85fec49020800000000000000
+      internalID: 2347728859837526908
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_49
+      rect:
+        serializedVersion: 2
+        x: 966
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 479760bd59ca4f050800000000000000
+      internalID: 5833477176976374132
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_50
+      rect:
+        serializedVersion: 2
+        x: 1104
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 052eabbda74487110800000000000000
+      internalID: 1258831390313210448
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_51
+      rect:
+        serializedVersion: 2
+        x: 1242
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3624dce2a6be82190800000000000000
+      internalID: -7986875097857310109
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_52
+      rect:
+        serializedVersion: 2
+        x: 1380
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5108057b7d69d1a00800000000000000
+      internalID: 728904567941529621
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_53
+      rect:
+        serializedVersion: 2
+        x: 1518
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d26f3d1b706667340800000000000000
+      internalID: 4861185031027291693
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_54
+      rect:
+        serializedVersion: 2
+        x: 1656
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 70838eccbb186cbf0800000000000000
+      internalID: -304413281204291577
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_55
+      rect:
+        serializedVersion: 2
+        x: 1794
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 781fe6bbb02a92cf0800000000000000
+      internalID: -276511730833624697
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_56
+      rect:
+        serializedVersion: 2
+        x: 1932
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ad862f2a5abcf9710800000000000000
+      internalID: 1702303096433174746
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_57
+      rect:
+        serializedVersion: 2
+        x: 2070
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 64e60787848638940800000000000000
+      internalID: 5297192247185403462
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_58
+      rect:
+        serializedVersion: 2
+        x: 2208
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9ff012ab965c53120800000000000000
+      internalID: 2393035834902253561
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_59
+      rect:
+        serializedVersion: 2
+        x: 2346
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0f22efd50139ba900800000000000000
+      internalID: 696812265864569584
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_60
+      rect:
+        serializedVersion: 2
+        x: 2484
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 17f8142924a3fa130800000000000000
+      internalID: 3580144286378856305
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_61
+      rect:
+        serializedVersion: 2
+        x: 2622
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5553155e9a62f0d10800000000000000
+      internalID: 2093934862889203029
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_62
+      rect:
+        serializedVersion: 2
+        x: 2760
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b7c7b4762d8865410800000000000000
+      internalID: 1465509166013185147
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_63
+      rect:
+        serializedVersion: 2
+        x: 2898
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5d73606fef8286ca0800000000000000
+      internalID: -6023519426093631531
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_64
+      rect:
+        serializedVersion: 2
+        x: 3036
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5843afb465c08ffa0800000000000000
+      internalID: -5766845758066510715
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_65
+      rect:
+        serializedVersion: 2
+        x: 3174
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9ea2a9af5f96269d0800000000000000
+      internalID: -2782545114569233687
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_66
+      rect:
+        serializedVersion: 2
+        x: 3312
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 585cad9745f822f90800000000000000
+      internalID: -6979858879486442107
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_67
+      rect:
+        serializedVersion: 2
+        x: 3450
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e700c3c76a989d6a0800000000000000
+      internalID: -6423952045325418370
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_68
+      rect:
+        serializedVersion: 2
+        x: 3588
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 059fb13275ca88ec0800000000000000
+      internalID: -3564409614812579504
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_69
+      rect:
+        serializedVersion: 2
+        x: 3726
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8da97925d58df8870800000000000000
+      internalID: 8687400101550201560
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_70
+      rect:
+        serializedVersion: 2
+        x: 3864
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0cbf58e87bcf77fe0800000000000000
+      internalID: -1191205711115846720
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_71
+      rect:
+        serializedVersion: 2
+        x: 4002
+        y: 651
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b62a89f48edb5f480800000000000000
+      internalID: -8865971485943487893
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_72
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 558
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1bc6c1b04dc4a7140800000000000000
+      internalID: 4718168033227205809
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_73
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 558
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f4543f3fffd85c30800000000000000
+      internalID: 4348471727596262644
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_74
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 558
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2dcce876550b5bce0800000000000000
+      internalID: -1390011029117809454
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_75
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 558
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3a44d7de3f4d7f0a0800000000000000
+      internalID: -6847770564266998621
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_76
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 558
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 63f2284a241c18a10800000000000000
+      internalID: 1910020208953798454
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_77
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 558
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4049bc60e54a3a400800000000000000
+      internalID: 334291521103434756
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_78
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 558
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7f1229690d4bd2d10800000000000000
+      internalID: 2102535409024246263
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_79
+      rect:
+        serializedVersion: 2
+        x: 966
+        y: 558
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 62764e9433834d670800000000000000
+      internalID: 8562530584472348454
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_80
+      rect:
+        serializedVersion: 2
+        x: 1104
+        y: 558
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 745161bde08095930800000000000000
+      internalID: 4132342992987362631
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_81
+      rect:
+        serializedVersion: 2
+        x: 1242
+        y: 558
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9a05ba46dd8535010800000000000000
+      internalID: 1176381635573797033
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_82
+      rect:
+        serializedVersion: 2
+        x: 1380
+        y: 558
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 724096aee21c904d0800000000000000
+      internalID: -3167788455633026009
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_83
+      rect:
+        serializedVersion: 2
+        x: 1518
+        y: 558
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4c09648cea65adb50800000000000000
+      internalID: 6618697911058731204
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_84
+      rect:
+        serializedVersion: 2
+        x: 1656
+        y: 558
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 43c6b11ef1a704ab0800000000000000
+      internalID: -5025882906806227916
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_85
+      rect:
+        serializedVersion: 2
+        x: 1794
+        y: 558
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dccd7bfa4f08be230800000000000000
+      internalID: 3669168109831838925
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_86
+      rect:
+        serializedVersion: 2
+        x: 1932
+        y: 558
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a8ff59f8f4ee8c110800000000000000
+      internalID: 1281536119465705354
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_87
+      rect:
+        serializedVersion: 2
+        x: 2070
+        y: 558
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 71ec899ec030a2990800000000000000
+      internalID: -7410106882891133417
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_88
+      rect:
+        serializedVersion: 2
+        x: 2208
+        y: 558
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 66ac8a69746cf4c90800000000000000
+      internalID: -7183304869860029850
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_89
+      rect:
+        serializedVersion: 2
+        x: 2346
+        y: 558
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 80d9142398454c1d0800000000000000
+      internalID: -3331444876116910840
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_90
+      rect:
+        serializedVersion: 2
+        x: 2484
+        y: 558
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5a65f048453521ce0800000000000000
+      internalID: -1435993708719810907
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_91
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 465
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 105a196269fd6fe60800000000000000
+      internalID: 7995824024428061953
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_92
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 465
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ac9d8e763606d06d0800000000000000
+      internalID: -3022653794834392630
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_93
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 465
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c2b72f842b73aaba0800000000000000
+      internalID: -6076983508315505876
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_94
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 465
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee36467305c25b2a0800000000000000
+      internalID: -6722418145742265362
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_95
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 465
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 90b33b82ce6e857e0800000000000000
+      internalID: -1776416151028155639
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_96
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 465
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 107b836e398779f70800000000000000
+      internalID: 9193949740918159105
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_97
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 465
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c787f0690be5b52c0800000000000000
+      internalID: -4441852494946011012
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_98
+      rect:
+        serializedVersion: 2
+        x: 966
+        y: 465
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 31fa6ba3f3a11c1b0800000000000000
+      internalID: -5638196399620837613
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_99
+      rect:
+        serializedVersion: 2
+        x: 1104
+        y: 465
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eed55cd85b5ade1f0800000000000000
+      internalID: -1013972141902307858
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_100
+      rect:
+        serializedVersion: 2
+        x: 1242
+        y: 465
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0ea6c5ac462946d40800000000000000
+      internalID: 5576743200180955872
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_101
+      rect:
+        serializedVersion: 2
+        x: 1380
+        y: 465
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 40bf2009c818b7700800000000000000
+      internalID: 539167021112425220
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_102
+      rect:
+        serializedVersion: 2
+        x: 1518
+        y: 465
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2a1c4c876e1ea77b0800000000000000
+      internalID: -5225616037625151070
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_103
+      rect:
+        serializedVersion: 2
+        x: 1656
+        y: 465
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 533f6d66e94ad8700800000000000000
+      internalID: 544272130218849077
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_104
+      rect:
+        serializedVersion: 2
+        x: 1794
+        y: 465
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d6cf33e248936b850800000000000000
+      internalID: 6392359960972622957
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_105
+      rect:
+        serializedVersion: 2
+        x: 1932
+        y: 465
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1cb5ed4c2a073c7f0800000000000000
+      internalID: -593506881492853823
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_106
+      rect:
+        serializedVersion: 2
+        x: 2070
+        y: 465
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8b464e06203254980800000000000000
+      internalID: -8555393423997901640
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_107
+      rect:
+        serializedVersion: 2
+        x: 2208
+        y: 465
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f48016ca88205a850800000000000000
+      internalID: 6387514432525764687
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_108
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 372
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 955d6e773850ef5d0800000000000000
+      internalID: -3026975837335923367
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_109
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 372
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 532a611c26378f680800000000000000
+      internalID: -8721093810419490251
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_110
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 372
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5e09a50a846d1baa0800000000000000
+      internalID: -6146896408967737115
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_111
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 279
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6398c70a6e3259320800000000000000
+      internalID: 2563995036299331894
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_112
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 279
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b227e1943b4257720800000000000000
+      internalID: 2843219092198814251
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_113
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 279
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d41cdaaa882725980800000000000000
+      internalID: -8551646811118517939
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_114
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 279
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 10449203c8e501000800000000000000
+      internalID: 4607555823813633
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_115
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 279
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c7cc41cefffb6d610800000000000000
+      internalID: 1645713819748846716
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_116
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 279
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cd549a8d52a3179d0800000000000000
+      internalID: -2778375560887712292
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_117
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 279
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 741075de23c64a620800000000000000
+      internalID: 2784469435607875911
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_118
+      rect:
+        serializedVersion: 2
+        x: 966
+        y: 279
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 98947ca3d3513b630800000000000000
+      internalID: 3941517451602643337
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_119
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 186
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 588e770fca312a1f0800000000000000
+      internalID: -1035243330852099963
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_120
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 186
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f649e7ddf981b5980800000000000000
+      internalID: -8549212392737827729
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_121
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 186
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c646a4342a5c6c900800000000000000
+      internalID: 704467692434383980
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_122
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 186
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b1f06e0af29bdcbf0800000000000000
+      internalID: -302381985749922021
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_123
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 186
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e1ddf5702f4c0fb0800000000000000
+      internalID: -4680278911907671577
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_124
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 186
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b3650079f0e3ebf0800000000000000
+      internalID: -296145788545440846
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_125
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 93
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 39636d60190bbda80800000000000000
+      internalID: -8440958939644414317
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_126
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 93
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 002f5dab921936fb0800000000000000
+      internalID: -4655717981356690944
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_127
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 93
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 674ef4147fa7b15d0800000000000000
+      internalID: -3090741516888447882
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_128
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bd4a6809a2906da40800000000000000
+      internalID: 5392507682240767195
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_129
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 0
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 77e31e5ca7bc81460800000000000000
+      internalID: 7212738531400171127
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_130
+      rect:
+        serializedVersion: 2
+        x: 276
+        y: 0
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c59c7a46545611fd0800000000000000
+      internalID: -2373004179931674276
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_131
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 0
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2fc75e897efcff2f0800000000000000
+      internalID: -936801603860202254
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_132
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 0
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c2d36c8b8398788b0800000000000000
+      internalID: -5149996772163699412
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_133
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 0
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: efcff407b8997b4b0800000000000000
+      internalID: -5424698401980678914
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_134
+      rect:
+        serializedVersion: 2
+        x: 828
+        y: 0
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f26c87a8e27ce4b60800000000000000
+      internalID: 7732336612947314223
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_135
+      rect:
+        serializedVersion: 2
+        x: 966
+        y: 0
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 940d9190f05d36fb0800000000000000
+      internalID: -4655643329217048503
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_136
+      rect:
+        serializedVersion: 2
+        x: 1104
+        y: 0
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9a64eb964cc7f6690800000000000000
+      internalID: -7606724062575966551
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_137
+      rect:
+        serializedVersion: 2
+        x: 1242
+        y: 0
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c8b426b4167c1da90800000000000000
+      internalID: -7290827101045634164
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_138
+      rect:
+        serializedVersion: 2
+        x: 1380
+        y: 0
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dcd2fec0bd9b886c0800000000000000
+      internalID: -4140855506901193267
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_139
+      rect:
+        serializedVersion: 2
+        x: 1518
+        y: 0
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e87d8de413efc67d0800000000000000
+      internalID: -2923682570340608114
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_140
+      rect:
+        serializedVersion: 2
+        x: 1656
+        y: 0
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 259363953d74b5de0800000000000000
+      internalID: -1343401090779563694
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Voidborn Goddess-SpriteSheet_141
+      rect:
+        serializedVersion: 2
+        x: 1794
+        y: 0
+        width: 138
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ff049b46ed92f6420800000000000000
+      internalID: 2625363142929629439
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 2329485bf4a617d40addbe57dfa17b1c
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":138.0,"y":93.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
+    nameFileIdTable:
+      Voidborn Goddess-SpriteSheet_0: 8161392755375268392
+      Voidborn Goddess-SpriteSheet_1: -4145478867158919824
+      Voidborn Goddess-SpriteSheet_10: -8377046834115921051
+      Voidborn Goddess-SpriteSheet_100: 5576743200180955872
+      Voidborn Goddess-SpriteSheet_101: 539167021112425220
+      Voidborn Goddess-SpriteSheet_102: -5225616037625151070
+      Voidborn Goddess-SpriteSheet_103: 544272130218849077
+      Voidborn Goddess-SpriteSheet_104: 6392359960972622957
+      Voidborn Goddess-SpriteSheet_105: -593506881492853823
+      Voidborn Goddess-SpriteSheet_106: -8555393423997901640
+      Voidborn Goddess-SpriteSheet_107: 6387514432525764687
+      Voidborn Goddess-SpriteSheet_108: -3026975837335923367
+      Voidborn Goddess-SpriteSheet_109: -8721093810419490251
+      Voidborn Goddess-SpriteSheet_11: 3065555905143999339
+      Voidborn Goddess-SpriteSheet_110: -6146896408967737115
+      Voidborn Goddess-SpriteSheet_111: 2563995036299331894
+      Voidborn Goddess-SpriteSheet_112: 2843219092198814251
+      Voidborn Goddess-SpriteSheet_113: -8551646811118517939
+      Voidborn Goddess-SpriteSheet_114: 4607555823813633
+      Voidborn Goddess-SpriteSheet_115: 1645713819748846716
+      Voidborn Goddess-SpriteSheet_116: -2778375560887712292
+      Voidborn Goddess-SpriteSheet_117: 2784469435607875911
+      Voidborn Goddess-SpriteSheet_118: 3941517451602643337
+      Voidborn Goddess-SpriteSheet_119: -1035243330852099963
+      Voidborn Goddess-SpriteSheet_12: 7306391289463500163
+      Voidborn Goddess-SpriteSheet_120: -8549212392737827729
+      Voidborn Goddess-SpriteSheet_121: 704467692434383980
+      Voidborn Goddess-SpriteSheet_122: -302381985749922021
+      Voidborn Goddess-SpriteSheet_123: -4680278911907671577
+      Voidborn Goddess-SpriteSheet_124: -296145788545440846
+      Voidborn Goddess-SpriteSheet_125: -8440958939644414317
+      Voidborn Goddess-SpriteSheet_126: -4655717981356690944
+      Voidborn Goddess-SpriteSheet_127: -3090741516888447882
+      Voidborn Goddess-SpriteSheet_128: 5392507682240767195
+      Voidborn Goddess-SpriteSheet_129: 7212738531400171127
+      Voidborn Goddess-SpriteSheet_13: -5308805285082968807
+      Voidborn Goddess-SpriteSheet_130: -2373004179931674276
+      Voidborn Goddess-SpriteSheet_131: -936801603860202254
+      Voidborn Goddess-SpriteSheet_132: -5149996772163699412
+      Voidborn Goddess-SpriteSheet_133: -5424698401980678914
+      Voidborn Goddess-SpriteSheet_134: 7732336612947314223
+      Voidborn Goddess-SpriteSheet_135: -4655643329217048503
+      Voidborn Goddess-SpriteSheet_136: -7606724062575966551
+      Voidborn Goddess-SpriteSheet_137: -7290827101045634164
+      Voidborn Goddess-SpriteSheet_138: -4140855506901193267
+      Voidborn Goddess-SpriteSheet_139: -2923682570340608114
+      Voidborn Goddess-SpriteSheet_14: -2423439272494466377
+      Voidborn Goddess-SpriteSheet_140: -1343401090779563694
+      Voidborn Goddess-SpriteSheet_141: 2625363142929629439
+      Voidborn Goddess-SpriteSheet_15: 3090967886204347204
+      Voidborn Goddess-SpriteSheet_16: 1957043493802644820
+      Voidborn Goddess-SpriteSheet_17: -3148603087566981107
+      Voidborn Goddess-SpriteSheet_18: -676043708361559593
+      Voidborn Goddess-SpriteSheet_19: 7175127143146969577
+      Voidborn Goddess-SpriteSheet_2: -775405694734029054
+      Voidborn Goddess-SpriteSheet_20: -1945857909451172658
+      Voidborn Goddess-SpriteSheet_21: 1842137235066579086
+      Voidborn Goddess-SpriteSheet_22: -392583279995406099
+      Voidborn Goddess-SpriteSheet_23: 593276741052027979
+      Voidborn Goddess-SpriteSheet_24: -7146783641081536313
+      Voidborn Goddess-SpriteSheet_25: 8958607778572031087
+      Voidborn Goddess-SpriteSheet_26: 8337702217875509378
+      Voidborn Goddess-SpriteSheet_27: 1142931702461709755
+      Voidborn Goddess-SpriteSheet_28: -2130565495136745645
+      Voidborn Goddess-SpriteSheet_29: -3280507406818710760
+      Voidborn Goddess-SpriteSheet_3: 4619208969202795328
+      Voidborn Goddess-SpriteSheet_30: 8296851351273505496
+      Voidborn Goddess-SpriteSheet_31: -2021509041581443666
+      Voidborn Goddess-SpriteSheet_32: -7295618326806572603
+      Voidborn Goddess-SpriteSheet_33: -2646821780648177808
+      Voidborn Goddess-SpriteSheet_34: 8168096911185529003
+      Voidborn Goddess-SpriteSheet_35: -8244036202796234222
+      Voidborn Goddess-SpriteSheet_36: 8293081643813679341
+      Voidborn Goddess-SpriteSheet_37: 8655701865728063980
+      Voidborn Goddess-SpriteSheet_38: 7530622041894937176
+      Voidborn Goddess-SpriteSheet_39: 2868911474855017883
+      Voidborn Goddess-SpriteSheet_4: -5915520341691285266
+      Voidborn Goddess-SpriteSheet_40: 5084005975203352993
+      Voidborn Goddess-SpriteSheet_41: -1251351908809511220
+      Voidborn Goddess-SpriteSheet_42: 701075664047281439
+      Voidborn Goddess-SpriteSheet_43: 6392934083969437529
+      Voidborn Goddess-SpriteSheet_44: -388824126003865808
+      Voidborn Goddess-SpriteSheet_45: -6531105927564349842
+      Voidborn Goddess-SpriteSheet_46: -7594455820818865400
+      Voidborn Goddess-SpriteSheet_47: -2968774513006278788
+      Voidborn Goddess-SpriteSheet_48: 2347728859837526908
+      Voidborn Goddess-SpriteSheet_49: 5833477176976374132
+      Voidborn Goddess-SpriteSheet_5: -1005250043846737753
+      Voidborn Goddess-SpriteSheet_50: 1258831390313210448
+      Voidborn Goddess-SpriteSheet_51: -7986875097857310109
+      Voidborn Goddess-SpriteSheet_52: 728904567941529621
+      Voidborn Goddess-SpriteSheet_53: 4861185031027291693
+      Voidborn Goddess-SpriteSheet_54: -304413281204291577
+      Voidborn Goddess-SpriteSheet_55: -276511730833624697
+      Voidborn Goddess-SpriteSheet_56: 1702303096433174746
+      Voidborn Goddess-SpriteSheet_57: 5297192247185403462
+      Voidborn Goddess-SpriteSheet_58: 2393035834902253561
+      Voidborn Goddess-SpriteSheet_59: 696812265864569584
+      Voidborn Goddess-SpriteSheet_6: -2514377554385366128
+      Voidborn Goddess-SpriteSheet_60: 3580144286378856305
+      Voidborn Goddess-SpriteSheet_61: 2093934862889203029
+      Voidborn Goddess-SpriteSheet_62: 1465509166013185147
+      Voidborn Goddess-SpriteSheet_63: -6023519426093631531
+      Voidborn Goddess-SpriteSheet_64: -5766845758066510715
+      Voidborn Goddess-SpriteSheet_65: -2782545114569233687
+      Voidborn Goddess-SpriteSheet_66: -6979858879486442107
+      Voidborn Goddess-SpriteSheet_67: -6423952045325418370
+      Voidborn Goddess-SpriteSheet_68: -3564409614812579504
+      Voidborn Goddess-SpriteSheet_69: 8687400101550201560
+      Voidborn Goddess-SpriteSheet_7: -4616609406463933407
+      Voidborn Goddess-SpriteSheet_70: -1191205711115846720
+      Voidborn Goddess-SpriteSheet_71: -8865971485943487893
+      Voidborn Goddess-SpriteSheet_72: 4718168033227205809
+      Voidborn Goddess-SpriteSheet_73: 4348471727596262644
+      Voidborn Goddess-SpriteSheet_74: -1390011029117809454
+      Voidborn Goddess-SpriteSheet_75: -6847770564266998621
+      Voidborn Goddess-SpriteSheet_76: 1910020208953798454
+      Voidborn Goddess-SpriteSheet_77: 334291521103434756
+      Voidborn Goddess-SpriteSheet_78: 2102535409024246263
+      Voidborn Goddess-SpriteSheet_79: 8562530584472348454
+      Voidborn Goddess-SpriteSheet_8: -6069340449666270875
+      Voidborn Goddess-SpriteSheet_80: 4132342992987362631
+      Voidborn Goddess-SpriteSheet_81: 1176381635573797033
+      Voidborn Goddess-SpriteSheet_82: -3167788455633026009
+      Voidborn Goddess-SpriteSheet_83: 6618697911058731204
+      Voidborn Goddess-SpriteSheet_84: -5025882906806227916
+      Voidborn Goddess-SpriteSheet_85: 3669168109831838925
+      Voidborn Goddess-SpriteSheet_86: 1281536119465705354
+      Voidborn Goddess-SpriteSheet_87: -7410106882891133417
+      Voidborn Goddess-SpriteSheet_88: -7183304869860029850
+      Voidborn Goddess-SpriteSheet_89: -3331444876116910840
+      Voidborn Goddess-SpriteSheet_9: 8916606196611037757
+      Voidborn Goddess-SpriteSheet_90: -1435993708719810907
+      Voidborn Goddess-SpriteSheet_91: 7995824024428061953
+      Voidborn Goddess-SpriteSheet_92: -3022653794834392630
+      Voidborn Goddess-SpriteSheet_93: -6076983508315505876
+      Voidborn Goddess-SpriteSheet_94: -6722418145742265362
+      Voidborn Goddess-SpriteSheet_95: -1776416151028155639
+      Voidborn Goddess-SpriteSheet_96: 9193949740918159105
+      Voidborn Goddess-SpriteSheet_97: -4441852494946011012
+      Voidborn Goddess-SpriteSheet_98: -5638196399620837613
+      Voidborn Goddess-SpriteSheet_99: -1013972141902307858
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
