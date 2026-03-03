@@ -534,7 +534,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.04613304, y: -3.8434258}
+  m_Offset: {x: 0.04613304, y: -4.071353}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -544,7 +544,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 19.795757, y: 2.834564}
+  m_Size: {x: 19.795757, y: 2.37871}
   m_EdgeRadius: 0
 --- !u!1 &86939398
 GameObject:
@@ -1285,7 +1285,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &218656635
 Transform:
   m_ObjectHideFlags: 0
@@ -1313,7 +1313,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c56cfd3b2af58a4a81b67082388db88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterManager
-  playerPrefab: {fileID: 1935310566284295070, guid: beaa6f07a815e2c4ea9e4dee9fe7a1ef, type: 3}
+  playerPrefab: {fileID: 8004609420162812241, guid: aeb534f1b4c87be4ca0ddcba244e3845, type: 3}
   spawnPoint: {fileID: 271092032}
   healthBar: {fileID: 27520355}
   staminaBar: {fileID: 2031141652}
@@ -8829,6 +8829,10 @@ PrefabInstance:
     - target: {fileID: 8004609420162812241, guid: aeb534f1b4c87be4ca0ddcba244e3845, type: 3}
       propertyPath: m_Name
       value: Warrior
+      objectReference: {fileID: 0}
+    - target: {fileID: 8004609420162812241, guid: aeb534f1b4c87be4ca0ddcba244e3845, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8549273736241064913, guid: aeb534f1b4c87be4ca0ddcba244e3845, type: 3}
       propertyPath: startingHealth
