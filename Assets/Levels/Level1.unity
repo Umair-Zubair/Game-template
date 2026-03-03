@@ -8476,6 +8476,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5936174672932515508, guid: aeb534f1b4c87be4ca0ddcba244e3845, type: 3}
+      propertyPath: attackSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 74a334d41fab92d48a31cd0d6025506e, type: 3}
+    - target: {fileID: 5936174672932515508, guid: aeb534f1b4c87be4ca0ddcba244e3845, type: 3}
+      propertyPath: comboAttackSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 578108a7e37e5294286b02a60ab13f99, type: 3}
     - target: {fileID: 7371757333391998575, guid: aeb534f1b4c87be4ca0ddcba244e3845, type: 3}
       propertyPath: m_GravityScale
       value: 1
