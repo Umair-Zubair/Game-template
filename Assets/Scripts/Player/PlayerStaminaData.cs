@@ -33,6 +33,9 @@ public class PlayerStaminaData : ScriptableObject
     [Tooltip("Stamina consumed per ground attack.")]
     public float attackCost = 20f;
 
+    [Tooltip("Stamina consumed per combo (2nd hit) ground attack.")]
+    public float comboAttackCost = 30f;
+
     [Tooltip("Stamina consumed per air attack (jump attack / uppercut while airborne).")]
     public float airAttackCost = 25f;
 

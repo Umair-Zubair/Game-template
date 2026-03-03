@@ -7,6 +7,11 @@ public class MeleeAttack : MonoBehaviour
     [SerializeField] private float attackRange;
     [SerializeField] private int damage;
 
+    [Header("Combo Parameters")]
+    [Tooltip("Damage dealt by the second (combo) hit.")]
+    [SerializeField] private int comboDamage = 15;
+    [SerializeField] private AudioClip comboAttackSound;
+
     [Header("Jump Attack Parameters")]
     [SerializeField] private float jumpAttackHeight;
 
@@ -31,6 +36,10 @@ public class MeleeAttack : MonoBehaviour
     private BoxCollider2D boxCollider;
     private float cooldownTimer = Mathf.Infinity;
 
+    // Combo tracking
+    private bool comboWindowOpen = false;  // Set true by Animation Event, false when window closes
+    private bool comboQueued = false;      // True if player clicked LMB during the combo window
+
     private void Awake()
     {
         anim = GetComponent<Animator>();
@@ -42,16 +51,24 @@ public class MeleeAttack : MonoBehaviour
 
     private void Update()
     {
-        // LMB — Regular melee attack
-        if (Input.GetMouseButton(0) && cooldownTimer > attackCooldown && playerController != null
-            && Time.timeScale > 0)
+        // LMB — buffer input for combo if the window is open, otherwise start a new attack
+        if (Input.GetMouseButtonDown(0) && playerController != null && Time.timeScale > 0)
         {
-            float cost = IsGrounded()
-                ? (stamina != null ? stamina.Data.attackCost : 0f)
-                : (stamina != null ? stamina.Data.airAttackCost : 0f);
+            if (comboWindowOpen)
+            {
+                // Player clicked during the combo window — queue the second hit
+                comboQueued = true;
+            }
+            else if (cooldownTimer > attackCooldown)
+            {
+                // ── First hit ──
+                float cost = IsGrounded()
+                    ? (stamina != null ? stamina.Data.attackCost : 0f)
+                    : (stamina != null ? stamina.Data.airAttackCost : 0f);
 
-            if (stamina == null || stamina.TryConsume(cost))
-                Attack();
+                if (stamina == null || stamina.TryConsume(cost))
+                    Attack();
+            }
         }
 
         // F key — Jump Attack (grounded only)
@@ -62,7 +79,7 @@ public class MeleeAttack : MonoBehaviour
             if (stamina == null || stamina.TryConsume(cost))
                 JumpAttack();
         }
-
+        
         // RMB — Uppercut
         if (Input.GetMouseButtonDown(1) && cooldownTimer > attackCooldown && playerController != null
             && Time.timeScale > 0)
@@ -82,22 +99,57 @@ public class MeleeAttack : MonoBehaviour
 
         anim.SetTrigger("attack");
         cooldownTimer = 0;
+        comboQueued = false;
         OnAttackPerformed?.Invoke("melee");
 
-        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayer);
-        foreach (Collider2D enemy in hitEnemies)
+        DealDamage(damage);
+    }
+
+    private void ComboAttack()
+    {
+        if (comboAttackSound != null)
+            SoundManager.instance.PlaySound(comboAttackSound);
+        else if (attackSound != null)
+            SoundManager.instance.PlaySound(attackSound);
+
+        anim.SetTrigger("comboAttack");
+        cooldownTimer = 0;
+        OnAttackPerformed?.Invoke("meleeCombo");
+
+        DealDamage(comboDamage);
+    }
+
+    // ────────────────────────────────────────────────
+    //  Animation Event callbacks (called from the attack animation clip)
+    // ────────────────────────────────────────────────
+
+    /// <summary>
+    /// Called by an Animation Event on the first attack clip to open the combo input window.
+    /// Place this event at the frame where the first swing connects or shortly after.
+    /// </summary>
+    public void OpenComboWindow()
+    {
+        comboWindowOpen = true;
+    }
+
+    /// <summary>
+    /// Called by an Animation Event at the end of the first attack clip.
+    /// If the player queued a second click, the combo fires; otherwise the combo resets.
+    /// </summary>
+    public void CloseComboWindow()
+    {
+        if (comboQueued)
         {
-            if (enemy.GetComponent<Health>() != null)
-            {
-                enemy.GetComponent<Health>().TakeDamage(damage);
-                OnDamageDealt?.Invoke(damage);
-            }
-            else if (enemy.GetComponentInParent<Health>() != null)
-            {
-                enemy.GetComponentInParent<Health>().TakeDamage(damage);
-                OnDamageDealt?.Invoke(damage);
-            }
+            float cost = IsGrounded()
+                ? (stamina != null ? stamina.Data.comboAttackCost : 0f)
+                : (stamina != null ? stamina.Data.airAttackCost : 0f);
+
+            if (stamina == null || stamina.TryConsume(cost))
+                ComboAttack();
         }
+
+        comboWindowOpen = false;
+        comboQueued = false;
     }
 
     private void JumpAttack()
@@ -112,20 +164,7 @@ public class MeleeAttack : MonoBehaviour
         if (body != null)
             body.linearVelocity = new Vector2(body.linearVelocity.x, jumpAttackHeight);
 
-        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayer);
-        foreach (Collider2D enemy in hitEnemies)
-        {
-            if (enemy.GetComponent<Health>() != null)
-            {
-                enemy.GetComponent<Health>().TakeDamage(damage);
-                OnDamageDealt?.Invoke(damage);
-            }
-            else if (enemy.GetComponentInParent<Health>() != null)
-            {
-                enemy.GetComponentInParent<Health>().TakeDamage(damage);
-                OnDamageDealt?.Invoke(damage);
-            }
-        }
+        DealDamage(damage);
     }
 
     private void Uppercut()
@@ -137,18 +176,24 @@ public class MeleeAttack : MonoBehaviour
         cooldownTimer = 0;
         OnAttackPerformed?.Invoke("uppercut");
 
+        DealDamage(damage);
+    }
+
+    /// <summary>Shared hit-detection used by every attack type.</summary>
+    private void DealDamage(int dmg)
+    {
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayer);
         foreach (Collider2D enemy in hitEnemies)
         {
             if (enemy.GetComponent<Health>() != null)
             {
-                enemy.GetComponent<Health>().TakeDamage(damage);
-                OnDamageDealt?.Invoke(damage);
+                enemy.GetComponent<Health>().TakeDamage(dmg);
+                OnDamageDealt?.Invoke(dmg);
             }
             else if (enemy.GetComponentInParent<Health>() != null)
             {
-                enemy.GetComponentInParent<Health>().TakeDamage(damage);
-                OnDamageDealt?.Invoke(damage);
+                enemy.GetComponentInParent<Health>().TakeDamage(dmg);
+                OnDamageDealt?.Invoke(dmg);
             }
         }
     }
