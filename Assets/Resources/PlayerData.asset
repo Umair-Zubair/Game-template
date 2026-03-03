@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerData
   runSpeed: 8
   airAcceleration: 50
-  jumpForce: 12
+  jumpForce: 13
   coyoteTime: 0.15
   jumpBufferTime: 0.1
   variableJumpMultiplier: 0.5

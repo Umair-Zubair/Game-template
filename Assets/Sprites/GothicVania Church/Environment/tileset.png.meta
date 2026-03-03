@@ -117,7 +117,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: tileset_0
+      name: platformleft
       rect:
         serializedVersion: 2
         x: 16
@@ -139,13 +139,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: tileset_1
+      name: platformmid
       rect:
         serializedVersion: 2
-        x: 64
+        x: 48
         y: 160
-        width: 64
-        height: 64
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -164,10 +164,10 @@ TextureImporter:
       name: tileset_2
       rect:
         serializedVersion: 2
-        x: 128
+        x: 160
         y: 160
-        width: 64
-        height: 64
+        width: 16
+        height: 48
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -183,12 +183,12 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: tileset_3
+      name: newplat3
       rect:
         serializedVersion: 2
-        x: 192
-        y: 160
-        width: 64
+        x: 288
+        y: 144
+        width: 32
         height: 64
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -205,13 +205,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: tileset_4
+      name: newplat2
       rect:
         serializedVersion: 2
-        x: 256
-        y: 160
-        width: 64
-        height: 64
+        x: 240
+        y: 144
+        width: 32
+        height: 48
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -230,10 +230,10 @@ TextureImporter:
       name: tileset_5
       rect:
         serializedVersion: 2
-        x: 0
-        y: 96
-        width: 64
-        height: 64
+        x: 16
+        y: 80
+        width: 31
+        height: 32
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -249,13 +249,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: tileset_6
+      name: platformright
       rect:
         serializedVersion: 2
-        x: 64
-        y: 96
-        width: 64
-        height: 64
+        x: 96
+        y: 160
+        width: 16
+        height: 32
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -293,12 +293,12 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: tileset_8
+      name: newplat1
       rect:
         serializedVersion: 2
         x: 192
-        y: 96
-        width: 64
+        y: 144
+        width: 32
         height: 64
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -318,8 +318,8 @@ TextureImporter:
       name: tileset_9
       rect:
         serializedVersion: 2
-        x: 256
-        y: 96
+        x: 257
+        y: 76
         width: 64
         height: 64
       alignment: 0
@@ -337,13 +337,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: tileset_10
+      name: gothground1
       rect:
         serializedVersion: 2
         x: 0
-        y: 32
-        width: 64
-        height: 64
+        y: 16
+        width: 48
+        height: 40
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -359,13 +359,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: tileset_11
+      name: gothground2
       rect:
         serializedVersion: 2
         x: 64
-        y: 32
-        width: 64
-        height: 64
+        y: 16
+        width: 48
+        height: 41
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -381,15 +381,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: tileset_12
+      name: gothground3
       rect:
         serializedVersion: 2
         x: 128
-        y: 32
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        y: 16
+        width: 48
+        height: 41
+      alignment: 9
+      pivot: {x: 0.466547, y: 0.44563895}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -462,20 +462,20 @@ TextureImporter:
       - key: SpriteEditor.SliceSettings
         value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      tileset_0: 727043544
-      tileset_1: -418708066
-      tileset_10: -1617781093
-      tileset_11: 1838070932
-      tileset_12: 960326780
+      gothground1: -1617781093
+      gothground2: 1838070932
+      gothground3: 960326780
+      newplat1: -2142504242
+      newplat2: 1750594577
+      newplat3: 384382248
+      platformleft: 727043544
+      platformmid: -418708066
+      platformright: 1946501882
       tileset_13: 1577552937
       tileset_14: -1206665412
       tileset_2: 203582546
-      tileset_3: 384382248
-      tileset_4: 1750594577
       tileset_5: -948701337
-      tileset_6: 1946501882
       tileset_7: 594433103
-      tileset_8: -2142504242
       tileset_9: 1015820564
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
