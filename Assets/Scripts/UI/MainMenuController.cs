@@ -9,6 +9,7 @@ public class MainMenuController : MonoBehaviour
 {
     [Header("Panels")]
     [SerializeField] private GameObject characterSelectPanel;
+    [SerializeField] private GameObject menuButtonsContainer;
     [SerializeField] private SelectionArrow mainMenuArrow;
 
     [Header("Audio")]
@@ -69,6 +70,9 @@ public class MainMenuController : MonoBehaviour
         if (characterSelectPanel != null)
             characterSelectPanel.SetActive(true);
         
+        if (menuButtonsContainer != null)
+            menuButtonsContainer.SetActive(false);
+        
         if (mainMenuArrow != null)
             mainMenuArrow.enabled = false;
     }
@@ -81,6 +85,9 @@ public class MainMenuController : MonoBehaviour
 
         if (characterSelectPanel != null)
             characterSelectPanel.SetActive(false);
+        
+        if (menuButtonsContainer != null)
+            menuButtonsContainer.SetActive(true);
         
         if (mainMenuArrow != null)
             mainMenuArrow.enabled = true;

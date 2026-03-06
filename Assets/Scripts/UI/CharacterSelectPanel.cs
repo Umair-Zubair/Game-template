@@ -12,6 +12,7 @@ public class CharacterSelectPanel : MonoBehaviour
     [SerializeField] private Button blobMeleeButton;
     [SerializeField] private Button blobRangedButton;
     [SerializeField] private Button backButton;
+    [SerializeField] private Button startButton;
 
     [Header("Selection Arrow")]
     [SerializeField] private RectTransform selectionArrow;
@@ -60,14 +61,21 @@ public class CharacterSelectPanel : MonoBehaviour
         if (backButton != null)
             backButton.onClick.AddListener(Close);
 
+        if (startButton != null)
+            startButton.onClick.AddListener(ConfirmAndPlay);
+
         if (blobMeleeButton != null) blobMeleeOriginalScale = blobMeleeButton.transform.localScale;
         if (blobRangedButton != null) blobRangedOriginalScale = blobRangedButton.transform.localScale;
 
         if (blobRangedPreviewImage != null)
             blobRangedPreviewImage.color = blobRangedColor;
 
+        PlayerPrefs.DeleteKey(SELECTED_CHARACTER_KEY);
+        PlayerPrefs.Save();
+
         currentPosition = 0;
         UpdateArrowPosition();
+        UpdateSelectionVisuals();
     }
 
     private void Update()
@@ -163,12 +171,27 @@ public class CharacterSelectPanel : MonoBehaviour
     private void UpdateSelectionVisuals()
     {
         int selected = PlayerPrefs.GetInt(SELECTED_CHARACTER_KEY, -1);
+        bool hasSelection = selected != -1;
+
+        if (backButton != null)
+            backButton.gameObject.SetActive(!hasSelection);
+        
+        if (startButton != null)
+            startButton.gameObject.SetActive(hasSelection);
 
         if (selectionArrow != null)
         {
-            Vector2 arrowPos = selectionArrow.anchoredPosition;
-            arrowPos.y = selected == BLOB_MELEE_INDEX ? blobMeleeArrowY : blobRangedArrowY;
-            selectionArrow.anchoredPosition = arrowPos;
+            if (hasSelection)
+            {
+                selectionArrow.gameObject.SetActive(true);
+                Vector2 arrowPos = selectionArrow.anchoredPosition;
+                arrowPos.y = selected == BLOB_MELEE_INDEX ? blobMeleeArrowY : blobRangedArrowY;
+                selectionArrow.anchoredPosition = arrowPos;
+            }
+            else
+            {
+                selectionArrow.gameObject.SetActive(false);
+            }
         }
 
         if (blobMeleeSelectedIndicator != null)
