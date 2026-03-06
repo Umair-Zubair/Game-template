@@ -199,11 +199,12 @@ MonoBehaviour:
   attackCooldown: 2
   range: 0.8
   damage: 1
-  colliderDistance: 0.35
+  colliderDistance: 0.5
   boxCollider: {fileID: 984975126297369520}
   playerLayer:
     serializedVersion: 2
     m_Bits: 1024
+  damageDelay: 0.3
 --- !u!114 &1277053266104376406
 MonoBehaviour:
   m_ObjectHideFlags: 0

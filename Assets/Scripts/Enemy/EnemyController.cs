@@ -746,6 +746,21 @@ public class EnemyController : MonoBehaviour
 
     #region Gizmos
 
+    // ALWAYS draw melee attack radius (even when not selected)
+    private void OnDrawGizmos()
+    {
+        if (meleeAttackPoint != null)
+        {
+            // Draw filled sphere (semi-transparent)
+            Gizmos.color = new Color(1f, 0f, 1f, 0.3f); // Magenta with transparency
+            Gizmos.DrawSphere(meleeAttackPoint.position, meleeAttackRadius);
+            
+            // Draw wire sphere outline (solid)
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawWireSphere(meleeAttackPoint.position, meleeAttackRadius);
+        }
+    }
+
     private void OnDrawGizmosSelected()
     {
         if (data == null) return;
@@ -766,10 +781,10 @@ public class EnemyController : MonoBehaviour
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, data.projectileDetectionRange);
 
-        // Melee attack hitbox (if applicable)
+        // Melee attack hitbox (brighter when selected)
         if (meleeAttackPoint != null)
         {
-            Gizmos.color = Color.magenta;
+            Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(meleeAttackPoint.position, meleeAttackRadius);
         }
     }

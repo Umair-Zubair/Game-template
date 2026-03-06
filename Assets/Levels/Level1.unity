@@ -5126,6 +5126,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3647629301635541336, guid: 0cd5ddff8b596404182275a636514347, type: 3}
+      propertyPath: components.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3647629301635541336, guid: 0cd5ddff8b596404182275a636514347, type: 3}
+      propertyPath: 'components.Array.data[0]'
+      value: 
+      objectReference: {fileID: 1582445780}
+    - target: {fileID: 3647629301635541336, guid: 0cd5ddff8b596404182275a636514347, type: 3}
+      propertyPath: 'components.Array.data[1]'
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 4303414237555634310, guid: 0cd5ddff8b596404182275a636514347, type: 3}
       propertyPath: m_Name
       value: VoidbornGoddess
@@ -6752,6 +6764,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemies: []
+--- !u!114 &1582445780 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9210189640734394756, guid: 0cd5ddff8b596404182275a636514347, type: 3}
+  m_PrefabInstance: {fileID: 1260625188}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 912d3aa5ce863ba478a2977072b3db45, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VoidbornGoddessController
 --- !u!1 &1630552614
 GameObject:
   m_ObjectHideFlags: 0
@@ -8374,6 +8397,18 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3501972229371936435, guid: b767e7620193598459ccc72cbf834f77, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.324
+      objectReference: {fileID: 0}
+    - target: {fileID: 3501972229371936435, guid: b767e7620193598459ccc72cbf834f77, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.29
+      objectReference: {fileID: 0}
+    - target: {fileID: 3501972229371936435, guid: b767e7620193598459ccc72cbf834f77, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5668116622541676383, guid: b767e7620193598459ccc72cbf834f77, type: 3}
       propertyPath: leftEdge
       value: 
@@ -8382,9 +8417,17 @@ PrefabInstance:
       propertyPath: rightEdge
       value: 
       objectReference: {fileID: 2146743449}
+    - target: {fileID: 5668116622541676383, guid: b767e7620193598459ccc72cbf834f77, type: 3}
+      propertyPath: meleeAttackRadius
+      value: 2.5
+      objectReference: {fileID: 0}
     - target: {fileID: 6079567495307126285, guid: b767e7620193598459ccc72cbf834f77, type: 3}
       propertyPath: range
       value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6079567495307126285, guid: b767e7620193598459ccc72cbf834f77, type: 3}
+      propertyPath: colliderDistance
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 6680059711010044411, guid: b767e7620193598459ccc72cbf834f77, type: 3}
       propertyPath: m_LocalScale.x
@@ -8396,11 +8439,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6680059711010044411, guid: b767e7620193598459ccc72cbf834f77, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.44
+      value: -0.59
       objectReference: {fileID: 0}
     - target: {fileID: 6680059711010044411, guid: b767e7620193598459ccc72cbf834f77, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.1
+      value: 0.06
       objectReference: {fileID: 0}
     - target: {fileID: 6680059711010044411, guid: b767e7620193598459ccc72cbf834f77, type: 3}
       propertyPath: m_LocalRotation.w
