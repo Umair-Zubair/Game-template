@@ -15,6 +15,12 @@ public class BlobRangedAttack : MonoBehaviour
     private PlayerStamina stamina;
     private float cooldownTimer = Mathf.Infinity;
 
+    // Hit stun — prevents attacking for a brief period after taking damage
+    [Header("Hit Stun")]
+    [Tooltip("How long the player is locked out of attacking after being hit.")]
+    [SerializeField] private float hitStunDuration = 0.4f;
+    private float hitStunTimer;
+
     private GameObject[] projectiles;
     private GameObject[] jumpProjectiles;
 
@@ -62,6 +68,14 @@ public class BlobRangedAttack : MonoBehaviour
 
     private void Update()
     {
+        // Tick down hit stun timer
+        if (hitStunTimer > 0)
+        {
+            hitStunTimer -= Time.deltaTime;
+            cooldownTimer += Time.deltaTime;
+            return; // Block all attack input while stunned
+        }
+
         // LMB fires range attack — ground fires normal, air fires jump range
         if (Input.GetMouseButtonDown(0) && cooldownTimer > attackCooldown && playerController != null && Time.timeScale > 0)
         {
@@ -135,6 +149,23 @@ public class BlobRangedAttack : MonoBehaviour
 
         jumpProjectiles[index].transform.position = firePoint.position;
         jumpProjectiles[index].GetComponent<Projectile>().SetDirection(dir);
+    }
+
+    /// <summary>
+    /// Called by Health when the player takes damage.
+    /// Interrupts the current attack and locks out attacks briefly.
+    /// </summary>
+    public void OnHitStun()
+    {
+        hitStunTimer = hitStunDuration;
+        cooldownTimer = 0; // Reset cooldown so they can't instantly attack after stun ends
+
+        // Reset attack animation triggers so they don't fire after stun
+        if (anim != null)
+        {
+            anim.ResetTrigger("rangeAttack");
+            anim.ResetTrigger("jumpRange");
+        }
     }
 
     // ── Pool Helper ──────────────────────────────────────────────────────────

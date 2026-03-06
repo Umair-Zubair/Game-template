@@ -18,22 +18,37 @@ public class Health : MonoBehaviour
     private PlayerShield playerShield;
     private PlayerStamina playerStamina;
 
+    // Attack scripts (auto-found) — used to interrupt attacks on hit
+    private MeleeAttack meleeAttack;
+    private DragonAttack dragonAttack;
+    private BlobRangedAttack blobRangedAttack;
+
+    // Boss controller — used to stop the state machine on death
+    private BossController bossController;
+
     private void Awake()
     {
         currentHealth = startingHealth;
         anim = GetComponent<Animator>();
         playerShield = GetComponent<PlayerShield>();
         playerStamina = GetComponent<PlayerStamina>();
+        meleeAttack = GetComponent<MeleeAttack>();
+        dragonAttack = GetComponent<DragonAttack>();
+        blobRangedAttack = GetComponent<BlobRangedAttack>();
+        bossController = GetComponent<BossController>();
 
         // 1. Auto-Find all scripts so you don't have to drag them
         if (components == null || components.Length == 0)
         {
             List<Behaviour> foundComponents = new List<Behaviour>();
+            // Player scripts
             if (GetComponent<PlayerController>()) foundComponents.Add(GetComponent<PlayerController>());
             if (GetComponent<MeleeAttack>()) foundComponents.Add(GetComponent<MeleeAttack>());
             if (GetComponent<DragonAttack>()) foundComponents.Add(GetComponent<DragonAttack>());
             if (GetComponent<PlayerShield>()) foundComponents.Add(GetComponent<PlayerShield>());
             if (GetComponent<PlayerStamina>()) foundComponents.Add(GetComponent<PlayerStamina>());
+            // Boss scripts — disabling stops the state machine so the boss can't act after death
+            if (GetComponent<BossController>()) foundComponents.Add(GetComponent<BossController>());
             components = foundComponents.ToArray();
         }
     }
@@ -51,6 +66,11 @@ public class Health : MonoBehaviour
         currentHealth = Mathf.Clamp(currentHealth - _damage, 0, startingHealth);
         OnDamageTaken?.Invoke(_damage); // Layer 2: notify trackers
 
+        // 4. Hit Stun — interrupt current attack and lock out new attacks briefly
+        if (meleeAttack != null) meleeAttack.OnHitStun();
+        if (dragonAttack != null) dragonAttack.OnHitStun();
+        if (blobRangedAttack != null) blobRangedAttack.OnHitStun();
+
         if (currentHealth > 0)
         {
             anim.SetTrigger("hurt");
@@ -61,7 +81,9 @@ public class Health : MonoBehaviour
             {
                 anim.SetTrigger("die");
 
-                // --- THE FIX IS HERE ---
+                // Stop the boss state machine immediately so it can't act while dying
+                if (bossController != null) bossController.OnDeath();
+
                 // We manually force the Block animation OFF immediately
                 if (playerShield != null)
                 {

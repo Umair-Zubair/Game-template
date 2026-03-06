@@ -39,6 +39,9 @@ public abstract class BossController : MonoBehaviour
     public bool IsAttacking { get; set; } = false;
     public bool IsDashing { get; set; } = false;
 
+    // Death flag — prevents state machine from running after death
+    public bool IsDead { get; private set; } = false;
+
     // Debugging
     public bool DebugMode = true;
 
@@ -70,6 +73,8 @@ public abstract class BossController : MonoBehaviour
 
     protected virtual void Update()
     {
+        if (IsDead) return;
+
         if (Player == null) FindPlayer();
         
         UpdateTimers();
@@ -78,8 +83,22 @@ public abstract class BossController : MonoBehaviour
 
     protected virtual void FixedUpdate()
     {
+        if (IsDead) return;
+
         StateMachine.FixedUpdate(this);
         ApplyGravity();
+    }
+
+    /// <summary>
+    /// Called when this boss dies. Stops the state machine and all movement.
+    /// Can be invoked by Health or externally.
+    /// </summary>
+    public void OnDeath()
+    {
+        if (IsDead) return;
+        IsDead = true;
+        IsAttacking = false;
+        Stop();
     }
 
     /// <summary>

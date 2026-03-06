@@ -40,6 +40,12 @@ public class MeleeAttack : MonoBehaviour
     private bool comboWindowOpen = false;  // Set true by Animation Event, false when window closes
     private bool comboQueued = false;      // True if player clicked LMB during the combo window
 
+    // Hit stun — prevents attacking for a brief period after taking damage
+    [Header("Hit Stun")]
+    [Tooltip("How long the player is locked out of attacking after being hit.")]
+    [SerializeField] private float hitStunDuration = 0.4f;
+    private float hitStunTimer;
+
     private void Awake()
     {
         anim = GetComponent<Animator>();
@@ -51,6 +57,14 @@ public class MeleeAttack : MonoBehaviour
 
     private void Update()
     {
+        // Tick down hit stun timer
+        if (hitStunTimer > 0)
+        {
+            hitStunTimer -= Time.deltaTime;
+            cooldownTimer += Time.deltaTime;
+            return; // Block all attack input while stunned
+        }
+
         // LMB — buffer input for combo if the window is open, otherwise start a new attack
         if (Input.GetMouseButtonDown(0) && playerController != null && Time.timeScale > 0)
         {
@@ -177,6 +191,29 @@ public class MeleeAttack : MonoBehaviour
         OnAttackPerformed?.Invoke("uppercut");
 
         DealDamage(damage);
+    }
+
+    /// <summary>
+    /// Called by Health when the player takes damage.
+    /// Interrupts the current attack, cancels combos, and locks out attacks briefly.
+    /// </summary>
+    public void OnHitStun()
+    {
+        hitStunTimer = hitStunDuration;
+        cooldownTimer = 0; // Reset cooldown so they can't instantly attack after stun ends
+
+        // Cancel any in-progress combo
+        comboWindowOpen = false;
+        comboQueued = false;
+
+        // Reset attack animation triggers so they don't fire after stun
+        if (anim != null)
+        {
+            anim.ResetTrigger("attack");
+            anim.ResetTrigger("comboAttack");
+            anim.ResetTrigger("jumpAttack");
+            anim.ResetTrigger("uppercut");
+        }
     }
 
     /// <summary>Shared hit-detection used by every attack type.</summary>
