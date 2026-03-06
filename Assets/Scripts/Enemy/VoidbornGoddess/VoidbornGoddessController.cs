@@ -8,7 +8,7 @@ public class VoidbornGoddessController : BossController
 {
     [Header("Voidborn Settings")]
     public float chaseSpeed = 3f;
-    public float attackCooldown = 2.5f;
+    public float meleeAttackCooldown = 2.5f;
     public float dashSpeed = 10f;
     
     [Header("Melee Setup")]
@@ -31,7 +31,7 @@ public class VoidbornGoddessController : BossController
         ChaseState = new VoidbornChaseState();
         MeleeState = new VoidbornMeleeAttackState();
         
-        AttackTimer = attackCooldown;
+        AttackTimer = meleeAttackCooldown;
     }
 
     protected override void StartState()
@@ -47,7 +47,7 @@ public class VoidbornGoddessController : BossController
 
     public void ResetAttackTimer()
     {
-        AttackTimer = attackCooldown;
+        AttackTimer = meleeAttackCooldown;
     }
 
     /// <summary>
