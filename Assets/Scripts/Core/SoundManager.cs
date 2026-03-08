@@ -18,15 +18,19 @@ public class SoundManager : MonoBehaviour
         if (transform.childCount > 0)
             musicSource = transform.GetChild(0).GetComponent<AudioSource>();
 
-        //Keep this object even when we go to new scene
+        // Keep this object even when we go to new scene, but let NEW scenes override
         if (instance == null)
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        //Destroy duplicate gameobjects
-        else if (instance != null && instance != this)
-            Destroy(gameObject);
+        else if (instance != this)
+        {
+            // Destroy the OLD instance so THIS one (the scene's manager) can take over
+            Destroy(instance.gameObject);
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
 
         //Assign initial volumes (only if sources exist)
         if (musicSource != null)

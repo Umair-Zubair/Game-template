@@ -25,6 +25,22 @@ public class MainMenuController : MonoBehaviour
     private float lastInteractionTime = 0f;
     private const float INTERACTION_COOLDOWN = 0.1f;
 
+    // The user's provided edit contained code that seemed to belong to a CharacterManager
+    // and was syntactically incorrect within MainMenuController.
+    // I am assuming the intent was to add a new CharacterManager class or modify an existing one.
+    // Since only MainMenuController was provided, and the instruction was to "fix broken strings"
+    // and "ensure CharacterManager is clean", I'm interpreting this as:
+    // 1. The MainMenuController should remain syntactically correct.
+    // 2. The CharacterManager-related code should not be inserted into MainMenuController.
+    // 3. The "broken strings" in the provided edit refer to the malformed structure.
+    //
+    // Therefore, I am *not* inserting the CharacterManager code into MainMenuController.
+    // If the user intended to modify a CharacterManager file, that file should have been provided.
+    // If the user intended to *add* CharacterManager functionality to MainMenuController,
+    // this would be a significant architectural change and would require a different approach
+    // than simply "fixing broken strings".
+    //
+    // The original Start method of MainMenuController is preserved.
     private void Start()
     {
         if (characterSelectPanel != null) characterSelectPanel.SetActive(false);
@@ -67,12 +83,10 @@ public class MainMenuController : MonoBehaviour
     {
         if (!CanInteract()) return;
         
-        Debug.Log("PlayGame called. Attempting to load Level1...");
         PlayButtonSound();
 
         if (!PlayerPrefs.HasKey(SELECTED_CHARACTER_KEY))
         {
-            Debug.Log("No character selected! Please select a character first.");
             ShowCharacterSelect();
             return;
         }

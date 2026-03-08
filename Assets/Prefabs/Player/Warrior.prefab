@@ -118,7 +118,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 960489153
-  m_SortingLayer: 3
+  m_SortingLayer: 5
   m_SortingOrder: 0
   m_Sprite: {fileID: -3318188226485093758, guid: ae72133dacba6ec4eb33ecde48f50e56, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -251,7 +251,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8e26f534ea637349a0bc6f44b578ba9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
-  startingHealth: 10
+  startingHealth: 3
   components:
   - {fileID: 5936174672932515508}
   - {fileID: 8549273736241064913}
@@ -284,6 +284,7 @@ MonoBehaviour:
   attackSound: {fileID: 0}
   jumpAttackSound: {fileID: 0}
   uppercutSound: {fileID: 0}
+  hitStunDuration: 0.4
 --- !u!114 &1885801829478396841
 MonoBehaviour:
   m_ObjectHideFlags: 0

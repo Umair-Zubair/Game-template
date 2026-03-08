@@ -2236,7 +2236,7 @@ GameObject:
   - component: {fileID: 631170731}
   - component: {fileID: 631170734}
   m_Layer: 0
-  m_Name: RangedBlobButton
+  m_Name: BountyHunterButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2258,8 +2258,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 158, y: -12}
-  m_SizeDelta: {x: 2.0854, y: 2.0855}
+  m_AnchoredPosition: {x: 224, y: 69}
+  m_SizeDelta: {x: 6.1065, y: 5.0666}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &631170731
 MonoBehaviour:
@@ -2330,14 +2330,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0, b: 0, a: 0.16470589}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -4753702385071775785, guid: e664e36d80c8465458dfda2d1f1630b5, type: 3}
+  m_Sprite: {fileID: 4536585280519004551, guid: 15e3ba5442bcffa4baa7339fa5f119f4, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2981,7 +2981,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -230, y: 14}
+  m_AnchoredPosition: {x: -155, y: 14}
   m_SizeDelta: {x: 159.2047, y: 263.4337}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &996694523

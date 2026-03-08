@@ -3,7 +3,7 @@ using UnityEngine;
 public class CharacterManager : MonoBehaviour
 {
     [Header("Player")]
-    [SerializeField] private GameObject playerPrefab; // The one Blob prefab with both attack scripts
+    [SerializeField] private GameObject[] playerPrefabs; // Element 0: Hunter, Element 1: Warrior
     [SerializeField] private Transform spawnPoint;
 
     [Header("Dependencies")]
@@ -14,68 +14,45 @@ public class CharacterManager : MonoBehaviour
     private const int BLOB_RANGED_INDEX = 0;
     private const int BLOB_MELEE_INDEX = 1;
 
+    private void Awake()
+    {
+    }
+
     private void Start()
     {
-        if (playerPrefab == null)
-        {
-            Debug.LogError("CharacterManager: playerPrefab is not assigned in the Inspector!");
-            return;
-        }
-
-        if (!PlayerPrefs.HasKey(SELECTED_CHARACTER_KEY))
-            Debug.LogWarning("CharacterManager: No character selection found in PlayerPrefs! Defaulting to Blob Ranged. Did you select a character in the main menu?");
+        if (playerPrefabs == null || playerPrefabs.Length == 0) return;
 
         int selected = PlayerPrefs.GetInt(SELECTED_CHARACTER_KEY, BLOB_RANGED_INDEX);
-        Debug.Log($"CharacterManager: Selected index = {selected} (0=Ranged, 1=Melee)");
-
         SpawnCharacter(selected);
     }
 
     private void SpawnCharacter(int index)
     {
-        GameObject newPlayer = Instantiate(playerPrefab, spawnPoint.position, Quaternion.identity);
-        Debug.Log($"CharacterManager: Spawned '{newPlayer.name}'");
+        if (index < 0 || index >= playerPrefabs.Length) return;
 
-        MeleeAttack melee    = newPlayer.GetComponent<MeleeAttack>();
-        BlobRangedAttack ranged = newPlayer.GetComponent<BlobRangedAttack>();
+        GameObject prefabToSpawn = playerPrefabs[index];
+        if (prefabToSpawn == null) return;
 
-        Debug.Log($"CharacterManager: MeleeAttack found = {melee != null} | BlobRangedAttack found = {ranged != null}");
+        GameObject newPlayer = Instantiate(prefabToSpawn, spawnPoint.position, Quaternion.identity);
 
-        // Disable both first
-        if (melee  != null) melee.enabled  = false;
-        if (ranged != null) ranged.enabled = false;
+        // We use GetComponentInChildren just in case the Health script is on a child object
+        Health playerHealth = newPlayer.GetComponentInChildren<Health>();
 
-        // Enable only the selected one
-        if (index == BLOB_MELEE_INDEX)
-        {
-            if (melee != null)
-            {
-                melee.enabled = true;
-                Debug.Log("CharacterManager: MeleeAttack ENABLED, BlobRangedAttack DISABLED.");
-            }
-            else
-                Debug.LogError("CharacterManager: MeleeAttack not found on prefab!");
-        }
-        else // BLOB_RANGED_INDEX
-        {
-            if (ranged != null)
-            {
-                ranged.enabled = true;
-                Debug.Log("CharacterManager: BlobRangedAttack ENABLED, MeleeAttack DISABLED.");
-            }
-            else
-                Debug.LogError("CharacterManager: BlobRangedAttack not found on prefab!");
-        }
-
-        // Hook up UI
+        // Ensure the UI follows the player
         if (healthBar != null)
-            healthBar.SetPlayer(newPlayer.GetComponent<Health>());
+        {
+            healthBar.SetPlayer(playerHealth);
+        }
         else
-            Debug.LogWarning("CharacterManager: Healthbar not assigned.");
+        {
+            // If No direct reference, find all bars and force them to the player.
+            // This stops them from accidentally 'finding' the Boss health instead of yours.
+            var allBars = Object.FindObjectsByType<Healthbar>(FindObjectsSortMode.None);
+            foreach (var bar in allBars)
+                bar.SetPlayer(playerHealth);
+        }
 
         if (staminaBar != null)
             staminaBar.SetPlayer(newPlayer.GetComponent<PlayerStamina>());
-        else
-            Debug.LogWarning("CharacterManager: StaminaBar not assigned.");
     }
 }

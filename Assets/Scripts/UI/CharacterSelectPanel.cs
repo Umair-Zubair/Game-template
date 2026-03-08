@@ -50,8 +50,15 @@ public class CharacterSelectPanel : MonoBehaviour
     private Vector3 blobMeleeOriginalScale;
     private Vector3 blobRangedOriginalScale;
 
+    private void Awake()
+    {
+        Debug.Log($"<color=orange>[CharacterSelectPanel] Awake on GameObject: {gameObject.name} (InstanceID: {gameObject.GetInstanceID()})</color>");
+    }
+
     private void Start()
     {
+        Debug.Log($"<color=orange>[CharacterSelectPanel] Start on GameObject: {gameObject.name} (InstanceID: {gameObject.GetInstanceID()})</color>");
+        
         if (blobMeleeButton != null)
             blobMeleeButton.onClick.AddListener(SelectBlobMelee);
 
@@ -144,24 +151,22 @@ public class CharacterSelectPanel : MonoBehaviour
 
     public void SelectBlobMelee()
     {
+        Debug.Log($"<color=green>[CharacterSelectPanel] Saving Melee Selection (Index: {BLOB_MELEE_INDEX})</color>");
         PlayerPrefs.SetInt(SELECTED_CHARACTER_KEY, BLOB_MELEE_INDEX);
         PlayerPrefs.Save();
 
         PlayInteractSound();
         UpdateSelectionVisuals();
-
-        Debug.Log("[CharacterSelect] Blob Melee selected.");
     }
 
     public void SelectBlobRanged()
     {
+        Debug.Log($"<color=green>[CharacterSelectPanel] Saving Ranged Selection (Index: {BLOB_RANGED_INDEX})</color>");
         PlayerPrefs.SetInt(SELECTED_CHARACTER_KEY, BLOB_RANGED_INDEX);
         PlayerPrefs.Save();
 
         PlayInteractSound();
         UpdateSelectionVisuals();
-
-        Debug.Log("[CharacterSelect] Blob Ranged selected.");
     }
 
     // ────────────────────────────────────────────────────────────────────────
