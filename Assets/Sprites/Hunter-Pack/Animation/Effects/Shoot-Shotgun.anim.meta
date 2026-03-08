@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a70b1d8ab36365440b3aefd87e866705
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 197550
+  packageName: Bounty-Hunter
+  packageVersion: 1.0
+  assetPath: Assets/Bounty Hunter/Animation/Effects/Shoot-Shotgun.anim
+  uploadId: 640181

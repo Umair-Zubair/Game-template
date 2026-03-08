@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: fd866f6a9a7402548bc38e75d8017297
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 197550
+  packageName: Bounty-Hunter
+  packageVersion: 1.0
+  assetPath: Assets/Bounty Hunter/Animation/Shotgun-Version/Shoot-Fall_Shotgun.anim
+  uploadId: 640181

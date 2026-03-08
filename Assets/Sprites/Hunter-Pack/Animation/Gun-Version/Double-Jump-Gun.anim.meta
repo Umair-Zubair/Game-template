@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c211685fb5c53564f93a443b2194cede
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 197550
+  packageName: Bounty-Hunter
+  packageVersion: 1.0
+  assetPath: Assets/Bounty Hunter/Animation/Gun-Version/Double-Jump-Gun.anim
+  uploadId: 640181

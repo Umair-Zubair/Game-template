@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 6c4056a01ee67644b9ef547c214605f2
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 197550
+  packageName: Bounty-Hunter
+  packageVersion: 1.0
+  assetPath: Assets/Bounty Hunter/Animation/Effects/Impact_2.controller
+  uploadId: 640181

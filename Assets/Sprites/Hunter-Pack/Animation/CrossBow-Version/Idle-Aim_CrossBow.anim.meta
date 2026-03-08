@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ed8ecdba8bbb81e4abc7246d16675c6e
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 197550
+  packageName: Bounty-Hunter
+  packageVersion: 1.0
+  assetPath: Assets/Bounty Hunter/Animation/CrossBow-Version/Idle-Aim_CrossBow.anim
+  uploadId: 640181

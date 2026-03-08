@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d9143cb653d34e847b7cefae230e837e
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 197550
+  packageName: Bounty-Hunter
+  packageVersion: 1.0
+  assetPath: Assets/Bounty Hunter/Animation/Effects/ShotGun_Shoot.controller
+  uploadId: 640181

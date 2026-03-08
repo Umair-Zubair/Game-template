@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 0c8296ed1ed76cc4faef4abef3a8f344
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 197550
+  packageName: Bounty-Hunter
+  packageVersion: 1.0
+  assetPath: Assets/Bounty Hunter/Animation/Effects/Bullet_1.controller
+  uploadId: 640181

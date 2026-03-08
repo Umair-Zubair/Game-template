@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4fb50a071abae3b408c381c5609cadf4
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 197550
+  packageName: Bounty-Hunter
+  packageVersion: 1.0
+  assetPath: Assets/Bounty Hunter/Animation/Effects/Dash-Atk-effect.controller
+  uploadId: 640181

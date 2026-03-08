@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: cba57b02ae67e8c409ba3855452b00c6
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 197550
+  packageName: Bounty-Hunter
+  packageVersion: 1.0
+  assetPath: Assets/Bounty Hunter/Animation/Gun-Version/Roll_Gun.anim
+  uploadId: 640181

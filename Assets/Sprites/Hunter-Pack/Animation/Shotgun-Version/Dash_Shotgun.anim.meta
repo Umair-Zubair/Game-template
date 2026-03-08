@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c8074749427c16c44982553fd2432a84
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 197550
+  packageName: Bounty-Hunter
+  packageVersion: 1.0
+  assetPath: Assets/Bounty Hunter/Animation/Shotgun-Version/Dash_Shotgun.anim
+  uploadId: 640181
