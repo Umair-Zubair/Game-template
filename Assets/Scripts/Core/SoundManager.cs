@@ -3,6 +3,7 @@ using UnityEngine;
 public class SoundManager : MonoBehaviour
 {
     public static SoundManager instance { get; private set; }
+    [SerializeField] private AudioClip interactionSound; // Sound to play when volume changes
     private AudioSource soundSource;
     private AudioSource musicSource;
 
@@ -44,7 +45,7 @@ public class SoundManager : MonoBehaviour
     }
     public void ChangeMusicVolume(float _change)
     {
-        ChangeSourceVolume(0.3f, "musicVolume", _change, musicSource);
+        ChangeSourceVolume(1f, "musicVolume", _change, musicSource);
     }
 
     private void ChangeSourceVolume(float baseVolume, string volumeName, float change, AudioSource source)
@@ -62,6 +63,10 @@ public class SoundManager : MonoBehaviour
         //Assign final value
         float finalVolume = currentVolume * baseVolume;
         source.volume = finalVolume;
+
+        // Play feedback sound if assigned
+        if (interactionSound != null && soundSource != null)
+            soundSource.PlayOneShot(interactionSound);
 
         //Save final value to player prefs
         PlayerPrefs.SetFloat(volumeName, currentVolume);
