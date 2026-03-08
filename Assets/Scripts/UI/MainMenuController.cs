@@ -191,7 +191,6 @@ public class MainMenuController : MonoBehaviour
     {
         if (!CanInteract()) return;
         
-        Debug.Log("[MainMenu] Sound Volume button pressed.");
         PlayButtonSound();
         if (SoundManager.instance != null)
             SoundManager.instance.ChangeSoundVolume(0.2f);
@@ -201,7 +200,6 @@ public class MainMenuController : MonoBehaviour
     {
         if (!CanInteract()) return;
         
-        Debug.Log("[MainMenu] Music Volume button pressed.");
         PlayButtonSound();
         if (SoundManager.instance != null)
             SoundManager.instance.ChangeMusicVolume(0.2f);
