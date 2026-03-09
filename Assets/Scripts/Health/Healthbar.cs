@@ -14,7 +14,7 @@ public class Healthbar : MonoBehaviour
         // Update the bar immediately so it doesn't show empty
         if (playerHealth != null)
         {
-            totalhealthBar.fillAmount = playerHealth.currentHealth / 10;
+            totalhealthBar.fillAmount = playerHealth.currentHealth / 3;
         }
     }
     // ------------------------------------
@@ -26,12 +26,12 @@ public class Healthbar : MonoBehaviour
             playerHealth = FindFirstObjectByType<Health>();
 
         if (playerHealth != null)
-            totalhealthBar.fillAmount = playerHealth.currentHealth / 10;
+            totalhealthBar.fillAmount = playerHealth.currentHealth / 3;
     }
 
     private void Update()
     {
         if (playerHealth != null)
-            currenthealthBar.fillAmount = playerHealth.currentHealth / 10;
+            currenthealthBar.fillAmount = playerHealth.currentHealth / 3;
     }
 }
