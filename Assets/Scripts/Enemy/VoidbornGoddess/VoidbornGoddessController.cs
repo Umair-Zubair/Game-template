@@ -3,6 +3,7 @@ using UnityEngine;
 /// <summary>
 /// Specific controller for the Voidborn Goddess Boss.
 /// Inherits from the base BossController and implements her unique states.
+/// Supports melee attacks and an animation-driven artillery attack.
 /// </summary>
 public class VoidbornGoddessController : BossController
 {
@@ -15,23 +16,49 @@ public class VoidbornGoddessController : BossController
     public Transform meleeAttackPoint;
     public float meleeAttackRadius = 1.5f;
     public int meleeDamage = 2;
-    
+
+    // -----------------------------------------------------------------
+    // ARTILLERY ATTACK — configurable teleport anchor + projectile setup
+    // -----------------------------------------------------------------
+    [Header("Artillery Attack")]
+    [Tooltip("World position where the boss teleports during the artillery attack (top-right area). Adjustable in the Inspector or via script.")]
+    public Vector2 artilleryAnchorPosition = new Vector2(8f, 6f);
+
+    [Tooltip("Prefab for the artillery projectile. Leave empty to auto-create at runtime.")]
+    public GameObject artilleryProjectilePrefab;
+
+    [Tooltip("Height above the player where the artillery projectile spawns")]
+    public float artillerySpawnHeight = 10f;
+
+    [Tooltip("Damage dealt by the artillery projectile")]
+    public int artilleryDamage = 2;
+
+    [Tooltip("Cooldown (seconds) between artillery attacks")]
+    public float artilleryCooldown = 8f;
+
     // States
     public VoidbornIdleState IdleState { get; private set; }
     public VoidbornChaseState ChaseState { get; private set; }
     public VoidbornMeleeAttackState MeleeState { get; private set; }
+    public VoidbornArtilleryState ArtilleryState { get; private set; }
     
-    // Timers
+    // Melee cooldown
     public float AttackTimer { get; private set; }
     public bool CanAttack => AttackTimer <= 0f && !IsAttacking;
+
+    // Artillery cooldown
+    public float ArtilleryTimer { get; private set; }
+    public bool CanUseArtillery => ArtilleryTimer <= 0f && !IsAttacking;
 
     protected override void InitializeStates()
     {
         IdleState = new VoidbornIdleState();
         ChaseState = new VoidbornChaseState();
         MeleeState = new VoidbornMeleeAttackState();
+        ArtilleryState = new VoidbornArtilleryState();
         
         AttackTimer = meleeAttackCooldown;
+        ArtilleryTimer = artilleryCooldown;
     }
 
     protected override void StartState()
@@ -43,11 +70,24 @@ public class VoidbornGoddessController : BossController
     {
         if (AttackTimer > 0)
             AttackTimer -= Time.deltaTime;
+
+        if (ArtilleryTimer > 0)
+            ArtilleryTimer -= Time.deltaTime;
     }
 
     public void ResetAttackTimer()
     {
         AttackTimer = meleeAttackCooldown;
+    }
+
+    /// <summary>
+    /// Resets the artillery cooldown so the next artillery attack
+    /// cannot fire until the full cooldown elapses again.
+    /// Called by VoidbornArtilleryState.OnExit().
+    /// </summary>
+    public void ResetArtilleryTimer()
+    {
+        ArtilleryTimer = artilleryCooldown;
     }
 
     /// <summary>
@@ -70,6 +110,47 @@ public class VoidbornGoddessController : BossController
         }
     }
 
+    // -----------------------------------------------------------------
+    // Artillery Projectile Spawning
+    // -----------------------------------------------------------------
+
+    /// <summary>
+    /// Spawns the artillery projectile above the player's current X position.
+    /// Called by VoidbornArtilleryState during the cast2spell animation phase.
+    /// Can also be invoked directly as an Animation Event on the cast2spell clip
+    /// if you want even tighter synchronisation with the animation.
+    /// </summary>
+    public void SpawnArtilleryProjectile()
+    {
+        if (Player == null) return;
+
+        // Capture the player's current X position — creates the "artillery" targeting
+        float playerX = Player.position.x;
+        Vector3 spawnPos = new Vector3(playerX, Player.position.y + artillerySpawnHeight, 0f);
+
+        // Instantiate from prefab or create at runtime
+        GameObject projObj;
+        if (artilleryProjectilePrefab != null)
+        {
+            projObj = Instantiate(artilleryProjectilePrefab, spawnPos, Quaternion.identity);
+        }
+        else
+        {
+            projObj = new GameObject("VoidbornArtilleryProjectile");
+            projObj.transform.position = spawnPos;
+            projObj.AddComponent<VoidbornArtilleryProjectile>();
+        }
+
+        // Initialize the projectile with position and damage
+        VoidbornArtilleryProjectile proj = projObj.GetComponent<VoidbornArtilleryProjectile>();
+        if (proj != null)
+        {
+            proj.Initialize(spawnPos, artilleryDamage);
+        }
+
+        Debug.Log($"[Voidborn] Artillery projectile spawned at {spawnPos}");
+    }
+
     public void Deactivate()
     {
         gameObject.SetActive(false);
@@ -77,16 +158,25 @@ public class VoidbornGoddessController : BossController
 
     private void OnDrawGizmosSelected()
     {
+        // Detection range
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectionRange);
 
+        // Attack range
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
 
+        // Melee attack point
         if (meleeAttackPoint != null)
         {
             Gizmos.color = Color.magenta;
             Gizmos.DrawWireSphere(meleeAttackPoint.position, meleeAttackRadius);
         }
+
+        // Artillery teleport anchor — visible in the Scene view for easy positioning
+        Gizmos.color = Color.cyan;
+        Vector3 anchorPos = new Vector3(artilleryAnchorPosition.x, artilleryAnchorPosition.y, 0f);
+        Gizmos.DrawWireSphere(anchorPos, 0.5f);
+        Gizmos.DrawLine(transform.position, anchorPos);
     }
 }

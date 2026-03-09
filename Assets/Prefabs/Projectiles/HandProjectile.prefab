@@ -13,7 +13,8 @@ GameObject:
   - component: {fileID: 5186602594099031604}
   - component: {fileID: 1743220062714528599}
   - component: {fileID: 2925863720740462436}
-  m_Layer: 0
+  - component: {fileID: 7418411594075443877}
+  m_Layer: 6
   m_Name: HandProjectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -127,7 +128,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.0039239824, y: 0.12812445}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -137,7 +138,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1.38, y: 0.93}
+  m_Size: {x: 0.357377, y: 0.29225767}
   m_EdgeRadius: 0
 --- !u!50 &1743220062714528599
 Rigidbody2D:
@@ -147,7 +148,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3693015339863160863}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -188,3 +189,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &7418411594075443877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3693015339863160863}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0beabf681193134fa92d5e7a3c773b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VoidbornArtilleryProjectile
+  formDuration: 0.8
+  fallSpeed: 12
+  lifetime: 6
+  projectileSprite: {fileID: 0}

@@ -115,7 +115,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 960489153
-  m_SortingLayer: 4
+  m_SortingLayer: 5
   m_SortingOrder: 0
   m_Sprite: {fileID: 8161392755375268392, guid: 43874630a328bf743a4b2da6c2e65a3c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -285,8 +285,13 @@ MonoBehaviour:
   StunTimer: 0
   DebugMode: 1
   chaseSpeed: 2
-  attackCooldown: 2
+  meleeAttackCooldown: 2.5
   dashSpeed: 10
   meleeAttackPoint: {fileID: 6178199018294719981}
   meleeAttackRadius: 1.5
   meleeDamage: 2
+  artilleryAnchorPosition: {x: 8.35, y: 2.84}
+  artilleryProjectilePrefab: {fileID: 3693015339863160863, guid: 7b7f98c0d3e00ad4d9ab857f37e7d803, type: 3}
+  artillerySpawnHeight: 5
+  artilleryDamage: 2
+  artilleryCooldown: 6

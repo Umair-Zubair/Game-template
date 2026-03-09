@@ -251,7 +251,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8e26f534ea637349a0bc6f44b578ba9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
-  startingHealth: 10
+  startingHealth: 6
   components:
   - {fileID: 8049873378223907268}
   - {fileID: 5436545606271198369}
