@@ -1249,7 +1249,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &218656635
 Transform:
   m_ObjectHideFlags: 0
@@ -1278,7 +1278,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterManager
   playerPrefabs:
-  - {fileID: 7235458630087564018, guid: 876ccb7512133544e82e544c241ac2c4, type: 3}
+  - {fileID: 5536329845775654271, guid: 876ccb7512133544e82e544c241ac2c4, type: 3}
   - {fileID: 5963178899783550497, guid: 577e1bd8d75c0a648be516ea4b64a3e2, type: 3}
   spawnPoint: {fileID: 271092032}
   healthBar: {fileID: 27520355}
@@ -6663,7 +6663,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1531825606
 Transform:
   m_ObjectHideFlags: 0
@@ -8411,34 +8411,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 203213257753715243, guid: aeb534f1b4c87be4ca0ddcba244e3845, type: 3}
-      propertyPath: m_SortingLayer
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 203213257753715243, guid: aeb534f1b4c87be4ca0ddcba244e3845, type: 3}
-      propertyPath: m_SortingOrder
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 203213257753715243, guid: aeb534f1b4c87be4ca0ddcba244e3845, type: 3}
-      propertyPath: m_SortingLayerID
-      value: 960489153
-      objectReference: {fileID: 0}
-    - target: {fileID: 1729156680349293521, guid: aeb534f1b4c87be4ca0ddcba244e3845, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1729156680349293521, guid: aeb534f1b4c87be4ca0ddcba244e3845, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1729156680349293521, guid: aeb534f1b4c87be4ca0ddcba244e3845, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1729156680349293521, guid: aeb534f1b4c87be4ca0ddcba244e3845, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -7.18
-      objectReference: {fileID: 0}
     - target: {fileID: 3037766531658175649, guid: 577e1bd8d75c0a648be516ea4b64a3e2, type: 3}
       propertyPath: m_LocalPosition.y
       value: -2.46
@@ -8479,6 +8451,38 @@ PrefabInstance:
       propertyPath: m_Name
       value: Warrior
       objectReference: {fileID: 0}
+    - target: {fileID: 5963178899783550497, guid: 577e1bd8d75c0a648be516ea4b64a3e2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 203213257753715243, guid: aeb534f1b4c87be4ca0ddcba244e3845, type: 3}
+      propertyPath: m_SortingLayer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 203213257753715243, guid: aeb534f1b4c87be4ca0ddcba244e3845, type: 3}
+      propertyPath: m_SortingOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 203213257753715243, guid: aeb534f1b4c87be4ca0ddcba244e3845, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 960489153
+      objectReference: {fileID: 0}
+    - target: {fileID: 1729156680349293521, guid: aeb534f1b4c87be4ca0ddcba244e3845, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1729156680349293521, guid: aeb534f1b4c87be4ca0ddcba244e3845, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1729156680349293521, guid: aeb534f1b4c87be4ca0ddcba244e3845, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1729156680349293521, guid: aeb534f1b4c87be4ca0ddcba244e3845, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -7.18
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -8492,9 +8496,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5536329845775654271, guid: 876ccb7512133544e82e544c241ac2c4, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7235458630087564018, guid: 876ccb7512133544e82e544c241ac2c4, type: 3}
       propertyPath: m_Name
       value: Hunter
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235458630087564018, guid: 876ccb7512133544e82e544c241ac2c4, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9171882789950083081, guid: 876ccb7512133544e82e544c241ac2c4, type: 3}
       propertyPath: m_LocalPosition.x
@@ -8651,3 +8663,4 @@ SceneRoots:
   - {fileID: 1948467262}
   - {fileID: 391583834}
   - {fileID: 1260625188}
+  - {fileID: 1578293920}
