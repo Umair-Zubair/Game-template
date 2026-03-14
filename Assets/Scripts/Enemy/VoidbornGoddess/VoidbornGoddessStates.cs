@@ -83,55 +83,206 @@ public class VoidbornChaseState : IBossState
 }
 
 // ============================================================================
-// MELEE ATTACK STATE — Close-range hit driven by timers (unchanged)
+// MELEE ATTACK STATE — Animation-driven combo system (1–4 random swipes)
+//
+// HOW IT WORKS:
+//   On OnEnter, the boss randomly picks how many swipes to do (MIN_SWIPES to
+//   MAX_SWIPES). It then fires each swipe trigger one at a time, waits for that
+//   animation clip to finish using the same two-stage wait pattern as the
+//   artillery state, then fires the next trigger — until the chosen count is done.
+//
+// DAMAGE:
+//   Each swipe deals damage via PerformMeleeHit(). This is called either:
+//     (a) By an Animation Event on each clip at the exact hit frame — recommended.
+//     (b) By the fallback timer FALLBACK_HIT_DELAY seconds into the swipe — safety net.
+//   If you have Animation Events set up, set FALLBACK_HIT_DELAY = 0f to disable (b).
+//
+// ANIMATOR REQUIREMENTS:
+//   Trigger parameters : meleeSwipe1, meleeSwipe2, meleeSwipe3, meleeSwipe4
+//   Any State → MeleeSwipe1  [Condition: meleeSwipe1 | Has Exit Time: OFF | Duration: 0 | Can Transition To Self: OFF]
+//   Any State → MeleeSwipe2  [Condition: meleeSwipe2 | Has Exit Time: OFF | Duration: 0 | Can Transition To Self: OFF]
+//   Any State → MeleeSwipe3  [Condition: meleeSwipe3 | Has Exit Time: OFF | Duration: 0 | Can Transition To Self: OFF]
+//   Any State → MeleeSwipe4  [Condition: meleeSwipe4 | Has Exit Time: OFF | Duration: 0 | Can Transition To Self: OFF]
+//   MeleeSwipe1 → Idle       [No condition           | Has Exit Time: ON  | Exit: 0.95  | Duration: 0.1]
+//   MeleeSwipe2 → Idle       [same as above]
+//   MeleeSwipe3 → Idle       [same as above]
+//   MeleeSwipe4 → Idle       [same as above]
 // ============================================================================
 public class VoidbornMeleeAttackState : IBossState
 {
-    private float stateTimer;
-    private bool hasHit;
-    // We assume the animation plays for roughly this long. Later this can be driven by Animation Events.
-    private const float ATTACK_WINDUP = 0.4f; 
-    private const float ATTACK_DURATION = 1.0f;
+    // ── Combo settings ───────────────────────────────────────────────────────
+    private const int MIN_SWIPES = 1;
+    private const int MAX_SWIPES = 4; // inclusive
 
+    // Trigger names — must exactly match the Trigger parameters in your Animator
+    private static readonly string[] SwipeTriggers =
+        { "meleeSwipe1", "meleeSwipe2", "meleeSwipe3", "meleeSwipe4" };
+
+    // Fallback hit delay per swipe (seconds after the trigger fires).
+    // Set to 0f if you are using Animation Events on all clips instead.
+    private const float FALLBACK_HIT_DELAY = 0.25f;
+
+    // ── Two-stage animation wait (same pattern as ArtilleryState) ───────────
+    private enum AnimWait { WaitingForNewState, WaitingForCompletion }
+    private AnimWait animWait;
+    private int triggerStateHash;
+    private int targetStateHash;
+
+    // ── Runtime state ────────────────────────────────────────────────────────
+    private int totalSwipes;        // Chosen randomly each time we enter this state
+    private int currentSwipeIndex;  // Which swipe we are currently on (0-based)
+    private bool swipeInitialized;  // Has the trigger for the current swipe been fired?
+    private bool hitLanded;         // Has damage been dealt for the current swipe?
+    private float swipeTimer;       // Time elapsed since the current swipe trigger fired
+
+    // ── OnEnter ──────────────────────────────────────────────────────────────
     public void OnEnter(BossController boss)
     {
         VoidbornGoddessController goddess = boss as VoidbornGoddessController;
-        stateTimer = 0f;
-        hasHit = false;
-        
+
         goddess.Stop();
         goddess.SetMoving(false);
         goddess.FacePlayer();
         goddess.IsAttacking = true;
-        
-        if (goddess.Anim != null)
-            goddess.Anim.SetTrigger("meleeAttack");
+
+        // Randomly decide combo length for this attack
+        totalSwipes       = Random.Range(MIN_SWIPES, MAX_SWIPES + 1);
+        currentSwipeIndex = 0;
+        swipeInitialized  = false;
+        hitLanded         = false;
+        swipeTimer        = 0f;
+
+        Debug.Log($"[Voidborn] ===== Melee combo started — chosen swipe count: {totalSwipes} =====");
     }
 
+    // ── OnUpdate ─────────────────────────────────────────────────────────────
     public void OnUpdate(BossController boss)
     {
         VoidbornGoddessController goddess = boss as VoidbornGoddessController;
-        stateTimer += Time.deltaTime;
+        Animator anim = boss.Anim;
+        if (anim == null) return;
 
-        if (stateTimer >= ATTACK_WINDUP && !hasHit)
+        // All chosen swipes finished — return to chase
+        if (currentSwipeIndex >= totalSwipes)
         {
-            goddess.PerformMeleeHit();
-            hasHit = true;
+            Debug.Log($"[Voidborn] Melee combo complete ({totalSwipes} swipe(s) done). Returning to Chase.");
+            goddess.StateMachine.ChangeState(goddess.ChaseState, goddess);
+            return;
         }
 
-        if (stateTimer >= ATTACK_DURATION)
+        // ── Fire the trigger for the current swipe ───────────────────────────
+        if (!swipeInitialized)
         {
-            goddess.StateMachine.ChangeState(goddess.ChaseState, goddess);
+            BeginSwipe(anim, currentSwipeIndex);
+            return;
+        }
+
+        // ── Fallback hit timer ───────────────────────────────────────────────
+        if (FALLBACK_HIT_DELAY > 0f && !hitLanded)
+        {
+            swipeTimer += Time.deltaTime;
+            if (swipeTimer >= FALLBACK_HIT_DELAY)
+            {
+                Debug.Log($"[Voidborn] Swipe {currentSwipeIndex + 1} — fallback hit fired.");
+                goddess.PerformMeleeHit();
+                hitLanded = true;
+            }
+        }
+
+        // ── Wait for the current swipe animation to finish ───────────────────
+        if (IsSwipeComplete(anim))
+        {
+            // Safety: ensure damage landed even if both Animation Event and fallback missed
+            if (!hitLanded)
+            {
+                Debug.Log($"[Voidborn] Swipe {currentSwipeIndex + 1} — safety hit fired on clip end.");
+                goddess.PerformMeleeHit();
+                hitLanded = true;
+            }
+
+            Debug.Log($"[Voidborn] Swipe {currentSwipeIndex + 1}/{totalSwipes} finished.");
+
+            // Advance to the next swipe
+            currentSwipeIndex++;
+            swipeInitialized = false;
+            hitLanded        = false;
+            swipeTimer       = 0f;
         }
     }
 
+    /// <summary>
+    /// Called by an Animation Event on each MeleeSwipe clip at the hit frame.
+    /// Delivers damage at the exact frame the swipe visually connects.
+    /// The fallback timer is a safety net — hitLanded prevents double-firing.
+    /// </summary>
+    public void OnSwipeAnimationHit(BossController boss)
+    {
+        if (hitLanded) return;
+        VoidbornGoddessController goddess = boss as VoidbornGoddessController;
+        Debug.Log($"[Voidborn] Swipe {currentSwipeIndex + 1} — Animation Event hit fired.");
+        goddess.PerformMeleeHit();
+        hitLanded = true;
+    }
+
+    // ── BeginSwipe: fire the trigger and reset the two-stage wait ────────────
+    private void BeginSwipe(Animator anim, int swipeIndex)
+    {
+        AnimatorStateInfo info = anim.GetCurrentAnimatorStateInfo(0);
+        triggerStateHash = info.fullPathHash;
+        targetStateHash  = 0;
+        animWait         = AnimWait.WaitingForNewState;
+        swipeInitialized = true;
+
+        // Clear all swipe triggers first to prevent any stale trigger from firing
+        foreach (string t in SwipeTriggers)
+            anim.ResetTrigger(t);
+
+        string triggerName = SwipeTriggers[swipeIndex];
+        anim.SetTrigger(triggerName);
+
+        Debug.Log($"[Voidborn] Swipe {swipeIndex + 1}/{totalSwipes} — firing trigger '{triggerName}'");
+    }
+
+    // ── IsSwipeComplete: two-stage animation completion check ────────────────
+    private bool IsSwipeComplete(Animator anim)
+    {
+        AnimatorStateInfo info = anim.GetCurrentAnimatorStateInfo(0);
+        bool inTransition = anim.IsInTransition(0);
+
+        switch (animWait)
+        {
+            case AnimWait.WaitingForNewState:
+                if (inTransition) return false;
+                if (info.fullPathHash == triggerStateHash) return false;
+                // Settled into the new clip — record its hash
+                targetStateHash = info.fullPathHash;
+                animWait = AnimWait.WaitingForCompletion;
+                return false; // let it play at least one frame before checking
+
+            case AnimWait.WaitingForCompletion:
+                // Still inside the swipe clip — wait for it to reach the end
+                if (!inTransition && info.fullPathHash == targetStateHash)
+                    return info.normalizedTime >= 0.95f;
+                // Animator already moved on (clip finished and auto-transitioned to Idle)
+                if (!inTransition && info.fullPathHash != targetStateHash)
+                    return true;
+                // Mid-transition away from the swipe clip — it's wrapping up
+                if (inTransition && info.fullPathHash == targetStateHash)
+                    return true;
+                return false;
+        }
+        return false;
+    }
+
     public void OnFixedUpdate(BossController boss) { }
-    
+
+    // ── OnExit ───────────────────────────────────────────────────────────────
     public void OnExit(BossController boss)
     {
         VoidbornGoddessController goddess = boss as VoidbornGoddessController;
         goddess.IsAttacking = false;
         goddess.ResetAttackTimer();
+        Debug.Log("[Voidborn] Melee state exited — attack timer reset.");
     }
 }
 
