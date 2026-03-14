@@ -41,6 +41,7 @@ public class VoidbornGoddessController : BossController
     public VoidbornChaseState ChaseState { get; private set; }
     public VoidbornMeleeAttackState MeleeState { get; private set; }
     public VoidbornArtilleryState ArtilleryState { get; private set; }
+    public VoidbornHurtState HurtState { get; private set; }
     
     // Melee cooldown
     public float AttackTimer { get; private set; }
@@ -56,7 +57,8 @@ public class VoidbornGoddessController : BossController
         ChaseState = new VoidbornChaseState();
         MeleeState = new VoidbornMeleeAttackState();
         ArtilleryState = new VoidbornArtilleryState();
-        
+        HurtState = new VoidbornHurtState();
+
         AttackTimer = meleeAttackCooldown;
         ArtilleryTimer = artilleryCooldown;
     }
@@ -64,6 +66,30 @@ public class VoidbornGoddessController : BossController
     protected override void StartState()
     {
         StateMachine.Initialize(IdleState, this);
+    }
+
+    protected override void Start()
+    {
+        base.Start();
+        if (Health != null)
+            Health.OnDamageTaken += OnTakeDamage;
+    }
+
+    private void OnDestroy()
+    {
+        if (Health != null)
+            Health.OnDamageTaken -= OnTakeDamage;
+    }
+
+    /// <summary>
+    /// Subscribed to Health.OnDamageTaken. Transitions the FSM to HurtState
+    /// unless the boss is already dead or mid-attack.
+    /// </summary>
+    public void OnTakeDamage(float damage)
+    {
+        if (IsDead) return;
+        if (IsAttacking) return; // don't interrupt melee combo or artillery sequence
+        StateMachine.ChangeState(HurtState, this);
     }
 
     protected override void UpdateBossTimers()

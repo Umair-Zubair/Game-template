@@ -61,6 +61,10 @@ crashlytics-build.properties
 # Antigravity skills
 .agent
 
+# Claude Stuff
+.claude/
+CLAUDE.md
+
 # Documentation
 /docs
 *.dwlt

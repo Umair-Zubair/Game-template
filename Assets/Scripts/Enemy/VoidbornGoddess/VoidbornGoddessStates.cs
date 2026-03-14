@@ -1,6 +1,45 @@
 using UnityEngine;
 
 // ============================================================================
+// HURT STATE — Brief stagger when the boss takes non-lethal damage
+//
+// NOTE: Health.TakeDamage() already fires the "hurt" animator trigger directly,
+// so this state does NOT re-trigger it. It just pauses AI behaviour for
+// STUN_DURATION seconds, then returns to Chase (or Idle if player left).
+//
+// Attacks are NOT interrupted (IsAttacking check in OnTakeDamage) — boss
+// finishes its combo/artillery before reacting to hits.
+// ============================================================================
+public class VoidbornHurtState : IBossState
+{
+    private const float STUN_DURATION = 0.7f;
+    private float timer;
+
+    public void OnEnter(BossController boss)
+    {
+        timer = 0f;
+        boss.Stop();
+        boss.SetMoving(false);
+        Debug.Log("[Voidborn] Hurt state entered.");
+    }
+
+    public void OnUpdate(BossController boss)
+    {
+        timer += Time.deltaTime;
+        if (timer < STUN_DURATION) return;
+
+        VoidbornGoddessController goddess = boss as VoidbornGoddessController;
+        goddess.StateMachine.ChangeState(
+            goddess.PlayerInDetectionRange() ? (IBossState)goddess.ChaseState : goddess.IdleState,
+            goddess
+        );
+    }
+
+    public void OnFixedUpdate(BossController boss) { }
+    public void OnExit(BossController boss) { }
+}
+
+// ============================================================================
 // IDLE STATE — Waits until the player enters detection range
 // ============================================================================
 public class VoidbornIdleState : IBossState
