@@ -51,6 +51,27 @@ public class VoidbornGoddessController : BossController
     public float ArtilleryTimer { get; private set; }
     public bool CanUseArtillery => ArtilleryTimer <= 0f && !IsAttacking;
 
+    // ---- Effective values (scaled by active AdaptationProfile) ----
+    public float EffectiveChaseSpeed => Mathf.Clamp(
+        chaseSpeed * (ActiveProfile?.chaseSpeedMultiplier ?? 1f),
+        chaseSpeed * AdaptationProfile.MinSpeedMultiplier,
+        chaseSpeed * AdaptationProfile.MaxSpeedMultiplier);
+
+    public float EffectiveMeleeAttackCooldown => Mathf.Clamp(
+        meleeAttackCooldown * (ActiveProfile?.attackCooldownMultiplier ?? 1f),
+        meleeAttackCooldown * AdaptationProfile.MinCooldownMultiplier,
+        meleeAttackCooldown * AdaptationProfile.MaxCooldownMultiplier);
+
+    // artilleryPriorityBonus > 0 = fires more often (shorter cooldown), < 0 = less often
+    public float EffectiveArtilleryCooldown
+    {
+        get
+        {
+            float bonus = ActiveProfile?.artilleryPriorityBonus ?? 0f;
+            return Mathf.Max(3f, artilleryCooldown / Mathf.Max(0.5f, 1f + bonus));
+        }
+    }
+
     protected override void InitializeStates()
     {
         IdleState = new VoidbornIdleState();
@@ -103,7 +124,7 @@ public class VoidbornGoddessController : BossController
 
     public void ResetAttackTimer()
     {
-        AttackTimer = meleeAttackCooldown;
+        AttackTimer = EffectiveMeleeAttackCooldown;
     }
 
     /// <summary>
@@ -113,7 +134,7 @@ public class VoidbornGoddessController : BossController
     /// </summary>
     public void ResetArtilleryTimer()
     {
-        ArtilleryTimer = artilleryCooldown;
+        ArtilleryTimer = EffectiveArtilleryCooldown;
     }
 
     /// <summary>

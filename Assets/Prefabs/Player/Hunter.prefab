@@ -49,6 +49,7 @@ GameObject:
   - component: {fileID: 7103587418571317392}
   - component: {fileID: 5739552593001750824}
   - component: {fileID: 2548767403431450800}
+  - component: {fileID: -8182996424340938370}
   m_Layer: 10
   m_Name: Hunter
   m_TagString: Player
@@ -310,3 +311,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStamina
   data: {fileID: 11400000, guid: 58a581b7729ef2b4da0e61ccef5fb02b, type: 2}
+--- !u!114 &-8182996424340938370
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5536329845775654271}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b34023dc9e319b84ba5df2b57ab8dac2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerBehaviorTracker
+  windowDuration: 3
+  sampleInterval: 0.5
+  DebugMode: 1

@@ -105,7 +105,7 @@ public class VoidbornChaseState : IBossState
         if (goddess.GetDistanceToPlayer() > goddess.attackRange)
         {
             goddess.SetMoving(true);
-            goddess.MoveInDirection(goddess.GetDirectionToPlayer(), goddess.chaseSpeed);
+            goddess.MoveInDirection(goddess.GetDirectionToPlayer(), goddess.EffectiveChaseSpeed);
         }
         else
         {

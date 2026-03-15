@@ -5218,8 +5218,19 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4303414237555634310, guid: 0cd5ddff8b596404182275a636514347, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1582445781}
+    - targetCorrespondingSourceObject: {fileID: 4303414237555634310, guid: 0cd5ddff8b596404182275a636514347, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1582445789}
   m_SourcePrefab: {fileID: 100100000, guid: 0cd5ddff8b596404182275a636514347, type: 3}
+--- !u!1 &1260625189 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4303414237555634310, guid: 0cd5ddff8b596404182275a636514347, type: 3}
+  m_PrefabInstance: {fileID: 1260625188}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1261870631
 GameObject:
   m_ObjectHideFlags: 0
@@ -6883,12 +6894,46 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 9210189640734394756, guid: 0cd5ddff8b596404182275a636514347, type: 3}
   m_PrefabInstance: {fileID: 1260625188}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1260625189}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 912d3aa5ce863ba478a2977072b3db45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VoidbornGoddessController
+--- !u!114 &1582445781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1260625189}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c41d119917ca6549a1475df6c284a25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VoidbornAdaptationManager
+  evaluationInterval: 3
+  transitionDuration: 1
+  aggressiveThreshold: 0.5
+  passiveThreshold: 0.2
+  aerialThreshold: 0.4
+  rangedThreshold: 0.5
+  DebugMode: 1
+  currentStyle: 0
+--- !u!114 &1582445789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1260625189}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 419cecac1877669499fc10954292d099, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossAIDebugHUD
+  offset: {x: 10, y: 10}
+  panelWidth: 300
 --- !u!1 &1630552614
 GameObject:
   m_ObjectHideFlags: 0

@@ -45,6 +45,11 @@ public abstract class BossController : MonoBehaviour
     // Debugging
     public bool DebugMode = true;
 
+    // ---- Heuristic Adaptation ----
+    private AdaptationProfile activeProfile;
+    public void ApplyAdaptationProfile(AdaptationProfile profile) { activeProfile = profile; }
+    protected AdaptationProfile ActiveProfile => activeProfile;
+
     protected virtual void Awake()
     {
         RB = GetComponent<Rigidbody2D>();
