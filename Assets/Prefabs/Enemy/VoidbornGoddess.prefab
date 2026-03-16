@@ -31,6 +31,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3637007278329730629}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &3377770626979636796
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8911680581464627095}
+  m_Layer: 0
+  m_Name: rangedProjectileSpawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8911680581464627095
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3377770626979636796}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.221, y: -0.128, z: 0}
+  m_LocalScale: {x: 0.16666667, y: 0.16666667, z: 0.16666667}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3637007278329730629}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4303414237555634310
 GameObject:
   m_ObjectHideFlags: 0
@@ -68,6 +99,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6178199018294719981}
+  - {fileID: 8911680581464627095}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &7781098245552850649
@@ -290,6 +322,10 @@ MonoBehaviour:
   meleeAttackPoint: {fileID: 6178199018294719981}
   meleeAttackRadius: 1.5
   meleeDamage: 2
+  rangedProjectilePrefab: {fileID: 7502445281614252710, guid: 3bfd775183696ff4a9c5da99cbf23c73, type: 3}
+  rangedProjectileSpawnPoint: {fileID: 8911680581464627095}
+  rangedAttackCooldown: 4
+  rangedAttackMinDistance: 3
   artilleryAnchorPosition: {x: 8.35, y: 2.84}
   artilleryProjectilePrefab: {fileID: 3693015339863160863, guid: 7b7f98c0d3e00ad4d9ab857f37e7d803, type: 3}
   artillerySpawnHeight: 5
