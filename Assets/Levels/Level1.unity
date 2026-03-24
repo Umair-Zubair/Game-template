@@ -5225,6 +5225,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4303414237555634310, guid: 0cd5ddff8b596404182275a636514347, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1582445789}
+    - targetCorrespondingSourceObject: {fileID: 4303414237555634310, guid: 0cd5ddff8b596404182275a636514347, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1582445790}
   m_SourcePrefab: {fileID: 100100000, guid: 0cd5ddff8b596404182275a636514347, type: 3}
 --- !u!1 &1260625189 stripped
 GameObject:
@@ -6934,6 +6937,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossAIDebugHUD
   offset: {x: 10, y: 10}
   panelWidth: 300
+--- !u!114 &1582445790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1260625189}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c8dfd3ab033c2d428b4d9a62faf04b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIDecisionEngine
+  evaluationInterval: 0.3
+  confidenceThreshold: 0.4
+  persistWeights: 1
+  DebugMode: 1
 --- !u!1 &1630552614
 GameObject:
   m_ObjectHideFlags: 0
