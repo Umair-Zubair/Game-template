@@ -85,23 +85,51 @@ public class VoidbornChaseState : IBossState
             return;
         }
 
-        // --- Artillery attack takes priority when its cooldown is ready ---
-        if (goddess.CanUseArtillery)
+        // --- Ask AIDecisionEngine for action (three-layer cascade) ---
+        AIDecisionEngine engine = goddess.DecisionEngine;
+        if (engine != null)
         {
-            goddess.StateMachine.ChangeState(goddess.ArtilleryState, goddess);
-            return;
+            BossDecision decision = engine.CurrentDecision;
+
+            switch (decision.action)
+            {
+                case BossActionType.ArtilleryAttack:
+                    if (goddess.CanUseArtillery)
+                    {
+                        engine.OnBossActionStarted(BossActionType.ArtilleryAttack);
+                        goddess.StateMachine.ChangeState(goddess.ArtilleryState, goddess);
+                        return;
+                    }
+                    break;
+
+                case BossActionType.MeleeAttack:
+                    if (goddess.PlayerInAttackRange() && goddess.CanAttack)
+                    {
+                        engine.OnBossActionStarted(BossActionType.MeleeAttack);
+                        goddess.StateMachine.ChangeState(goddess.MeleeState, goddess);
+                        return;
+                    }
+                    break;
+            }
+        }
+        else
+        {
+            // Fallback: original behavior when no AIDecisionEngine is attached
+            if (goddess.CanUseArtillery)
+            {
+                goddess.StateMachine.ChangeState(goddess.ArtilleryState, goddess);
+                return;
+            }
+            if (goddess.PlayerInAttackRange() && goddess.CanAttack)
+            {
+                goddess.StateMachine.ChangeState(goddess.MeleeState, goddess);
+                return;
+            }
         }
 
-        // --- Melee attack when in close range ---
-        if (goddess.PlayerInAttackRange() && goddess.CanAttack)
-        {
-            goddess.StateMachine.ChangeState(goddess.MeleeState, goddess);
-            return;
-        }
-
+        // --- Chase behavior ---
         goddess.FacePlayer();
-        
-        // Move towards player if outside attack range
+
         if (goddess.GetDistanceToPlayer() > goddess.attackRange)
         {
             goddess.SetMoving(true);
@@ -321,6 +349,10 @@ public class VoidbornMeleeAttackState : IBossState
         VoidbornGoddessController goddess = boss as VoidbornGoddessController;
         goddess.IsAttacking = false;
         goddess.ResetAttackTimer();
+
+        // Notify AIDecisionEngine of action completion (feeds into Layer 2 weight update)
+        goddess.DecisionEngine?.OnBossActionCompleted(BossActionType.MeleeAttack);
+
         Debug.Log("[Voidborn] Melee state exited — attack timer reset.");
     }
 }
@@ -585,6 +617,9 @@ public class VoidbornArtilleryState : IBossState
         goddess.IsAttacking = false;
         goddess.IsDashing = false; // Re-enable gravity
         goddess.ResetArtilleryTimer();
+
+        // Notify AIDecisionEngine of action completion (feeds into Layer 2 weight update)
+        goddess.DecisionEngine?.OnBossActionCompleted(BossActionType.ArtilleryAttack);
 
         Debug.Log("[Voidborn] Artillery state exited, cooldown reset.");
     }

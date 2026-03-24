@@ -48,7 +48,10 @@ public abstract class BossController : MonoBehaviour
     // ---- Heuristic Adaptation ----
     private AdaptationProfile activeProfile;
     public void ApplyAdaptationProfile(AdaptationProfile profile) { activeProfile = profile; }
-    protected AdaptationProfile ActiveProfile => activeProfile;
+    public AdaptationProfile ActiveProfile => activeProfile;
+
+    // ---- AI Decision Engine (found on same GameObject, may be null) ----
+    public AIDecisionEngine DecisionEngine { get; private set; }
 
     protected virtual void Awake()
     {
@@ -74,6 +77,7 @@ public abstract class BossController : MonoBehaviour
     {
         FindPlayer();
         StartState();
+        DecisionEngine = GetComponent<AIDecisionEngine>();
     }
 
     protected virtual void Update()

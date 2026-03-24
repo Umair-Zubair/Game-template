@@ -58,7 +58,9 @@ public class VoidbornGoddessController : BossController
         chaseSpeed * AdaptationProfile.MaxSpeedMultiplier);
 
     public float EffectiveMeleeAttackCooldown => Mathf.Clamp(
-        meleeAttackCooldown * (ActiveProfile?.attackCooldownMultiplier ?? 1f),
+        meleeAttackCooldown
+            * (ActiveProfile?.attackCooldownMultiplier ?? 1f)
+            * (DecisionEngine?.FairnessCooldownMultiplier ?? 1f),
         meleeAttackCooldown * AdaptationProfile.MinCooldownMultiplier,
         meleeAttackCooldown * AdaptationProfile.MaxCooldownMultiplier);
 
@@ -68,7 +70,9 @@ public class VoidbornGoddessController : BossController
         get
         {
             float bonus = ActiveProfile?.artilleryPriorityBonus ?? 0f;
-            return Mathf.Max(3f, artilleryCooldown / Mathf.Max(0.5f, 1f + bonus));
+            float baseCooldown = artilleryCooldown / Mathf.Max(0.5f, 1f + bonus);
+            float fairness = DecisionEngine?.FairnessCooldownMultiplier ?? 1f;
+            return Mathf.Max(3f, baseCooldown * fairness);
         }
     }
 

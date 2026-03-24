@@ -7,6 +7,9 @@ public class Health : MonoBehaviour
     [SerializeField] private float startingHealth;
     public float currentHealth { get; private set; }
 
+    /// <summary>Maximum health (used by AIDecisionEngine for normalization).</summary>
+    public float MaxHealth => startingHealth;
+
     /// <summary>Layer 2 AI: Fired when this object takes damage. Arg = actual damage applied (after shield).</summary>
     public System.Action<float> OnDamageTaken;
     private Animator anim;

@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// On-screen debug overlay for any boss using the adaptation system.
-/// Works with any BossController + any IBossAdaptationManager on the same GameObject.
+/// Shows player style, FSM state, player metrics, and AI Decision Engine info.
 ///
 /// Attach to: Boss GameObject (same one with BossController + adaptation manager).
 /// Toggle: Disable this component in the Inspector to hide the HUD.
@@ -16,6 +16,7 @@ public class BossAIDebugHUD : MonoBehaviour
     // ---- References (auto-found) ----
     private BossController boss;
     private IBossAdaptationManager adaptationManager;
+    private AIDecisionEngine decisionEngine;
     private PlayerBehaviorTracker tracker;
 
     // ---- Styles (built once) ----
@@ -31,11 +32,14 @@ public class BossAIDebugHUD : MonoBehaviour
     private static readonly Color BalancedColor   = new Color(0.4f, 0.7f, 1f);
     private static readonly Color AerialColor     = new Color(1f, 1f, 0.3f);
     private static readonly Color RangedColor     = new Color(1f, 0.6f, 0.2f);
+    private static readonly Color FairnessColor   = new Color(1f, 0.4f, 0.8f);
+    private static readonly Color EngineColor     = new Color(0.3f, 1f, 0.9f);
 
     private void Awake()
     {
         boss = GetComponent<BossController>();
         adaptationManager = GetComponent<IBossAdaptationManager>();
+        decisionEngine = GetComponent<AIDecisionEngine>();
     }
 
     private void Start()
@@ -88,16 +92,20 @@ public class BossAIDebugHUD : MonoBehaviour
 
         PlayerStyle style = adaptationManager.CurrentStyle;
 
-        // Strip class name noise: "VoidbornChaseState" → "Chase", "BossAttackState" → "Attack"
+        // Strip class name noise: "VoidbornChaseState" → "Chase"
         string fsmState = boss.StateMachine?.CurrentState?.GetType().Name ?? "None";
         fsmState = fsmState.Replace("Voidborn", "").Replace("Boss", "").Replace("Enemy", "").Replace("State", "");
 
         PlayerProfile profile = tracker != null ? tracker.Profile : new PlayerProfile();
 
+        // Count rows dynamically based on whether engine is attached
+        bool hasEngine = decisionEngine != null;
+        int lineCount = 7; // header + 6 base rows
+        if (hasEngine) lineCount += 4; // separator + active layer + decision + fairness
+
         // ---- Layout ----
         float lineHeight = 22f;
         float padding = 10f;
-        int lineCount = 7; // header + 6 data rows
         float panelHeight = (lineCount * lineHeight) + (padding * 2) + 4f;
 
         Rect panelRect = new Rect(Screen.width - panelWidth - offset.x, offset.y, panelWidth, panelHeight);
@@ -117,6 +125,26 @@ public class BossAIDebugHUD : MonoBehaviour
         DrawRow(ref y, x, lineHeight, labelW, valueW, "Aerial:",     profile.aerialRatio.ToString("F2"),            Color.white);
         DrawRow(ref y, x, lineHeight, labelW, valueW, "Atk Freq:",   profile.attackFrequency.ToString("F1") + "/s", Color.white);
         DrawRow(ref y, x, lineHeight, labelW, valueW, "Distance:",   profile.averageDistance.ToString("F1"),        Color.white);
+
+        // ---- AI Decision Engine section ----
+        if (hasEngine)
+        {
+            y += 4f; // Small gap
+            GUI.Label(new Rect(x, y, panelWidth - padding * 2, lineHeight), "─ Decision Engine ─", headerStyle);
+            y += lineHeight + 2f;
+
+            BossDecision decision = decisionEngine.CurrentDecision;
+            string layerName = decisionEngine.ActiveLayer;
+            string actionName = decision.action.ToString();
+
+            DrawRow(ref y, x, lineHeight, labelW, valueW, "Active Layer:", layerName,                              EngineColor);
+            DrawRow(ref y, x, lineHeight, labelW, valueW, "Decision:",     actionName + $" ({decision.confidence:F2})", Color.white);
+
+            // Fairness Guardian status
+            string fairnessStatus = decisionEngine.IsFairnessActive ? "ACTIVE" : "Off";
+            Color fairnessStatusColor = decisionEngine.IsFairnessActive ? FairnessColor : Color.gray;
+            DrawRow(ref y, x, lineHeight, labelW, valueW, "Fairness:",     fairnessStatus, fairnessStatusColor);
+        }
     }
 
     private void DrawRow(ref float y, float x, float lineHeight, float labelW, float valueW,

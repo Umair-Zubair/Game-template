@@ -241,7 +241,16 @@ public class PlayerBehaviorTracker : MonoBehaviour
 
     private void FindBoss()
     {
-        EnemyController boss = FindFirstObjectByType<EnemyController>();
+        // Try EnemyController first (regular enemies)
+        EnemyController enemy = FindFirstObjectByType<EnemyController>();
+        if (enemy != null)
+        {
+            bossTransform = enemy.transform;
+            return;
+        }
+
+        // Try BossController (Voidborn Goddess and other bosses)
+        BossController boss = FindFirstObjectByType<BossController>();
         if (boss != null)
             bossTransform = boss.transform;
     }
