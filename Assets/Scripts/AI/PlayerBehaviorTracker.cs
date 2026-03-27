@@ -20,7 +20,6 @@ public class PlayerBehaviorTracker : MonoBehaviour
     // ---- References (auto-found) ----
     private MeleeAttack meleeAttack;
     private BlobRangedAttack blobRangedAttack;
-    private DragonAttack dragonAttack;
     private PlayerShield playerShield;
     private Health playerHealth;
     private Transform bossTransform;
@@ -53,7 +52,6 @@ public class PlayerBehaviorTracker : MonoBehaviour
     {
         meleeAttack      = GetComponent<MeleeAttack>();
         blobRangedAttack = GetComponent<BlobRangedAttack>();
-        dragonAttack     = GetComponent<DragonAttack>();
         playerShield     = GetComponent<PlayerShield>();
         playerHealth     = GetComponent<Health>();
     }
@@ -68,10 +66,8 @@ public class PlayerBehaviorTracker : MonoBehaviour
         }
         if (blobRangedAttack != null)
             blobRangedAttack.OnAttackPerformed += OnPlayerAttack;
-        if (dragonAttack != null)
-            dragonAttack.OnAttackPerformed += OnPlayerAttack;
 
-        if (meleeAttack == null && blobRangedAttack == null && dragonAttack == null)
+        if (meleeAttack == null && blobRangedAttack == null)
             Debug.LogWarning("[BehaviorTracker] No attack component found on player — attack metrics will be empty.");
 
         // Subscribe to damage taken event
@@ -93,8 +89,6 @@ public class PlayerBehaviorTracker : MonoBehaviour
         }
         if (blobRangedAttack != null)
             blobRangedAttack.OnAttackPerformed -= OnPlayerAttack;
-        if (dragonAttack != null)
-            dragonAttack.OnAttackPerformed -= OnPlayerAttack;
 
         if (playerHealth != null)
             playerHealth.OnDamageTaken -= OnPlayerDamageTaken;
