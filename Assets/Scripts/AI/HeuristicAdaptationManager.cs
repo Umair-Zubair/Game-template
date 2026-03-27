@@ -118,7 +118,7 @@ public class HeuristicAdaptationManager : MonoBehaviour
         // Always log scores so we can see what the system is computing
         if (DebugMode)
             Debug.Log($"[ADAPT] Scores: aggro={profile.aggressionScore:F2} " +
-                      $"aerial={profile.aerialRatio:F2} atkFreq={profile.attackFrequency:F2}/s avgDist={profile.averageDistance:F1} → {currentStyle}");
+                      $"aerial={profile.jumpFrequency:F2} atkFreq={profile.attackFrequency:F2}/s avgDist={profile.averageDistance:F1} → {currentStyle}");
 
         PlayerStyle newStyle = ClassifyPlayerStyle(profile);
 
@@ -127,7 +127,7 @@ public class HeuristicAdaptationManager : MonoBehaviour
             if (DebugMode)
                 Debug.Log($"[HeuristicAdaptation] Style change: {currentStyle} → {newStyle} " +
                           $"| Aggression: {profile.aggressionScore:F2} " +
-                          $"| AerialRatio: {profile.aerialRatio:F2} | AttackFreq: {profile.attackFrequency:F2}/s");
+                          $"| AerialRatio: {profile.jumpFrequency:F2} | AttackFreq: {profile.attackFrequency:F2}/s");
 
             currentStyle = newStyle;
             BeginTransitionTo(SelectProfile(newStyle));
@@ -150,7 +150,7 @@ public class HeuristicAdaptationManager : MonoBehaviour
             return PlayerStyle.Defensive;
 
         // 3. Aerial: lots of jump attacks
-        if (p.aerialRatio >= aerialThreshold && p.attackFrequency > 0.2f)
+        if (p.jumpFrequency >= aerialThreshold && p.attackFrequency > 0.2f)
             return PlayerStyle.Aerial;
 
         // 4. Ranged: lots of ranged attacks from distance

@@ -19,13 +19,15 @@ public class PlayerBehaviorTracker : MonoBehaviour
 
     // ---- References (auto-found) ----
     private MeleeAttack meleeAttack;
+    private BlobRangedAttack blobRangedAttack;
+    private DragonAttack dragonAttack;
     private PlayerShield playerShield;
     private Health playerHealth;
     private Transform bossTransform;
 
-    // ---- Rolling event log ----
-    // Each entry is a (timestamp, eventType) pair
+    // ---- Rolling event logs ----
     private List<(float time, string type)> attackLog = new List<(float, string)>();
+    private List<float> jumpLog = new List<float>(); // timestamps of Space presses
 
     // ---- Sampled metrics ----
     private List<float> distanceSamples  = new List<float>();
@@ -49,23 +51,28 @@ public class PlayerBehaviorTracker : MonoBehaviour
 
     private void Awake()
     {
-        meleeAttack  = GetComponent<MeleeAttack>();
-        playerShield = GetComponent<PlayerShield>();
-        playerHealth = GetComponent<Health>();
+        meleeAttack      = GetComponent<MeleeAttack>();
+        blobRangedAttack = GetComponent<BlobRangedAttack>();
+        dragonAttack     = GetComponent<DragonAttack>();
+        playerShield     = GetComponent<PlayerShield>();
+        playerHealth     = GetComponent<Health>();
     }
 
     private void Start()
     {
-        // Subscribe to attack events
+        // Subscribe to whichever attack component this character has
         if (meleeAttack != null)
         {
             meleeAttack.OnAttackPerformed += OnPlayerAttack;
-            meleeAttack.OnDamageDealt     += RegisterDamageDealt; // Track successful hits
+            meleeAttack.OnDamageDealt     += RegisterDamageDealt;
         }
-        else
-        {
-            Debug.LogWarning("[BehaviorTracker] MeleeAttack not found on player.");
-        }
+        if (blobRangedAttack != null)
+            blobRangedAttack.OnAttackPerformed += OnPlayerAttack;
+        if (dragonAttack != null)
+            dragonAttack.OnAttackPerformed += OnPlayerAttack;
+
+        if (meleeAttack == null && blobRangedAttack == null && dragonAttack == null)
+            Debug.LogWarning("[BehaviorTracker] No attack component found on player — attack metrics will be empty.");
 
         // Subscribe to damage taken event
         if (playerHealth != null)
@@ -79,12 +86,15 @@ public class PlayerBehaviorTracker : MonoBehaviour
 
     private void OnDestroy()
     {
-        // Always unsubscribe to avoid memory leaks
         if (meleeAttack != null)
         {
             meleeAttack.OnAttackPerformed -= OnPlayerAttack;
             meleeAttack.OnDamageDealt     -= RegisterDamageDealt;
         }
+        if (blobRangedAttack != null)
+            blobRangedAttack.OnAttackPerformed -= OnPlayerAttack;
+        if (dragonAttack != null)
+            dragonAttack.OnAttackPerformed -= OnPlayerAttack;
 
         if (playerHealth != null)
             playerHealth.OnDamageTaken -= OnPlayerDamageTaken;
@@ -92,6 +102,9 @@ public class PlayerBehaviorTracker : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Space))
+            jumpLog.Add(Time.time);
+
         PruneOldEvents();
 
         sampleTimer += Time.deltaTime;
@@ -162,6 +175,7 @@ public class PlayerBehaviorTracker : MonoBehaviour
     {
         float cutoff = Time.time - windowDuration;
         attackLog.RemoveAll(e => e.time < cutoff);
+        jumpLog.RemoveAll(t => t < cutoff);
     }
 
     // =========================================================
@@ -218,7 +232,8 @@ public class PlayerBehaviorTracker : MonoBehaviour
         p.aggressionScore = (normalizedFreq * 0.6f) + (normalizedCloseness * 0.4f);
 
         // --- Jump attack ratio (aerial tendency) ---
-        p.aerialRatio = p.jumpAttackRatio;
+        // --- Jump frequency (Space presses per second in window) ---
+        p.jumpFrequency = windowDuration > 0 ? jumpLog.Count / windowDuration : 0f;
 
         // --- Damage stats ---
         p.totalDamageTaken = totalDamageTaken;
@@ -261,6 +276,7 @@ public class PlayerBehaviorTracker : MonoBehaviour
     public void ResetTracking()
     {
         attackLog.Clear();
+        jumpLog.Clear();
         distanceSamples.Clear();
         blockSamples.Clear();
         totalDamageTaken = 0f;
@@ -292,8 +308,8 @@ public struct PlayerProfile
     // Defensive
     public float blockRate;         // 0 = never blocks, 1 = always blocking
 
-    // Aerial
-    public float aerialRatio;       // Alias for jumpAttackRatio (readability)
+    // Jump
+    public float jumpFrequency;     // Jumps (Space presses) per second in rolling window
 
     // Damage
     public float totalDamageTaken;

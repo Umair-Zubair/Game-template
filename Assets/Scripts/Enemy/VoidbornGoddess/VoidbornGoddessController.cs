@@ -36,6 +36,9 @@ public class VoidbornGoddessController : BossController
     [Tooltip("Cooldown (seconds) between artillery attacks")]
     public float artilleryCooldown = 8f;
 
+    // ---- Evaluation ----
+    private bool fightStarted = false;
+
     // States
     public VoidbornIdleState IdleState { get; private set; }
     public VoidbornChaseState ChaseState { get; private set; }
@@ -110,9 +113,28 @@ public class VoidbornGoddessController : BossController
     /// Subscribed to Health.OnDamageTaken. Transitions the FSM to HurtState
     /// unless the boss is already dead or mid-attack.
     /// </summary>
+    /// <summary>
+    /// Called the first time the boss enters ChaseState.
+    /// Notifies AISessionLogger that a new fight has begun.
+    /// </summary>
+    public void NotifyFightStart()
+    {
+        if (fightStarted) return;
+        fightStarted = true;
+        AISessionLogger.Instance?.StartFight();
+    }
+
     public void OnTakeDamage(float damage)
     {
         if (IsDead) return;
+
+        // Detect fatal hit — health is already updated before OnDamageTaken fires
+        if (Health.currentHealth <= 0)
+        {
+            AISessionLogger.Instance?.EndFight(false); // player won, boss died
+            return;
+        }
+
         if (IsAttacking) return; // don't interrupt melee combo or artillery sequence
         StateMachine.ChangeState(HurtState, this);
     }

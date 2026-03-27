@@ -118,18 +118,21 @@ public class VoidbornAdaptationManager : MonoBehaviour, IBossAdaptationManager
             : 999f;
 
         if (DebugMode)
-            Debug.Log($"[VoidbornAdapt] aggro={profile.aggressionScore:F2} aerial={profile.aerialRatio:F2} " +
+            Debug.Log($"[VoidbornAdapt] aggro={profile.aggressionScore:F2} aerial={profile.jumpFrequency:F2} " +
                       $"atkFreq={profile.attackFrequency:F2}/s dist={distance:F1} → {currentStyle}");
 
         PlayerStyle newStyle = ClassifyPlayerStyle(profile, distance);
 
         if (newStyle != currentStyle)
         {
-            if (DebugMode)
-                Debug.Log($"[VoidbornAdaptation] Style change: {currentStyle} → {newStyle}");
-
+            PlayerStyle oldStyle = currentStyle;
             currentStyle = newStyle;
             BeginTransitionTo(SelectProfile(newStyle));
+
+            if (DebugMode)
+                Debug.Log($"[VoidbornAdaptation] Style change: {oldStyle} → {newStyle}");
+
+            OnStyleChanged?.Invoke(oldStyle, newStyle);
         }
     }
 
@@ -141,7 +144,7 @@ public class VoidbornAdaptationManager : MonoBehaviour, IBossAdaptationManager
         if (p.aggressionScore <= passiveThreshold && distance > 5f)
             return PlayerStyle.Defensive;
 
-        if (p.aerialRatio >= aerialThreshold && p.attackFrequency > 0.2f)
+        if (p.jumpFrequency >= aerialThreshold && p.attackFrequency > 0.2f)
             return PlayerStyle.Aerial;
 
         if (p.rangedRatio >= rangedThreshold && distance > 5f)
@@ -193,6 +196,9 @@ public class VoidbornAdaptationManager : MonoBehaviour, IBossAdaptationManager
     // =========================================================
 
     public PlayerStyle CurrentStyle => currentStyle;
+
+    /// <summary>Fired when the detected player style changes. Args: (oldStyle, newStyle). Used by AISessionLogger.</summary>
+    public event System.Action<PlayerStyle, PlayerStyle> OnStyleChanged;
 
     /// <summary>Force a re-evaluation immediately (e.g. on phase change).</summary>
     public void ForceEvaluate()

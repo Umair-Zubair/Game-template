@@ -10,6 +10,9 @@ public class BlobRangedAttack : MonoBehaviour
     [SerializeField] private AudioClip projectileSound;
     [SerializeField] private AudioClip jumpProjectileSound;
 
+    /// <summary>Fired on every attack. Arg = attack type ("ranged" or "jumpAttack"). Consumed by PlayerBehaviorTracker.</summary>
+    public System.Action<string> OnAttackPerformed;
+
     private Animator anim;
     private PlayerController playerController;
     private PlayerStamina stamina;
@@ -114,6 +117,7 @@ public class BlobRangedAttack : MonoBehaviour
 
         anim.SetTrigger("rangeAttack");
         cooldownTimer = 0;
+        OnAttackPerformed?.Invoke("ranged");
 
         int index = FindProjectile(projectiles);
         float dir = Mathf.Sign(transform.localScale.x);
@@ -141,6 +145,7 @@ public class BlobRangedAttack : MonoBehaviour
 
         anim.SetTrigger("jumpRange"); // Uses the jumpRang animator parameter (visible in your animator)
         cooldownTimer = 0;
+        OnAttackPerformed?.Invoke("jumpAttack");
 
         int index = FindProjectile(jumpProjectiles);
         float dir = Mathf.Sign(transform.localScale.x);

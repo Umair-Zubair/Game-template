@@ -5228,6 +5228,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4303414237555634310, guid: 0cd5ddff8b596404182275a636514347, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1582445790}
+    - targetCorrespondingSourceObject: {fileID: 4303414237555634310, guid: 0cd5ddff8b596404182275a636514347, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1582445791}
   m_SourcePrefab: {fileID: 100100000, guid: 0cd5ddff8b596404182275a636514347, type: 3}
 --- !u!1 &1260625189 stripped
 GameObject:
@@ -6952,6 +6955,20 @@ MonoBehaviour:
   evaluationInterval: 0.3
   confidenceThreshold: 0.4
   persistWeights: 1
+  DebugMode: 1
+--- !u!114 &1582445791
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1260625189}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6b14e7e802bd5e4283cd50b8a5da479, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AISessionLogger
+  aiCondition: 1
   DebugMode: 1
 --- !u!1 &1630552614
 GameObject:

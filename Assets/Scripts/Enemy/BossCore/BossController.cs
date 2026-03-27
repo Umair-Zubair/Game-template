@@ -102,12 +102,16 @@ public abstract class BossController : MonoBehaviour
     /// Called when this boss dies. Stops the state machine and all movement.
     /// Can be invoked by Health or externally.
     /// </summary>
+    /// <summary>Fired once when the boss dies. Used by AISessionLogger to end the fight record.</summary>
+    public event System.Action OnDied;
+
     public void OnDeath()
     {
         if (IsDead) return;
         IsDead = true;
         IsAttacking = false;
         Stop();
+        OnDied?.Invoke();
     }
 
     /// <summary>

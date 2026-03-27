@@ -130,7 +130,7 @@ public class AIDebugHUD : MonoBehaviour
         DrawRow(ref y, x, lineHeight, labelW, valueW, "Aggression:", profile.aggressionScore.ToString("F2"), Color.white);
 
         // ---- Aerial ----
-        DrawRow(ref y, x, lineHeight, labelW, valueW, "Aerial:", profile.aerialRatio.ToString("F2"), Color.white);
+        DrawRow(ref y, x, lineHeight, labelW, valueW, "Jump Freq:", profile.jumpFrequency.ToString("F1") + "/s", Color.white);
 
         // ---- Attack Freq ----
         DrawRow(ref y, x, lineHeight, labelW, valueW, "Atk Freq:", profile.attackFrequency.ToString("F1") + "/s", Color.white);

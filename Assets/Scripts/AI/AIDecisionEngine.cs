@@ -52,6 +52,9 @@ public class AIDecisionEngine : MonoBehaviour
     /// <summary>The current recommended action from the last evaluation cycle.</summary>
     public BossDecision CurrentDecision { get; private set; }
 
+    /// <summary>Fired when the recommended action changes. Used by AISessionLogger for reaction-speed tracking.</summary>
+    public event System.Action<BossDecision> OnDecisionChanged;
+
     /// <summary>The game context from the last evaluation cycle.</summary>
     public GameContext CurrentContext { get; private set; }
 
@@ -135,7 +138,10 @@ public class AIDecisionEngine : MonoBehaviour
             );
 
             // Run three-layer decision cascade
+            BossDecision previous = CurrentDecision;
             CurrentDecision = RunDecisionCascade(CurrentContext);
+            if (CurrentDecision.action != previous.action)
+                OnDecisionChanged?.Invoke(CurrentDecision);
         }
     }
 
@@ -242,6 +248,9 @@ public class AIDecisionEngine : MonoBehaviour
             ? adaptationManager.CurrentStyle
             : PlayerStyle.Balanced;
         trackingOutcome = true;
+
+        // Log to evaluation system
+        AISessionLogger.Instance?.RecordAction(action, CurrentDecision.source);
 
         if (DebugMode)
             Debug.Log($"[AIEngine] Action started: {action} | BossHP={bossHealthAtActionStart:F0} PlayerHP={playerHealthAtActionStart:F0}");

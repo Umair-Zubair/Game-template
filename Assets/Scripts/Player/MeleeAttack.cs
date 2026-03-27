@@ -237,9 +237,10 @@ public class MeleeAttack : MonoBehaviour
 
     private bool IsGrounded()
     {
-        if (boxCollider == null) return false;
-        RaycastHit2D raycastHit = Physics2D.BoxCast(boxCollider.bounds.center, boxCollider.bounds.size, 0, Vector2.down, 0.1f, groundLayer);
-        return raycastHit.collider != null;
+        // Prefer PlayerController's ground check if available (uses its own configured groundLayer)
+        if (playerController != null) return playerController.IsGrounded();
+        // Fallback: near-zero vertical velocity means standing on ground
+        return body != null && Mathf.Abs(body.linearVelocity.y) < 0.1f;
     }
 
     private void OnDrawGizmosSelected()

@@ -122,7 +122,7 @@ public class BossAIDebugHUD : MonoBehaviour
         DrawRow(ref y, x, lineHeight, labelW, valueW, "Style:",      style.ToString().ToUpper(),                    GetStyleColor(style));
         DrawRow(ref y, x, lineHeight, labelW, valueW, "FSM State:",  fsmState,                                      Color.white);
         DrawRow(ref y, x, lineHeight, labelW, valueW, "Aggression:", profile.aggressionScore.ToString("F2"),        Color.white);
-        DrawRow(ref y, x, lineHeight, labelW, valueW, "Aerial:",     profile.aerialRatio.ToString("F2"),            Color.white);
+        DrawRow(ref y, x, lineHeight, labelW, valueW, "Jump Freq:",  profile.jumpFrequency.ToString("F1") + "/s",   Color.white);
         DrawRow(ref y, x, lineHeight, labelW, valueW, "Atk Freq:",   profile.attackFrequency.ToString("F1") + "/s", Color.white);
         DrawRow(ref y, x, lineHeight, labelW, valueW, "Distance:",   profile.averageDistance.ToString("F1"),        Color.white);
 

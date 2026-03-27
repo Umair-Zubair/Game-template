@@ -73,6 +73,7 @@ public class VoidbornChaseState : IBossState
     {
         boss.SetMoving(true);
         boss.FacePlayer();
+        (boss as VoidbornGoddessController)?.NotifyFightStart();
     }
 
     public void OnUpdate(BossController boss)
