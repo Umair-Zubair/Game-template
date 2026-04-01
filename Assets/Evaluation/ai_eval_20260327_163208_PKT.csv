@@ -1,0 +1,2 @@
+FightID,AICondition,Duration_s,BossWon,MeleeCount,ArtilleryCount,ChaseCount,DamageDealt,DamageTaken,DamageEfficiency,StrategyDiversity,L1_Pct,L2_Pct,L3_Pct,WeightShift,StyleChanges,AvgReactionSpeed_s,DominantStyle
+1,Layer1Plus2,8.74,1,1,1,0,2.0,4.0,0.50,2,0.0,100.0,0.0,0.0365,2,0.64,Aerial

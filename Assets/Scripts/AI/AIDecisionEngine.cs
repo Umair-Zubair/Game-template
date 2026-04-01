@@ -54,6 +54,15 @@ public class AIDecisionEngine : MonoBehaviour
 
     /// <summary>Fired when the recommended action changes. Used by AISessionLogger for reaction-speed tracking.</summary>
     public event System.Action<BossDecision> OnDecisionChanged;
+    public event System.Action OnFairnessActivated;
+    public event System.Action<GameContext, BossDecision> OnDecisionEvaluated;
+
+    public int TotalDecisions { get; private set; }
+    public float ConfidenceSum { get; private set; }
+    public int LowConfidenceCount { get; private set; }
+    public int L2DecisionCount { get; private set; }
+
+    private bool _prevFairnessActive;
 
     /// <summary>The game context from the last evaluation cycle.</summary>
     public GameContext CurrentContext { get; private set; }
@@ -140,6 +149,17 @@ public class AIDecisionEngine : MonoBehaviour
             // Run three-layer decision cascade
             BossDecision previous = CurrentDecision;
             CurrentDecision = RunDecisionCascade(CurrentContext);
+
+            TotalDecisions++;
+            ConfidenceSum += CurrentDecision.confidence;
+            if (CurrentDecision.confidence < confidenceThreshold) LowConfidenceCount++;
+            if (CurrentDecision.source != null && CurrentDecision.source.StartsWith("Weighted")) L2DecisionCount++;
+
+            bool fairNow = fairnessGuardian?.IsRelaxationActive ?? false;
+            if (fairNow && !_prevFairnessActive) OnFairnessActivated?.Invoke();
+            _prevFairnessActive = fairNow;
+
+            OnDecisionEvaluated?.Invoke(CurrentContext, CurrentDecision);
             if (CurrentDecision.action != previous.action)
                 OnDecisionChanged?.Invoke(CurrentDecision);
         }

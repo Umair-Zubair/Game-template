@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.IO;
 using System.Collections.Generic;
+using System.Text;
 
 public enum AITestCondition
 {
@@ -11,70 +12,85 @@ public enum AITestCondition
 
 /// <summary>
 /// Records per-fight metrics to CSV for evaluation of the adaptive AI system.
-///
-/// Metrics captured per fight:
-///   - Fight duration, win/loss outcome
-///   - Damage dealt / taken / efficiency (boss perspective)
-///   - Action counts and strategy diversity (distinct action types used)
-///   - Layer attribution % (Layer 1 heuristic vs Layer 2 weighted)
-///   - Strategy weight shift (total |W_end - W_start| across all style/action pairs)
-///   - Style change count + dominant player style detected
-///   - Reaction speed: seconds from player style change to first different boss decision
-///
-/// Setup:
-///   1. Attach to any persistent GameObject in the scene (e.g. the boss or a manager).
-///   2. Set AICondition in the Inspector before each test run ("Layer1Only" or "Layer1+2").
-///   3. CSV is written to Application.persistentDataPath — check the Console on Start for the path.
+/// Two CSVs are produced:
+///   ai_eval_*.csv      — one row per fight (summary metrics)
+///   ai_decisions_*.csv — one row per AI decision tick (per-decision log, via AIDecisionLogger)
 /// </summary>
 public class AISessionLogger : MonoBehaviour
 {
     public static AISessionLogger Instance { get; private set; }
 
     [Header("Test Configuration")]
-    [Tooltip("Select the AI configuration being tested. Change before each run.")]
+    [Tooltip("Select the AI configuration being tested.")]
     [SerializeField] private AITestCondition aiCondition = AITestCondition.Layer1Plus2;
 
     [Header("Debug")]
     public bool DebugMode = true;
 
-    // ---- References (auto-found) ----
+    // ---- References ----
     private AIDecisionEngine          decisionEngine;
     private VoidbornAdaptationManager adaptationManager;
     private PlayerBehaviorTracker     behaviorTracker;
     private Health                    playerHealth;
+    private Health                    bossHealth;
     private BossController            bossController;
+    private PlayerShield              playerShield;
+    private VoidbornGoddessController goddess;
 
     // ---- Fight state ----
     private bool  fightActive;
     private float fightStartTime;
     private int   fightId;
 
-    // ---- Action / layer counters ----
-    private int meleeCount;
-    private int artilleryCount;
-    private int chaseCount;
-    private int layer1Count;
-    private int layer2Count;
-    private int layer3Count;
-    private HashSet<BossActionType> actionsUsed = new HashSet<BossActionType>();
+    // ---- Outcome ----
+    private float playerHPMin;
+    private bool  firstBossHitDone;
+    private bool  firstPlayerHitDone;
+    private float timeToFirstBossHit;
+    private float timeToFirstPlayerHit;
 
-    // ---- Weight snapshot (for shift computation) ----
-    private Dictionary<PlayerStyle, Dictionary<BossActionType, float>> weightsAtFightStart;
+    // ---- Action / layer counters ----
+    private int meleeCount, artilleryCount, chaseCount;
+    private int layer1Count, layer2Count, layer3Count;
+    private int attacksAttempted, attacksLanded;
+    private int playerBlockCount;
+    private HashSet<BossActionType> actionsUsed = new HashSet<BossActionType>();
+    private List<float> actionTimestamps = new List<float>();
+
+    // ---- Decision engine baselines (snapshot at fight start, delta at end) ----
+    private int   totalDecisionsAtStart;
+    private float confidenceSumAtStart;
+    private int   lowConfAtStart;
+    private int   l2CountAtStart;
+
+    // ---- Fairness ----
+    private int fairnessActivations;
+
+    // ---- Weight snapshot ----
+    private Dictionary<PlayerStyle, Dictionary<BossActionType, float>> weightsAtStart;
 
     // ---- Reaction speed ----
-    private float         styleChangeTime     = -1f;
+    private float         styleChangeTime = -1f;
     private BossActionType decisionAtStyleChange;
-    private List<float>   reactionSpeeds      = new List<float>();
+    private List<float>   reactionSpeeds = new List<float>();
 
-    // ---- Style tracking ----
-    private Dictionary<PlayerStyle, int> styleSamples = new Dictionary<PlayerStyle, int>();
-    private int styleChangeCount;
+    // ---- Style tracking (time-based) ----
+    private PlayerStyle currentStyle;
+    private float       styleStartTime;
+    private Dictionary<PlayerStyle, float> styleTimeAccum = new Dictionary<PlayerStyle, float>();
+    private int         styleChangeCount;
+    private List<string> styleTransitionLog = new List<string>();
 
-    // ---- Damage baseline (tracker is cumulative — subtract at fight start) ----
+    // ---- Damage baseline ----
     private float damageDealtAtStart;
     private float damageTakenAtStart;
 
-    // ---- CSV file path ----
+    // ---- Distance ----
+    private float distanceSum;
+    private int   distanceSamples;
+    private float timeAtCloseRange;
+
+    // ---- CSV ----
     private string csvPath;
 
     // =========================================================
@@ -86,10 +102,9 @@ public class AISessionLogger : MonoBehaviour
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
 
-        string logsFolder = Path.Combine(Application.dataPath, "..", "Logs", "Evaluation");
+        string logsFolder = Path.Combine(Application.dataPath, "Evaluation");
         Directory.CreateDirectory(logsFolder);
 
-        // Use Pakistan Standard Time (UTC+5) for consistent naming
         System.TimeZoneInfo pkt = System.TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time");
         System.DateTime pktNow  = System.TimeZoneInfo.ConvertTimeFromUtc(System.DateTime.UtcNow, pkt);
         string filename = $"ai_eval_{pktNow:yyyyMMdd_HHmmss}_PKT.csv";
@@ -104,62 +119,113 @@ public class AISessionLogger : MonoBehaviour
         adaptationManager = FindFirstObjectByType<VoidbornAdaptationManager>();
         behaviorTracker   = FindFirstObjectByType<PlayerBehaviorTracker>();
         bossController    = FindFirstObjectByType<BossController>();
+        goddess           = FindFirstObjectByType<VoidbornGoddessController>();
 
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)
+        {
             playerHealth = playerObj.GetComponent<Health>();
+            playerShield = playerObj.GetComponent<PlayerShield>();
+        }
 
-        if (decisionEngine    != null) decisionEngine.OnDecisionChanged += HandleDecisionChanged;
-        if (adaptationManager != null) adaptationManager.OnStyleChanged  += HandleStyleChanged;
-        if (playerHealth      != null) playerHealth.OnDamageTaken        += HandlePlayerDamage;
-        if (bossController    != null) bossController.OnDied             += HandleBossDied;
+        if (bossController != null) bossHealth = bossController.Health;
 
-        Debug.Log($"[AISessionLogger] Ready — boss={bossController != null}, player={playerHealth != null}, engine={decisionEngine != null}");
+        if (decisionEngine    != null) decisionEngine.OnDecisionChanged   += HandleDecisionChanged;
+        if (decisionEngine    != null) decisionEngine.OnFairnessActivated += HandleFairnessActivated;
+        if (adaptationManager != null) adaptationManager.OnStyleChanged   += HandleStyleChanged;
+        if (playerHealth      != null) playerHealth.OnDamageTaken         += HandlePlayerDamage;
+        if (bossHealth        != null) bossHealth.OnDamageTaken           += HandleBossDamage;
+        if (bossController    != null) bossController.OnDied              += HandleBossDied;
+        if (playerShield      != null) playerShield.OnBlockStarted        += HandlePlayerBlock;
+        if (goddess           != null)
+        {
+            goddess.OnMeleeAttempted    += () => { if (fightActive) attacksAttempted++; };
+            goddess.OnMeleeResult       += (landed) => { if (fightActive && landed) attacksLanded++; };
+            goddess.OnArtilleryLaunched += () => { if (fightActive) attacksAttempted++; };
+        }
+
+        Debug.Log($"[AISessionLogger] Ready — boss={bossController != null}, player={playerHealth != null}");
+    }
+
+    private void Update()
+    {
+        if (!fightActive || bossController == null) return;
+        float dist = bossController.GetDistanceToPlayer();
+        if (dist < Mathf.Infinity)
+        {
+            distanceSum += dist;
+            distanceSamples++;
+            if (dist <= bossController.attackRange)
+                timeAtCloseRange += Time.deltaTime;
+        }
     }
 
     private void OnDestroy()
     {
-        if (fightActive) EndFight(false); // safety flush on scene unload
-
-        if (decisionEngine    != null) decisionEngine.OnDecisionChanged -= HandleDecisionChanged;
-        if (adaptationManager != null) adaptationManager.OnStyleChanged  -= HandleStyleChanged;
-        if (playerHealth      != null) playerHealth.OnDamageTaken        -= HandlePlayerDamage;
-        if (bossController    != null) bossController.OnDied             -= HandleBossDied;
+        if (fightActive) EndFight(false);
+        UnsubscribeAll();
     }
 
     private void OnApplicationQuit()
     {
-        if (fightActive)
-            EndFight(false);
+        if (fightActive) EndFight(false);
+    }
+
+    private void UnsubscribeAll()
+    {
+        if (decisionEngine    != null) { decisionEngine.OnDecisionChanged   -= HandleDecisionChanged; decisionEngine.OnFairnessActivated -= HandleFairnessActivated; }
+        if (adaptationManager != null) adaptationManager.OnStyleChanged     -= HandleStyleChanged;
+        if (playerHealth      != null) playerHealth.OnDamageTaken           -= HandlePlayerDamage;
+        if (bossHealth        != null) bossHealth.OnDamageTaken             -= HandleBossDamage;
+        if (bossController    != null) bossController.OnDied                -= HandleBossDied;
+        if (playerShield      != null) playerShield.OnBlockStarted          -= HandlePlayerBlock;
     }
 
     // =========================================================
-    // Fight Lifecycle  (called by VoidbornGoddessController)
+    // Fight Lifecycle
     // =========================================================
 
-    /// <summary>
-    /// Call once when the boss first detects the player and the fight begins.
-    /// </summary>
     public void StartFight()
     {
         if (fightActive) return;
-        fightActive = true;
+        fightActive    = true;
         fightId++;
         fightStartTime = Time.time;
 
-        // Reset all counters
         meleeCount = artilleryCount = chaseCount = 0;
-        layer1Count = layer2Count = layer3Count  = 0;
+        layer1Count = layer2Count = layer3Count = 0;
+        attacksAttempted = attacksLanded = playerBlockCount = 0;
         actionsUsed.Clear();
+        actionTimestamps.Clear();
         reactionSpeeds.Clear();
-        styleSamples.Clear();
+        styleTransitionLog.Clear();
         styleChangeCount = 0;
         styleChangeTime  = -1f;
+        fairnessActivations = 0;
 
-        // Snapshot weights so we can measure drift at fight end
-        weightsAtFightStart = SnapshotWeights();
+        playerHPMin          = playerHealth != null ? playerHealth.currentHealth : 0f;
+        firstBossHitDone     = firstPlayerHitDone = false;
+        timeToFirstBossHit   = -1f;
+        timeToFirstPlayerHit = -1f;
 
-        // Snapshot damage baseline (PlayerBehaviorTracker accumulates across fights)
+        styleTimeAccum.Clear();
+        foreach (PlayerStyle s in System.Enum.GetValues(typeof(PlayerStyle)))
+            styleTimeAccum[s] = 0f;
+        currentStyle   = adaptationManager != null ? adaptationManager.CurrentStyle : PlayerStyle.Balanced;
+        styleStartTime = Time.time;
+
+        distanceSum = 0f; distanceSamples = 0; timeAtCloseRange = 0f;
+
+        if (decisionEngine != null)
+        {
+            totalDecisionsAtStart = decisionEngine.TotalDecisions;
+            confidenceSumAtStart  = decisionEngine.ConfidenceSum;
+            lowConfAtStart        = decisionEngine.LowConfidenceCount;
+            l2CountAtStart        = decisionEngine.L2DecisionCount;
+        }
+
+        weightsAtStart = SnapshotWeights();
+
         if (behaviorTracker != null)
         {
             damageDealtAtStart = behaviorTracker.Profile.totalDamageDealt;
@@ -169,10 +235,6 @@ public class AISessionLogger : MonoBehaviour
         if (DebugMode) Debug.Log($"[AISessionLogger] === Fight #{fightId} started ({aiCondition}) ===");
     }
 
-    /// <summary>
-    /// Call when the fight ends (boss or player dies).
-    /// bossWon = true means the boss killed the player.
-    /// </summary>
     public void EndFight(bool bossWon)
     {
         if (!fightActive) return;
@@ -180,49 +242,154 @@ public class AISessionLogger : MonoBehaviour
 
         float duration = Time.time - fightStartTime;
 
-        // Damage this fight only
+        // Finalize style timing
+        if (styleTimeAccum.ContainsKey(currentStyle))
+            styleTimeAccum[currentStyle] += Time.time - styleStartTime;
+        float totalStyleTime = 0f;
+        foreach (var v in styleTimeAccum.Values) totalStyleTime += v;
+
+        // Outcome HP
+        float playerHPEnd = playerHealth != null ? playerHealth.currentHealth : 0f;
+        float bossHPEnd   = bossHealth   != null ? bossHealth.currentHealth   : 0f;
+        float playerMaxHP = playerHealth != null && playerHealth.MaxHealth > 0 ? playerHealth.MaxHealth : 100f;
+        float bossMaxHP   = bossHealth   != null && bossHealth.MaxHealth   > 0 ? bossHealth.MaxHealth   : 100f;
+        float playerHPPct = playerHPEnd / playerMaxHP;
+        float bossHPPct   = bossHPEnd   / bossMaxHP;
+        float closeness   = 1f - Mathf.Abs(playerHPPct - bossHPPct);
+
+        // Damage
         float dealt = 0f, taken = 0f;
         if (behaviorTracker != null)
         {
             dealt = behaviorTracker.Profile.totalDamageDealt - damageDealtAtStart;
             taken = behaviorTracker.Profile.totalDamageTaken - damageTakenAtStart;
         }
-        float efficiency = taken > 0f ? dealt / taken : dealt;
+        float efficiency   = taken > 0f ? dealt / taken : dealt;
+        float dpm          = duration > 0f ? dealt / (duration / 60f) : 0f;
 
-        // Layer attribution %
-        int totalDecisions = layer1Count + layer2Count + layer3Count;
-        float l1pct = totalDecisions > 0 ? (float)layer1Count / totalDecisions * 100f : 0f;
-        float l2pct = totalDecisions > 0 ? (float)layer2Count / totalDecisions * 100f : 0f;
-        float l3pct = totalDecisions > 0 ? (float)layer3Count / totalDecisions * 100f : 0f;
+        // Attack rates
+        float hitRate = attacksAttempted > 0 ? (float)attacksLanded / attacksAttempted : 0f;
 
-        WriteRow(
-            fightId, aiCondition.ToString(), duration, bossWon,
-            meleeCount, artilleryCount, chaseCount,
-            dealt, taken, efficiency,
-            actionsUsed.Count, l1pct, l2pct, l3pct,
-            ComputeWeightShift(), styleChangeCount,
-            AverageList(reactionSpeeds), GetDominantStyle()
-        );
+        // Pacing
+        float longestPassive = ComputeLongestPassive();
+        float avgInterval    = actionTimestamps.Count > 1
+            ? (actionTimestamps[actionTimestamps.Count - 1] - actionTimestamps[0]) / (actionTimestamps.Count - 1)
+            : -1f;
+
+        // Style percentages
+        float sPctAgg = StylePct(PlayerStyle.Aggressive, totalStyleTime);
+        float sPctDef = StylePct(PlayerStyle.Defensive,  totalStyleTime);
+        float sPctAer = StylePct(PlayerStyle.Aerial,     totalStyleTime);
+        float sPctRng = StylePct(PlayerStyle.Ranged,     totalStyleTime);
+        float sPctBal = StylePct(PlayerStyle.Balanced,   totalStyleTime);
+        float styleEntropy = ShannonEntropy(new[] { sPctAgg, sPctDef, sPctAer, sPctRng, sPctBal });
+
+        // Decision engine deltas
+        int   totalDec  = 0;
+        float avgConf   = 0f;
+        int   lowConf   = 0;
+        int   l2Dec     = 0;
+        if (decisionEngine != null)
+        {
+            totalDec = decisionEngine.TotalDecisions    - totalDecisionsAtStart;
+            float cs = decisionEngine.ConfidenceSum     - confidenceSumAtStart;
+            avgConf  = totalDec > 0 ? cs / totalDec : 0f;
+            lowConf  = decisionEngine.LowConfidenceCount - lowConfAtStart;
+            l2Dec    = decisionEngine.L2DecisionCount    - l2CountAtStart;
+        }
+
+        int   totalLayered = layer1Count + layer2Count + layer3Count;
+        float l1pct = totalLayered > 0 ? (float)layer1Count / totalLayered * 100f : 0f;
+        float l2pct = totalLayered > 0 ? (float)layer2Count / totalLayered * 100f : 0f;
+        float l3pct = totalLayered > 0 ? (float)layer3Count / totalLayered * 100f : 0f;
+
+        // Weights
+        var   endW        = SnapshotWeights();
+        float weightShift = ComputeWeightShift(endW);
+        float weightEntropy = ComputeWeightEntropy(endW);
+
+        // Distance
+        float avgDist  = distanceSamples > 0 ? distanceSum / distanceSamples : -1f;
+        float pctClose = duration > 0f ? timeAtCloseRange / duration * 100f : 0f;
+
+        var sb = new StringBuilder();
+        sb.Append(fightId).Append(',');
+        sb.Append(aiCondition).Append(',');
+        sb.Append(duration.F2()).Append(',');
+        sb.Append(bossWon ? 1 : 0).Append(',');
+        // Outcome
+        sb.Append(playerHPEnd.F1()).Append(',');
+        sb.Append(bossHPEnd.F1()).Append(',');
+        sb.Append(playerHPMin.F1()).Append(',');
+        sb.Append(closeness.F3()).Append(',');
+        // Damage
+        sb.Append(dealt.F1()).Append(',');
+        sb.Append(taken.F1()).Append(',');
+        sb.Append(efficiency.F2()).Append(',');
+        sb.Append(dpm.F1()).Append(',');
+        // Attacks
+        sb.Append(attacksAttempted).Append(',');
+        sb.Append(attacksLanded).Append(',');
+        sb.Append(hitRate.F3()).Append(',');
+        sb.Append(playerBlockCount).Append(',');
+        // Actions
+        sb.Append(meleeCount).Append(',');
+        sb.Append(artilleryCount).Append(',');
+        sb.Append(chaseCount).Append(',');
+        // Timing
+        sb.Append(timeToFirstBossHit.F2()).Append(',');
+        sb.Append(timeToFirstPlayerHit.F2()).Append(',');
+        sb.Append(longestPassive.F2()).Append(',');
+        sb.Append(avgInterval.F2()).Append(',');
+        // Style %
+        sb.Append(sPctAgg.F1()).Append(',');
+        sb.Append(sPctDef.F1()).Append(',');
+        sb.Append(sPctAer.F1()).Append(',');
+        sb.Append(sPctRng.F1()).Append(',');
+        sb.Append(sPctBal.F1()).Append(',');
+        sb.Append(styleEntropy.F3()).Append(',');
+        sb.Append(styleChangeCount).Append(',');
+        sb.Append('"').Append(string.Join("|", styleTransitionLog)).Append('"').Append(',');
+        sb.Append(DominantStyle()).Append(',');
+        // Weights (5 styles x 3 actions = 15)
+        foreach (PlayerStyle s in new[] { PlayerStyle.Aggressive, PlayerStyle.Defensive, PlayerStyle.Aerial, PlayerStyle.Ranged, PlayerStyle.Balanced })
+            foreach (BossActionType a in new[] { BossActionType.MeleeAttack, BossActionType.ArtilleryAttack, BossActionType.Chase })
+                sb.Append(W(endW, s, a).F4()).Append(',');
+        sb.Append(weightShift.F4()).Append(',');
+        sb.Append(weightEntropy.F3()).Append(',');
+        // Strategy
+        sb.Append(actionsUsed.Count).Append(',');
+        sb.Append(l1pct.F1()).Append(',');
+        sb.Append(l2pct.F1()).Append(',');
+        sb.Append(l3pct.F1()).Append(',');
+        // Decision engine
+        sb.Append(totalDec).Append(',');
+        sb.Append(avgConf.F3()).Append(',');
+        sb.Append(lowConf).Append(',');
+        sb.Append(l2Dec).Append(',');
+        sb.Append(fairnessActivations).Append(',');
+        // Spatial
+        sb.Append(avgDist.F2()).Append(',');
+        sb.Append(pctClose.F1()).Append(',');
+        // Reaction
+        sb.Append(AvgList(reactionSpeeds).F2());
+        sb.AppendLine();
+
+        File.AppendAllText(csvPath, sb.ToString());
 
         if (DebugMode)
-            Debug.Log($"[AISessionLogger] Fight #{fightId} | BossWon={bossWon} | " +
-                      $"Duration={duration:F1}s | Efficiency={efficiency:F2} | " +
-                      $"WeightShift={ComputeWeightShift():F4} | " +
-                      $"L1={l1pct:F0}% L2={l2pct:F0}%");
+            Debug.Log($"[AISessionLogger] Fight #{fightId} | BossWon={bossWon} | Duration={duration:F1}s | WeightShift={weightShift:F4}");
     }
 
     // =========================================================
-    // Public: called by AIDecisionEngine on action start
+    // Public: called by AIDecisionEngine
     // =========================================================
 
-    /// <summary>
-    /// Called by AIDecisionEngine.OnBossActionStarted to log which action was taken and which layer chose it.
-    /// </summary>
     public void RecordAction(BossActionType action, string layer)
     {
         if (!fightActive) return;
-
         actionsUsed.Add(action);
+        actionTimestamps.Add(Time.time);
 
         switch (action)
         {
@@ -232,7 +399,6 @@ public class AISessionLogger : MonoBehaviour
         }
 
         if (layer == null) return;
-
         if      (layer.StartsWith("Heuristic")) layer1Count++;
         else if (layer.StartsWith("Weighted"))  layer2Count++;
         else                                    layer3Count++;
@@ -245,87 +411,139 @@ public class AISessionLogger : MonoBehaviour
     private void HandleStyleChanged(PlayerStyle from, PlayerStyle to)
     {
         if (!fightActive) return;
-
+        if (styleTimeAccum.ContainsKey(from))
+            styleTimeAccum[from] += Time.time - styleStartTime;
+        currentStyle   = to;
+        styleStartTime = Time.time;
         styleChangeCount++;
+        styleTransitionLog.Add($"{from}->{to}");
         styleChangeTime = Time.time;
-
-        // Record what decision the boss was making just before the style changed
-        if (decisionEngine != null)
-            decisionAtStyleChange = decisionEngine.CurrentDecision.action;
-
-        // Track style distribution for dominant style computation
-        if (!styleSamples.ContainsKey(to)) styleSamples[to] = 0;
-        styleSamples[to]++;
-
-        if (DebugMode) Debug.Log($"[AISessionLogger] Style change #{styleChangeCount}: {from} → {to}");
+        if (decisionEngine != null) decisionAtStyleChange = decisionEngine.CurrentDecision.action;
+        if (DebugMode) Debug.Log($"[AISessionLogger] Style: {from} → {to}");
     }
 
     private void HandleDecisionChanged(BossDecision decision)
     {
         if (!fightActive || styleChangeTime < 0f) return;
-
-        // If the boss picked a different action after a style change, record reaction speed
         if (decision.action != decisionAtStyleChange)
         {
-            float reactionSpeed = Time.time - styleChangeTime;
-            reactionSpeeds.Add(reactionSpeed);
-            styleChangeTime = -1f; // Reset — wait for next style change
-
-            if (DebugMode) Debug.Log($"[AISessionLogger] Reaction speed: {reactionSpeed:F2}s");
+            reactionSpeeds.Add(Time.time - styleChangeTime);
+            styleChangeTime = -1f;
         }
-    }
-
-    private void HandleBossDied()
-    {
-        EndFight(false); // player won — boss died
     }
 
     private void HandlePlayerDamage(float damage)
     {
         if (!fightActive || playerHealth == null) return;
-
-        if (playerHealth.currentHealth <= 0)
-            EndFight(true); // boss won — player died
+        if (!firstBossHitDone) { firstBossHitDone = true; timeToFirstBossHit = Time.time - fightStartTime; }
+        float hp = playerHealth.currentHealth;
+        if (hp < playerHPMin) playerHPMin = hp;
+        if (hp <= 0) EndFight(true);
     }
+
+    private void HandleBossDamage(float damage)
+    {
+        if (!fightActive || firstPlayerHitDone) return;
+        firstPlayerHitDone   = true;
+        timeToFirstPlayerHit = Time.time - fightStartTime;
+    }
+
+    private void HandleBossDied()     => EndFight(false);
+    private void HandlePlayerBlock()  { if (fightActive) playerBlockCount++; }
+    private void HandleFairnessActivated() { if (fightActive) fairnessActivations++; }
 
     // =========================================================
     // Helpers
     // =========================================================
 
+    private float StylePct(PlayerStyle s, float total)
+    {
+        if (total <= 0f || !styleTimeAccum.ContainsKey(s)) return 0f;
+        return styleTimeAccum[s] / total * 100f;
+    }
+
+    private string DominantStyle()
+    {
+        PlayerStyle best = PlayerStyle.Balanced;
+        float max = -1f;
+        foreach (var kvp in styleTimeAccum)
+            if (kvp.Value > max) { max = kvp.Value; best = kvp.Key; }
+        return best.ToString();
+    }
+
+    private float ComputeLongestPassive()
+    {
+        if (actionTimestamps.Count < 2) return -1f;
+        float longest = 0f;
+        for (int i = 1; i < actionTimestamps.Count; i++)
+        {
+            float gap = actionTimestamps[i] - actionTimestamps[i - 1];
+            if (gap > longest) longest = gap;
+        }
+        return longest;
+    }
+
     private Dictionary<PlayerStyle, Dictionary<BossActionType, float>> SnapshotWeights()
     {
         if (decisionEngine == null) return null;
-
-        var snapshot = new Dictionary<PlayerStyle, Dictionary<BossActionType, float>>();
-        foreach (PlayerStyle style in System.Enum.GetValues(typeof(PlayerStyle)))
+        var snap = new Dictionary<PlayerStyle, Dictionary<BossActionType, float>>();
+        foreach (PlayerStyle s in System.Enum.GetValues(typeof(PlayerStyle)))
         {
-            var w = decisionEngine.GetWeightsForStyle(style);
-            if (w != null)
-                snapshot[style] = new Dictionary<BossActionType, float>(w);
+            var w = decisionEngine.GetWeightsForStyle(s);
+            if (w != null) snap[s] = new Dictionary<BossActionType, float>(w);
         }
-        return snapshot;
+        return snap;
     }
 
-    private float ComputeWeightShift()
+    private float ComputeWeightShift(Dictionary<PlayerStyle, Dictionary<BossActionType, float>> endW)
     {
-        if (weightsAtFightStart == null || decisionEngine == null) return 0f;
-
+        if (weightsAtStart == null || endW == null) return 0f;
         float total = 0f;
-        foreach (PlayerStyle style in System.Enum.GetValues(typeof(PlayerStyle)))
+        foreach (PlayerStyle s in System.Enum.GetValues(typeof(PlayerStyle)))
         {
-            var current = decisionEngine.GetWeightsForStyle(style);
-            if (current == null || !weightsAtFightStart.ContainsKey(style)) continue;
-
-            foreach (var kvp in current)
-            {
-                if (weightsAtFightStart[style].TryGetValue(kvp.Key, out float startW))
-                    total += Mathf.Abs(kvp.Value - startW);
-            }
+            if (!endW.ContainsKey(s) || !weightsAtStart.ContainsKey(s)) continue;
+            foreach (var kvp in endW[s])
+                if (weightsAtStart[s].TryGetValue(kvp.Key, out float sw))
+                    total += Mathf.Abs(kvp.Value - sw);
         }
         return total;
     }
 
-    private float AverageList(List<float> list)
+    private float ComputeWeightEntropy(Dictionary<PlayerStyle, Dictionary<BossActionType, float>> weights)
+    {
+        if (weights == null) return 0f;
+        var vals = new List<float>();
+        foreach (var d in weights.Values)
+            foreach (var v in d.Values)
+                vals.Add(v);
+        if (vals.Count == 0) return 0f;
+        float maxV = float.MinValue;
+        foreach (float v in vals) if (v > maxV) maxV = v;
+        float sumExp = 0f;
+        var exps = new List<float>();
+        foreach (float v in vals) { float e = Mathf.Exp(v - maxV); exps.Add(e); sumExp += e; }
+        float entropy = 0f;
+        foreach (float e in exps) { float p = e / sumExp; if (p > 0f) entropy -= p * Mathf.Log(p, 2f); }
+        return entropy;
+    }
+
+    private float ShannonEntropy(float[] pcts)
+    {
+        float total = 0f;
+        foreach (float p in pcts) total += p;
+        if (total <= 0f) return 0f;
+        float h = 0f;
+        foreach (float p in pcts) { float pr = p / total; if (pr > 0f) h -= pr * Mathf.Log(pr, 2f); }
+        return h;
+    }
+
+    private float W(Dictionary<PlayerStyle, Dictionary<BossActionType, float>> w, PlayerStyle s, BossActionType a)
+    {
+        if (w == null || !w.TryGetValue(s, out var d)) return 0f;
+        return d.TryGetValue(a, out float v) ? v : 0f;
+    }
+
+    private float AvgList(List<float> list)
     {
         if (list.Count == 0) return -1f;
         float sum = 0f;
@@ -333,42 +551,41 @@ public class AISessionLogger : MonoBehaviour
         return sum / list.Count;
     }
 
-    private string GetDominantStyle()
-    {
-        if (styleSamples.Count == 0) return "None";
-        PlayerStyle best = PlayerStyle.Balanced;
-        int max = 0;
-        foreach (var kvp in styleSamples)
-            if (kvp.Value > max) { max = kvp.Value; best = kvp.Key; }
-        return best.ToString();
-    }
-
     // =========================================================
-    // CSV
+    // CSV Header
     // =========================================================
 
     private void WriteHeader()
     {
         File.WriteAllText(csvPath,
             "FightID,AICondition,Duration_s,BossWon," +
+            "PlayerHP_End,BossHP_End,PlayerHP_Min,ClosenessScore," +
+            "DamageDealt,DamageTaken,DamageEfficiency,DamagePerMinute," +
+            "AttacksAttempted,AttacksLanded,HitRate," +
+            "PlayerBlockCount," +
             "MeleeCount,ArtilleryCount,ChaseCount," +
-            "DamageDealt,DamageTaken,DamageEfficiency," +
+            "TimeToFirstBossHit_s,TimeToFirstPlayerHit_s," +
+            "LongestPassivePeriod_s,AvgActionInterval_s," +
+            "StylePct_Aggressive,StylePct_Defensive,StylePct_Aerial,StylePct_Ranged,StylePct_Balanced," +
+            "StyleEntropy,StyleChanges,StyleTransitions,DominantStyle," +
+            "W_Agg_Melee,W_Agg_Artillery,W_Agg_Chase," +
+            "W_Def_Melee,W_Def_Artillery,W_Def_Chase," +
+            "W_Aer_Melee,W_Aer_Artillery,W_Aer_Chase," +
+            "W_Rng_Melee,W_Rng_Artillery,W_Rng_Chase," +
+            "W_Bal_Melee,W_Bal_Artillery,W_Bal_Chase," +
+            "WeightShift,WeightEntropy," +
             "StrategyDiversity,L1_Pct,L2_Pct,L3_Pct," +
-            "WeightShift,StyleChanges,AvgReactionSpeed_s,DominantStyle\n");
+            "TotalDecisions,AvgConfidence,LowConfidenceCount,L2DecisionCount,FairnessActivations," +
+            "AvgDistance,PctTimeCloseRange," +
+            "AvgReactionSpeed_s\n");
     }
+}
 
-    private void WriteRow(
-        int id, string condition, float duration, bool bossWon,
-        int melee, int artillery, int chase,
-        float dealt, float taken, float efficiency,
-        int diversity, float l1, float l2, float l3,
-        float weightShift, int styleChanges, float reactionSpeed, string dominant)
-    {
-        File.AppendAllText(csvPath,
-            $"{id},{condition},{duration:F2},{(bossWon ? 1 : 0)}," +
-            $"{melee},{artillery},{chase}," +
-            $"{dealt:F1},{taken:F1},{efficiency:F2}," +
-            $"{diversity},{l1:F1},{l2:F1},{l3:F1}," +
-            $"{weightShift:F4},{styleChanges},{reactionSpeed:F2},{dominant}\n");
-    }
+// Extension methods for compact float formatting
+internal static class FloatFmt
+{
+    public static string F1(this float f) => f.ToString("F1");
+    public static string F2(this float f) => f.ToString("F2");
+    public static string F3(this float f) => f.ToString("F3");
+    public static string F4(this float f) => f.ToString("F4");
 }

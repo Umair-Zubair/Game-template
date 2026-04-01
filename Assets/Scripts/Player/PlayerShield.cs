@@ -38,6 +38,7 @@ public class PlayerShield : MonoBehaviour
     private void StartBlock()
     {
         isBlocking = true;
+        OnBlockStarted?.Invoke();
         // playerController.isBlocking = true; // TODO: Add blocking state to controller if needed
         anim.SetBool("block", true);
         if(blockSound != null) SoundManager.instance.PlaySound(blockSound);
@@ -51,6 +52,7 @@ public class PlayerShield : MonoBehaviour
     }
 
     public bool IsBlocking() => isBlocking;
+    public event System.Action OnBlockStarted;
 
     public void TriggerBlockEffect()
     {

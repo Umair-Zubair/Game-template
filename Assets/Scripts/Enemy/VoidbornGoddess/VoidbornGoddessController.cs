@@ -38,6 +38,9 @@ public class VoidbornGoddessController : BossController
 
     // ---- Evaluation ----
     private bool fightStarted = false;
+    public event System.Action OnMeleeAttempted;
+    public event System.Action<bool> OnMeleeResult;
+    public event System.Action OnArtilleryLaunched;
 
     // States
     public VoidbornIdleState IdleState { get; private set; }
@@ -122,6 +125,7 @@ public class VoidbornGoddessController : BossController
         if (fightStarted) return;
         fightStarted = true;
         AISessionLogger.Instance?.StartFight();
+        AIDecisionLogger.Instance?.StartFight();
     }
 
     public void OnTakeDamage(float damage)
@@ -131,7 +135,8 @@ public class VoidbornGoddessController : BossController
         // Detect fatal hit — health is already updated before OnDamageTaken fires
         if (Health.currentHealth <= 0)
         {
-            AISessionLogger.Instance?.EndFight(false); // player won, boss died
+            AISessionLogger.Instance?.EndFight(false);
+            AIDecisionLogger.Instance?.EndFight(false);
             return;
         }
 
@@ -170,17 +175,20 @@ public class VoidbornGoddessController : BossController
     public void PerformMeleeHit()
     {
         if (meleeAttackPoint == null) return;
-
+        OnMeleeAttempted?.Invoke();
         Collider2D[] hits = Physics2D.OverlapCircleAll(meleeAttackPoint.position, meleeAttackRadius, playerDamageLayer);
+        bool landed = false;
         foreach (var hit in hits)
         {
             Health playerHealth = hit.GetComponent<Health>();
             if (playerHealth != null)
             {
                 playerHealth.TakeDamage(meleeDamage);
+                landed = true;
                 Debug.Log($"[Voidborn] Melee hit for {meleeDamage} damage!");
             }
         }
+        OnMeleeResult?.Invoke(landed);
     }
 
     // -----------------------------------------------------------------
@@ -196,6 +204,7 @@ public class VoidbornGoddessController : BossController
     public void SpawnArtilleryProjectile()
     {
         if (Player == null) return;
+        OnArtilleryLaunched?.Invoke();
 
         // Capture the player's current X position — creates the "artillery" targeting
         float playerX = Player.position.x;
