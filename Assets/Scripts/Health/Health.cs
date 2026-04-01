@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 public class Health : MonoBehaviour
@@ -99,16 +100,20 @@ public class Health : MonoBehaviour
                     if(component != null) component.enabled = false;
 
                 dead = true;
+
+                StartCoroutine(DeactivateAfterDeath());
             }
         }
     }
 
     public void Respawn()
     {
+        StopAllCoroutines();
+
         dead = false;
         AddHealth(startingHealth);
-        anim.ResetTrigger("die");
-        anim.Play("Idle");
+        anim.Rebind();
+        anim.Update(0f);
 
         // Reset stamina to full on respawn
         if (playerStamina != null)
@@ -116,6 +121,14 @@ public class Health : MonoBehaviour
 
         foreach (Behaviour component in components)
             if(component != null) component.enabled = true;
+    }
+
+    private IEnumerator DeactivateAfterDeath()
+    {
+        yield return null;
+        float clipLength = anim.GetCurrentAnimatorStateInfo(0).length;
+        yield return new WaitForSeconds(clipLength);
+        gameObject.SetActive(false);
     }
 
     public void AddHealth(float _value)

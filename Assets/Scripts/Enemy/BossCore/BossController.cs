@@ -98,12 +98,35 @@ public abstract class BossController : MonoBehaviour
         ApplyGravity();
     }
 
-    /// <summary>
-    /// Called when this boss dies. Stops the state machine and all movement.
-    /// Can be invoked by Health or externally.
-    /// </summary>
     /// <summary>Fired once when the boss dies. Used by AISessionLogger to end the fight record.</summary>
     public event System.Action OnDied;
+
+    /// <summary>
+    /// Resets the boss for a new ML-Agents episode: full health, zero velocity,
+    /// teleport to <paramref name="spawnPosition"/> (with small random jitter),
+    /// and restart the FSM. Override in subclasses to reset boss-specific state.
+    /// </summary>
+    public virtual void Respawn(Vector3 spawnPosition)
+    {
+        gameObject.SetActive(true);
+        enabled = true;
+
+        IsDead = false;
+        IsAttacking = false;
+        IsDashing = false;
+        StunTimer = 0f;
+
+        Health.Respawn();
+
+        RB.linearVelocity = Vector2.zero;
+        RB.angularVelocity = 0f;
+        RB.gravityScale = gravityScale;
+
+        Vector2 jitter = Random.insideUnitCircle * 0.5f;
+        transform.position = spawnPosition + new Vector3(jitter.x, jitter.y, 0f);
+
+        StartState();
+    }
 
     public void OnDeath()
     {

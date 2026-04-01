@@ -4813,6 +4813,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RestartManager
   delay: 2
+  bossSpawnPoint: {fileID: 1314204303}
+  playerSpawnPoint: {fileID: 271092032}
 --- !u!1 &1217151907
 GameObject:
   m_ObjectHideFlags: 0
@@ -5261,7 +5263,8 @@ PrefabInstance:
       value: 193736679
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 2810714375831478803, guid: 0cd5ddff8b596404182275a636514347, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 4303414237555634310, guid: 0cd5ddff8b596404182275a636514347, type: 3}
@@ -5826,6 +5829,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1313251798}
   m_CullTransparentMesh: 1
+--- !u!1 &1314204302
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1314204303}
+  m_Layer: 0
+  m_Name: EnemySpawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1314204303
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1314204302}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.72, y: -0.01, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1821620898}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1326386646
 GameObject:
   m_ObjectHideFlags: 0
@@ -7294,6 +7328,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 271092032}
+  - {fileID: 1314204303}
   - {fileID: 25761145}
   - {fileID: 2146743449}
   m_Father: {fileID: 1551478790}

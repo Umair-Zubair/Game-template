@@ -17,7 +17,7 @@ public class PlayerRespawn : MonoBehaviour
     {
         if (currentCheckpoint == null) 
         {
-            uiManager.GameOver();
+            if (uiManager != null) uiManager.GameOver();
             return;
         }
 

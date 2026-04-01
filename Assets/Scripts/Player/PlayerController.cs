@@ -227,6 +227,36 @@ public class PlayerController : MonoBehaviour
         return Physics2D.BoxCast(Collider.bounds.center, Collider.bounds.size, 0f, new Vector2(dir, 0), 0.1f, wallLayer);
     }
 
+    /// <summary>
+    /// Resets the player for a new ML-Agents episode: full health, zero velocity,
+    /// teleport to <paramref name="spawnPosition"/> (with small random jitter),
+    /// restart the FSM to Idle, and clear the PlayerBehaviorTracker.
+    /// </summary>
+    public void Respawn(Vector3 spawnPosition)
+    {
+        gameObject.SetActive(true);
+        enabled = true;
+
+        Health health = GetComponent<Health>();
+        if (health != null) health.Respawn();
+
+        RB.linearVelocity = Vector2.zero;
+        RB.angularVelocity = 0f;
+        RB.gravityScale = data.gravityScale;
+
+        Vector2 jitter = Random.insideUnitCircle * 0.5f;
+        transform.position = spawnPosition + new Vector3(jitter.x, jitter.y, 0f);
+
+        CoyoteTimeCounter = 0f;
+        JumpBufferCounter = 0f;
+        WallJumpLockCounter = 0f;
+
+        StateMachine.Initialize(IdleState, this);
+
+        PlayerBehaviorTracker tracker = GetComponent<PlayerBehaviorTracker>();
+        if (tracker != null) tracker.ResetTracking();
+    }
+
     public PlayerData Data => data;
 
     /// <summary>

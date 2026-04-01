@@ -233,6 +233,14 @@ public class VoidbornGoddessController : BossController
         Debug.Log($"[Voidborn] Artillery projectile spawned at {spawnPos}");
     }
 
+    public override void Respawn(Vector3 spawnPosition)
+    {
+        base.Respawn(spawnPosition);
+        AttackTimer = meleeAttackCooldown;
+        ArtilleryTimer = artilleryCooldown;
+        fightStarted = false;
+    }
+
     public void Deactivate()
     {
         gameObject.SetActive(false);
