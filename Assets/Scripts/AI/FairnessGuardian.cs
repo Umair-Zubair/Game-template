@@ -89,6 +89,13 @@ public class FairnessGuardian
     // Internal
     // =========================================================
 
+    public void Reset()
+    {
+        IsRelaxationActive = false;
+        CooldownMultiplier = 1f;
+        BlockArtillery = false;
+    }
+
     private void ActivateRelaxation()
     {
         IsRelaxationActive = true;

@@ -1,0 +1,46 @@
+behaviors:
+  VoidbornBoss:
+    trainer_type: ppo
+
+    hyperparameters:
+      # How much to adjust weights each update — 3e-4 is safe default for PPO
+      learning_rate: 3.0e-4
+      learning_rate_schedule: linear   # decays LR toward zero as max_steps approaches
+
+      # buffer_size episodes worth of data collected before each training update
+      # 2048 = roughly 1-2 full fights before first update
+      batch_size: 512
+      buffer_size: 2048
+
+      # PPO-specific — leave these at defaults unless reward is unstable
+      beta: 5.0e-3        # entropy bonus — encourages exploration early on
+      epsilon: 0.2        # clip range — how much policy can change per update
+      lambd: 0.95         # GAE lambda — controls bias/variance tradeoff
+      num_epoch: 3        # passes over the buffer per update
+
+    network_settings:
+      # 2 hidden layers of 128 neurons each — appropriate for 15 observations
+      num_layers: 2
+      hidden_units: 128
+      normalize: true     # observations are 0-1 range but normalize helps with reward scaling
+
+    reward_signals:
+      extrinsic:
+        gamma: 0.99       # discount factor — 0.99 means future rewards matter a lot
+        strength: 1.0     # multiplier on your AddReward() calls — keep at 1.0
+
+    # ---- Episode and logging settings ----
+    # 500000 steps at ~12 decisions/sec = ~11 hours of real fight time
+    # raise to 2000000 for a well-trained model
+    max_steps: 5000
+
+
+    # How many steps of experience each episode contributes before cut off
+    # 64 steps = ~5 seconds of fight at Decision Period 5, 60fps
+    time_horizon: 64
+
+    # Print reward summary every N steps
+    summary_freq: 100
+
+    # Save a checkpoint every N steps (keeps last 5 by default)
+    checkpoint_interval: 50000

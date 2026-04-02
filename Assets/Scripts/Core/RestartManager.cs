@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class RestartManager : MonoBehaviour
@@ -47,12 +46,12 @@ public class RestartManager : MonoBehaviour
 
     private void OnBossDied()
     {
-        StartCoroutine(RestartAfterDelay());
+        StartCoroutine(ResetAfterDelay());
     }
 
-    private IEnumerator RestartAfterDelay()
+    private IEnumerator ResetAfterDelay()
     {
         yield return new WaitForSeconds(delay);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        ResetEncounter();
     }
 }

@@ -205,4 +205,22 @@ public class VoidbornAdaptationManager : MonoBehaviour, IBossAdaptationManager
     {
         evaluationTimer = evaluationInterval;
     }
+
+    /// <summary>
+    /// Resets adaptation state for a new ML-Agents episode.
+    /// Returns style to Balanced and profile to Default so the boss
+    /// starts each episode with a clean slate.
+    /// </summary>
+    public void ResetForNewEpisode()
+    {
+        currentStyle    = PlayerStyle.Balanced;
+        currentProfile  = AdaptationProfile.Default();
+        targetProfile   = AdaptationProfile.Default();
+        previousProfile = AdaptationProfile.Default();
+        isTransitioning = false;
+        evaluationTimer = 0f;
+
+        if (boss != null)
+            boss.ApplyAdaptationProfile(currentProfile);
+    }
 }
