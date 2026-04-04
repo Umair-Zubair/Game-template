@@ -270,6 +270,9 @@ MonoBehaviour:
   poolSize: 10
   projectileSound: {fileID: 0}
   jumpProjectileSound: {fileID: 0}
+  maxAmmo: 3
+  reloadTime: 1
+  reloadSound: {fileID: 0}
   hitStunDuration: 0.4
 --- !u!114 &7103587418571317392
 MonoBehaviour:

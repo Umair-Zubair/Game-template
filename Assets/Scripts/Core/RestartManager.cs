@@ -18,7 +18,12 @@ public class RestartManager : MonoBehaviour
         player = FindFirstObjectByType<PlayerController>();
 
         if (boss != null)
+        {
             boss.OnDied += OnBossDied;
+
+            if (FindFirstObjectByType<BossHealthBar>() == null)
+                gameObject.AddComponent<BossHealthBar>();
+        }
     }
 
     private void Update()
@@ -35,13 +40,21 @@ public class RestartManager : MonoBehaviour
     {
         StopAllCoroutines();
 
+        CleanupProjectiles();
+
         if (boss != null)
             boss.Respawn(bossSpawnPoint != null ? bossSpawnPoint.position : boss.transform.position);
 
         if (player != null)
             player.Respawn(playerSpawnPoint != null ? playerSpawnPoint.position : player.transform.position);
 
-        Debug.Log("[RestartManager] Encounter reset via R key.");
+        Debug.Log("[RestartManager] Encounter reset.");
+    }
+
+    private static void CleanupProjectiles()
+    {
+        foreach (var p in FindObjectsByType<Projectile>(FindObjectsSortMode.None))
+            p.gameObject.SetActive(false);
     }
 
     private void OnBossDied()

@@ -7,6 +7,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject gameOverScreen;
     [SerializeField] private AudioClip gameOverSound;
 
+    [Tooltip("When true the Game Over screen is suppressed (useful for AI training loops).")]
+    public bool disableGameOver;
+
     [Header("Pause")]
     [SerializeField] private GameObject pauseScreen;
 
@@ -21,15 +24,15 @@ public class UIManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            //If pause screen already active unpause and viceversa
             PauseGame(!pauseScreen.activeInHierarchy);
         }
     }
 
     #region Game Over
-    //Activate game over screen
     public void GameOver()
     {
+        if (disableGameOver) return;
+
         gameOverScreen.SetActive(true);
         SoundManager.instance.PlaySound(gameOverSound);
     }

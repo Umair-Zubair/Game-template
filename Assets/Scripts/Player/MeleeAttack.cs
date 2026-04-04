@@ -12,16 +12,12 @@ public class MeleeAttack : MonoBehaviour
     [SerializeField] private int comboDamage = 15;
     [SerializeField] private AudioClip comboAttackSound;
 
-    [Header("Jump Attack Parameters")]
-    [SerializeField] private float jumpAttackHeight;
 
     [Header("References")]
     [SerializeField] private Transform attackPoint;
     [SerializeField] private LayerMask enemyLayer;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private AudioClip attackSound;
-    [SerializeField] private AudioClip jumpAttackSound;
-    [SerializeField] private AudioClip uppercutSound;
 
     // ---- Layer 2 AI: Behavior tracking events ----
     /// <summary>Fired whenever the player performs any attack. Arg = attack type string.</summary>
@@ -85,23 +81,7 @@ public class MeleeAttack : MonoBehaviour
             }
         }
 
-        // F key — Jump Attack (grounded only)
-        if (Input.GetKeyDown(KeyCode.F) && cooldownTimer > attackCooldown && playerController != null
-            && Time.timeScale > 0 && IsGrounded())
-        {
-            float cost = stamina != null ? stamina.Data.jumpAttackCost : 0f;
-            if (stamina == null || stamina.TryConsume(cost))
-                JumpAttack();
-        }
         
-        // RMB — Uppercut
-        if (Input.GetMouseButtonDown(1) && cooldownTimer > attackCooldown && playerController != null
-            && Time.timeScale > 0)
-        {
-            float cost = stamina != null ? stamina.Data.uppercutCost : 0f;
-            if (stamina == null || stamina.TryConsume(cost))
-                Uppercut();
-        }
 
         cooldownTimer += Time.deltaTime;
     }
@@ -166,32 +146,8 @@ public class MeleeAttack : MonoBehaviour
         comboQueued = false;
     }
 
-    private void JumpAttack()
-    {
-        if (jumpAttackSound != null)
-            SoundManager.instance.PlaySound(jumpAttackSound);
 
-        anim.SetTrigger("jumpAttack");
-        cooldownTimer = 0;
-        OnAttackPerformed?.Invoke("jumpAttack");
 
-        if (body != null)
-            body.linearVelocity = new Vector2(body.linearVelocity.x, jumpAttackHeight);
-
-        DealDamage(damage);
-    }
-
-    private void Uppercut()
-    {
-        if (uppercutSound != null)
-            SoundManager.instance.PlaySound(uppercutSound);
-
-        anim.SetTrigger("uppercut");
-        cooldownTimer = 0;
-        OnAttackPerformed?.Invoke("uppercut");
-
-        DealDamage(damage);
-    }
 
     /// <summary>
     /// Called by Health when the player takes damage.
@@ -211,8 +167,6 @@ public class MeleeAttack : MonoBehaviour
         {
             anim.ResetTrigger("attack");
             anim.ResetTrigger("comboAttack");
-            anim.ResetTrigger("jumpAttack");
-            anim.ResetTrigger("uppercut");
         }
     }
 

@@ -10,6 +10,13 @@ public class BlobRangedAttack : MonoBehaviour
     [SerializeField] private AudioClip projectileSound;
     [SerializeField] private AudioClip jumpProjectileSound;
 
+    [Header("Ammo & Reload")]
+    [Tooltip("Shots before a reload is required. Set to 0 for unlimited ammo.")]
+    [SerializeField] private int maxAmmo = 3;
+    [Tooltip("Seconds to reload after the magazine is empty.")]
+    [SerializeField] private float reloadTime = 2f;
+    [SerializeField] private AudioClip reloadSound;
+
     /// <summary>Fired on every attack. Arg = attack type ("ranged" or "jumpAttack"). Consumed by PlayerBehaviorTracker.</summary>
     public System.Action<string> OnAttackPerformed;
 
@@ -18,7 +25,10 @@ public class BlobRangedAttack : MonoBehaviour
     private PlayerStamina stamina;
     private float cooldownTimer = Mathf.Infinity;
 
-    // Hit stun — prevents attacking for a brief period after taking damage
+    private int currentAmmo;
+    private float reloadTimer;
+    private bool isReloading;
+
     [Header("Hit Stun")]
     [Tooltip("How long the player is locked out of attacking after being hit.")]
     [SerializeField] private float hitStunDuration = 0.4f;
@@ -33,13 +43,15 @@ public class BlobRangedAttack : MonoBehaviour
         playerController = GetComponent<PlayerController>();
         stamina = GetComponent<PlayerStamina>();
 
+        currentAmmo = maxAmmo;
         CreateProjectilePool();
     }
 
     private void OnEnable()
     {
-        // Re-check pool in case prefabs changed
         if (projectiles == null) CreateProjectilePool();
+        currentAmmo = maxAmmo;
+        isReloading = false;
     }
 
     private void CreateProjectilePool()
@@ -71,29 +83,40 @@ public class BlobRangedAttack : MonoBehaviour
 
     private void Update()
     {
-        // Tick down hit stun timer
         if (hitStunTimer > 0)
         {
             hitStunTimer -= Time.deltaTime;
             cooldownTimer += Time.deltaTime;
-            return; // Block all attack input while stunned
+            return;
         }
 
-        // LMB fires range attack — ground fires normal, air fires jump range
-        if (Input.GetMouseButtonDown(0) && cooldownTimer > attackCooldown && playerController != null && Time.timeScale > 0)
+        // Reload tick
+        if (isReloading)
+        {
+            reloadTimer -= Time.deltaTime;
+            if (reloadTimer <= 0f)
+            {
+                currentAmmo = maxAmmo;
+                isReloading = false;
+            }
+            return;
+        }
+
+        bool hasAmmo = maxAmmo <= 0 || currentAmmo > 0;
+
+        if (Input.GetMouseButtonDown(0) && hasAmmo && cooldownTimer > attackCooldown
+            && playerController != null && Time.timeScale > 0)
         {
             bool isGrounded = playerController.IsGrounded();
 
             if (isGrounded)
             {
-                // Ground ranged attack
                 float cost = stamina != null ? stamina.Data.rangedAttackCost : 0f;
                 if (stamina == null || stamina.TryConsume(cost))
                     Attack();
             }
             else
             {
-                // Air jump range attack
                 float cost = stamina != null ? stamina.Data.rangedAttackCost : 0f;
                 if (stamina == null || stamina.TryConsume(cost))
                     JumpRangeAttack();
@@ -122,10 +145,10 @@ public class BlobRangedAttack : MonoBehaviour
         int index = FindProjectile(projectiles);
         float dir = Mathf.Sign(transform.localScale.x);
 
-        Debug.Log($"[RangedAttack] Firing ground projectile - Direction: {dir}");
-
         projectiles[index].transform.position = firePoint.position;
         projectiles[index].GetComponent<Projectile>().SetDirection(dir);
+
+        ConsumeAmmo();
     }
 
     // ── Air Jump Range Attack ────────────────────────────────────────────────
@@ -134,7 +157,7 @@ public class BlobRangedAttack : MonoBehaviour
         if (jumpProjectiles == null)
         {
             Debug.LogWarning("BlobRangedAttack: jumpProjectilePrefab not assigned! Falling back to normal projectile.");
-            Attack(); // Fallback to normal if jump prefab missing
+            Attack();
             return;
         }
 
@@ -143,17 +166,31 @@ public class BlobRangedAttack : MonoBehaviour
         else if (projectileSound != null)
             SoundManager.instance.PlaySound(projectileSound);
 
-        anim.SetTrigger("jumpRange"); // Uses the jumpRang animator parameter (visible in your animator)
+        anim.SetTrigger("jumpRange");
         cooldownTimer = 0;
         OnAttackPerformed?.Invoke("jumpAttack");
 
         int index = FindProjectile(jumpProjectiles);
         float dir = Mathf.Sign(transform.localScale.x);
 
-        Debug.Log($"[RangedAttack] Firing jump projectile - Direction: {dir}");
-
         jumpProjectiles[index].transform.position = firePoint.position;
         jumpProjectiles[index].GetComponent<Projectile>().SetDirection(dir);
+
+        ConsumeAmmo();
+    }
+
+    private void ConsumeAmmo()
+    {
+        if (maxAmmo <= 0) return;
+
+        currentAmmo--;
+        if (currentAmmo <= 0)
+        {
+            isReloading = true;
+            reloadTimer = reloadTime;
+            if (reloadSound != null)
+                SoundManager.instance.PlaySound(reloadSound);
+        }
     }
 
     /// <summary>

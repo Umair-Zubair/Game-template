@@ -29,11 +29,15 @@ public class Health : MonoBehaviour
 
     // Boss controller — used to stop the state machine on death
     private BossController bossController;
+    private Rigidbody2D rb;
+    private float originalGravityScale;
 
     private void Awake()
     {
         currentHealth = startingHealth;
         anim = GetComponent<Animator>();
+        rb = GetComponent<Rigidbody2D>();
+        if (rb != null) originalGravityScale = rb.gravityScale;
         playerShield = GetComponent<PlayerShield>();
         playerStamina = GetComponent<PlayerStamina>();
         meleeAttack = GetComponent<MeleeAttack>();
@@ -83,23 +87,28 @@ public class Health : MonoBehaviour
         {
             if (!dead)
             {
+                dead = true;
+
+                // Freeze physics immediately so the character can't drift or fall
+                if (rb != null)
+                {
+                    rb.linearVelocity = Vector2.zero;
+                    rb.gravityScale = 0f;
+                }
+
+                // Disable all movement/attack components BEFORE triggering animation
+                foreach (Behaviour component in components)
+                    if (component != null) component.enabled = false;
+
                 anim.SetTrigger("die");
 
-                // Stop the boss state machine immediately so it can't act while dying
                 if (bossController != null) bossController.OnDeath();
 
-                // We manually force the Block animation OFF immediately
                 if (playerShield != null)
                 {
                     anim.SetBool("block", false);
-                    playerShield.enabled = false; 
+                    playerShield.enabled = false;
                 }
-
-                // Disable Movement and Attacks
-                foreach (Behaviour component in components)
-                    if(component != null) component.enabled = false;
-
-                dead = true;
 
                 StartCoroutine(DeactivateAfterDeath());
             }
@@ -115,7 +124,9 @@ public class Health : MonoBehaviour
         anim.Rebind();
         anim.Update(0f);
 
-        // Reset stamina to full on respawn
+        if (rb != null)
+            rb.gravityScale = originalGravityScale;
+
         if (playerStamina != null)
             playerStamina.ResetStamina();
 
@@ -125,7 +136,25 @@ public class Health : MonoBehaviour
 
     private IEnumerator DeactivateAfterDeath()
     {
-        yield return null;
+        // Wait until the animator has transitioned into the death state.
+        // Different characters use "Die" or "Death" as the state name.
+        float timeout = 1f;
+        float waited = 0f;
+        while (waited < timeout)
+        {
+            AnimatorStateInfo info = anim.GetCurrentAnimatorStateInfo(0);
+            if (info.IsName("Die") || info.IsName("Death")
+                || info.IsName("Death_Gun") || info.IsName("Death_CrossBow") || info.IsName("Death_Shotgun")
+                || info.IsName("Air-Death_Gun") || info.IsName("Air-Death_CrossBow") || info.IsName("Death_Air_Shotgun")
+                || info.IsName("Death NoEffect"))
+            {
+                break;
+            }
+            waited += Time.deltaTime;
+            yield return null;
+        }
+
+        // Now wait for the full clip to finish playing
         float clipLength = anim.GetCurrentAnimatorStateInfo(0).length;
         yield return new WaitForSeconds(clipLength);
         gameObject.SetActive(false);

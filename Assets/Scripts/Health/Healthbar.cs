@@ -11,27 +11,25 @@ public class Healthbar : MonoBehaviour
     public void SetPlayer(Health _newPlayer)
     {
         playerHealth = _newPlayer;
-        // Update the bar immediately so it doesn't show empty
         if (playerHealth != null)
         {
-            totalhealthBar.fillAmount = playerHealth.currentHealth / 3;
+            totalhealthBar.fillAmount = playerHealth.currentHealth / playerHealth.MaxHealth;
         }
     }
     // ------------------------------------
 
     private void Start()
     {
-        // Auto-find if missing
         if (playerHealth == null)
             playerHealth = FindFirstObjectByType<Health>();
 
         if (playerHealth != null)
-            totalhealthBar.fillAmount = playerHealth.currentHealth / 3;
+            totalhealthBar.fillAmount = playerHealth.currentHealth / playerHealth.MaxHealth;
     }
 
     private void Update()
     {
         if (playerHealth != null)
-            currenthealthBar.fillAmount = playerHealth.currentHealth / 3;
+            currenthealthBar.fillAmount = playerHealth.currentHealth / playerHealth.MaxHealth;
     }
 }

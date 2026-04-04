@@ -1278,8 +1278,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterManager
   playerPrefabs:
-  - {fileID: 5536329845775654271, guid: 876ccb7512133544e82e544c241ac2c4, type: 3}
   - {fileID: 5963178899783550497, guid: 577e1bd8d75c0a648be516ea4b64a3e2, type: 3}
+  - {fileID: 5536329845775654271, guid: 876ccb7512133544e82e544c241ac2c4, type: 3}
   spawnPoint: {fileID: 271092032}
   healthBar: {fileID: 27520355}
   staminaBar: {fileID: 2031141652}
@@ -2777,7 +2777,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &668477922
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2881,6 +2881,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameOverScreen: {fileID: 1840033165}
   gameOverSound: {fileID: 8300000, guid: 363a938ca73b3584db2b4669a1d37e27, type: 3}
+  disableGameOver: 1
   pauseScreen: {fileID: 555522150}
 --- !u!1 &678272992
 GameObject:
@@ -4812,7 +4813,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c41bea398ac4454a86235c3719f6203, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RestartManager
-  deathResetDelay: 2
+  delay: 2
   bossSpawnPoint: {fileID: 1314204303}
   playerSpawnPoint: {fileID: 271092032}
 --- !u!1 &1217151907
@@ -6417,7 +6418,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1422196740
 Transform:
   m_ObjectHideFlags: 0
@@ -7657,7 +7658,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1840033166
 RectTransform:
   m_ObjectHideFlags: 0
