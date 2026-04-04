@@ -19,10 +19,10 @@ behaviors:
       num_epoch: 3        # passes over the buffer per update
 
     network_settings:
-      # 2 hidden layers of 128 neurons each — appropriate for 15 observations
+      # 2 hidden layers of 128 — 15 obs: health(3) + feasibility(3) + raw PlayerProfile(9)
       num_layers: 2
       hidden_units: 128
-      normalize: true     # observations are 0-1 range but normalize helps with reward scaling
+      normalize: true
 
     reward_signals:
       extrinsic:

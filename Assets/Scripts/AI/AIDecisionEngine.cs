@@ -312,21 +312,20 @@ public class AIDecisionEngine : MonoBehaviour
         float damageDealt = playerHealthAtActionStart - playerHealthNow;
         float damageTaken = bossHealthAtActionStart   - bossHealthNow;
 
-        // Reward table:
-        //   Hit + safe    = +1.0   Hit + got hit = +0.7
-        //   Miss + safe   = -0.2   Miss + got hit = -0.5
-        float reward = (damageDealt > 0f ? 1f : -0.2f) + (damageTaken > 0f ? -0.3f : 0f);
+        // Reward for weighted brain: binary hit/miss table
+        float weightedReward = (damageDealt > 0f ? 1f : -0.2f) + (damageTaken > 0f ? -0.3f : 0f);
+        weightedBrain.UpdateWeight(action, styleAtActionStart, weightedReward);
 
-        // ---- Feed reward to Layer 3 weighted brain ----
-        weightedBrain.UpdateWeight(action, styleAtActionStart, reward);
+        // Reward for ML brain: +1 per full-HP dealt, −1 per full-HP taken
+        float playerMax = playerHealth != null ? playerHealth.MaxHealth : 1f;
+        float bossMax   = bossHealth   != null ? bossHealth.MaxHealth   : 1f;
+        mlBrain?.ReceiveActionOutcome(damageDealt / playerMax, damageTaken / bossMax);
 
-        // ---- Feed reward + episode endings to Layer 2 ML brain ----
-        mlBrain?.ReceiveReward(reward);
         if (playerHealthNow <= 0f) mlBrain?.OnFightWon();
         if (bossHealthNow   <= 0f) mlBrain?.OnFightLost();
 
         if (DebugMode)
-            Debug.Log($"[AIEngine] Action completed: {action} | Dealt={damageDealt:F0} Taken={damageTaken:F0} → reward={reward:F2}");
+            Debug.Log($"[AIEngine] Action completed: {action} | Dealt={damageDealt:F0} Taken={damageTaken:F0} → wReward={weightedReward:F2}");
     }
 
     // =========================================================
