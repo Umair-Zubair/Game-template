@@ -4,47 +4,44 @@ using System.Collections.Generic;
 
 /// <summary>
 /// Three-layer AI Decision Engine for boss action selection.
-/// Implements SDS Algorithm 1: Decision Selector Logic.
 ///
-///   Layer 1: HeuristicBrain        — critical rule overrides, always first
-///   Layer 2: MLBrain               — neural network, wins if confidence >= mlConfidenceThreshold
-///   Layer 3: WeightedStrategyBrain — EMA weight fallback when ML absent or uncertain
+///   Layer 1 (L1): HeuristicBrain        — critical rule overrides
+///   Layer 2 (L2): MLBrain               — neural network inference
+///   Layer 3 (L3): WeightedStrategyBrain — EMA weight fallback
 ///
-/// Also owns the FairnessGuardian safety net and outcome tracking.
-///
-/// Attach to: Boss GameObject (same one with BossController + VoidbornAdaptationManager).
+/// isTrainingMode = true  → bypass cascade, return mlBrain.Evaluate() directly.
+/// isTrainingMode = false → run cascade with per-layer enable toggles.
 /// </summary>
 public class AIDecisionEngine : MonoBehaviour
 {
+    // ── Inspector ──────────────────────────────────────────────
+    [Header("Mode")]
+    [Tooltip("True during mlagents-learn. ML owns every decision, no cascade.")]
+    public bool isTrainingMode;
+
+    [Header("Layer Toggles (ignored in training mode)")]
+    public bool enableL1 = true;
+    public bool enableL2 = true;
+    public bool enableL3 = true;
+
     [Header("Decision Engine Settings")]
-    [Tooltip("How often (seconds) to re-evaluate the optimal action.")]
     [SerializeField] private float evaluationInterval = 0.3f;
-
-    [Tooltip("Confidence threshold for Layer 3 weighted brain (θ = 0.4).")]
     [SerializeField] private float confidenceThreshold = 0.4f;
-
-    [Tooltip("Save/load weighted brain data between sessions.")]
-    [SerializeField] private bool persistWeights = true;
+    [SerializeField] private bool  persistWeights = true;
 
     [Header("ML Brain")]
-    [Tooltip("Drag the VoidbornGoddess GameObject here (it has MLBrain on it).")]
     [SerializeField] private MLBrain mlBrain;
-
-    [Tooltip("ML wins decisions when its confidence >= this. " +
-             "Set to 1.1 during development (ML never wins). Drop to 0.6 after training.")]
     [SerializeField] private float mlConfidenceThreshold = 1.1f;
 
     [Header("Debug")]
     public bool DebugMode = true;
 
-    // ---- Decision Modules ----
+    // ── Modules ────────────────────────────────────────────────
     private HeuristicBrain heuristicBrain;
     private WeightedStrategyBrain weightedBrain;
-
-    // ---- Safety Net ----
     private FairnessGuardian fairnessGuardian;
 
-    // ---- References ----
+    // ── References ─────────────────────────────────────────────
     private BossController bossController;
     private VoidbornGoddessController goddess;
     private VoidbornAdaptationManager adaptationManager;
@@ -52,58 +49,11 @@ public class AIDecisionEngine : MonoBehaviour
     private Health bossHealth;
     private Health playerHealth;
 
-    // ---- State ----
+    // ── State ──────────────────────────────────────────────────
     private float evaluationTimer;
     private bool _prevFairnessActive;
-    private bool playerDeathSubscribed;
 
-    // =========================================================
-    // Public API
-    // =========================================================
-
-    public BossDecision CurrentDecision { get; private set; }
-    public GameContext  CurrentContext  { get; private set; }
-
-    public string ActiveLayer          => CurrentDecision.source ?? "None";
-    public bool   IsFairnessActive     => fairnessGuardian?.IsRelaxationActive ?? false;
-    public float  FairnessCooldownMultiplier => fairnessGuardian?.CooldownMultiplier ?? 1f;
-
-    // ---- ML Brain public state (for debug HUD) ----
-    public bool  MLBrainActive => mlBrain != null && mlBrain.IsModelLoaded;
-    public float MLConfidence  { get; private set; }
-
-    // ---- Decision counters (for AISessionLogger) ----
-    public int   TotalDecisions    { get; private set; }
-    public float ConfidenceSum     { get; private set; }
-    public int   LowConfidenceCount{ get; private set; }
-    public int   L1DecisionCount   { get; private set; }  // Heuristic
-    public int   L2DecisionCount   { get; private set; }  // MLBrain
-    public int   L3DecisionCount   { get; private set; }  // Weighted
-
-    // ---- Events ----
-    public event System.Action<BossDecision>          OnDecisionChanged;
-    public event System.Action                         OnFairnessActivated;
-    public event System.Action<GameContext,BossDecision> OnDecisionEvaluated;
-
-    public Dictionary<BossActionType, float> GetWeightsForStyle(PlayerStyle style)
-        => weightedBrain?.GetWeightsForStyle(style);
-
-    /// <summary>
-    /// Resets transient per-episode state so the next ML-Agents episode starts clean.
-    /// Persistent data (weighted brain, decision counters) is intentionally kept across episodes.
-    /// </summary>
-    public void ResetForNewEpisode()
-    {
-        evaluationTimer     = 0f;
-        trackingOutcome     = false;
-        _prevFairnessActive = false;
-        CurrentDecision     = BossDecision.Default;
-
-        fairnessGuardian?.Reset();
-        FindPlayerReferences();
-    }
-
-    // ---- Outcome tracking ----
+    // ── Outcome tracking ───────────────────────────────────────
     private BossActionType lastActionTaken = BossActionType.None;
     private float bossHealthAtActionStart;
     private float playerHealthAtActionStart;
@@ -112,10 +62,42 @@ public class AIDecisionEngine : MonoBehaviour
 
     private string SavePath => Path.Combine(Application.persistentDataPath, "boss_ai_weights.json");
 
-    // =========================================================
-    // Unity Lifecycle
-    // =========================================================
+    // ── Public API ─────────────────────────────────────────────
+    public BossDecision CurrentDecision { get; private set; }
+    public GameContext  CurrentContext  { get; private set; }
 
+    public string ActiveLayer          => CurrentDecision.source ?? "None";
+    public bool   IsFairnessActive     => fairnessGuardian?.IsRelaxationActive ?? false;
+    public float  FairnessCooldownMultiplier => fairnessGuardian?.CooldownMultiplier ?? 1f;
+
+    public bool  MLBrainActive => mlBrain != null && mlBrain.IsModelLoaded;
+    public float MLConfidence  { get; private set; }
+
+    public int   TotalDecisions    { get; private set; }
+    public float ConfidenceSum     { get; private set; }
+    public int   LowConfidenceCount{ get; private set; }
+    public int   L1DecisionCount   { get; private set; }
+    public int   L2DecisionCount   { get; private set; }
+    public int   L3DecisionCount   { get; private set; }
+
+    public event System.Action<BossDecision>            OnDecisionChanged;
+    public event System.Action                           OnFairnessActivated;
+    public event System.Action<GameContext, BossDecision> OnDecisionEvaluated;
+
+    public Dictionary<BossActionType, float> GetWeightsForStyle(PlayerStyle style)
+        => weightedBrain?.GetWeightsForStyle(style);
+
+    public void ResetForNewEpisode()
+    {
+        evaluationTimer     = 0f;
+        trackingOutcome     = false;
+        _prevFairnessActive = false;
+        CurrentDecision     = BossDecision.Default;
+        fairnessGuardian?.Reset();
+        FindPlayerReferences();
+    }
+
+    // ── Unity Lifecycle ────────────────────────────────────────
     private void Awake()
     {
         bossController    = GetComponent<BossController>();
@@ -126,17 +108,12 @@ public class AIDecisionEngine : MonoBehaviour
         heuristicBrain   = new HeuristicBrain();
         weightedBrain    = new WeightedStrategyBrain();
         fairnessGuardian = new FairnessGuardian();
-
         CurrentDecision  = BossDecision.Default;
     }
 
     private void Start()
     {
         FindPlayerReferences();
-
-        if (bossController != null)
-            bossController.OnDied += HandleBossDiedForML;
-
         if (persistWeights) LoadWeights();
     }
 
@@ -147,18 +124,18 @@ public class AIDecisionEngine : MonoBehaviour
 
         evaluationTimer += Time.deltaTime;
         if (evaluationTimer < evaluationInterval) return;
-
         evaluationTimer = 0f;
-        CurrentContext  = BuildContext();
 
-        fairnessGuardian.Evaluate(
-            CurrentContext.bossHealthNormalized,
-            CurrentContext.playerHealthNormalized);
+        CurrentContext = BuildContext();
+
+        if (!isTrainingMode)
+            fairnessGuardian.Evaluate(CurrentContext.bossHealthNormalized,
+                                      CurrentContext.playerHealthNormalized);
 
         BossDecision previous = CurrentDecision;
-        CurrentDecision = RunDecisionCascade(CurrentContext);
+        CurrentDecision = isTrainingMode ? RunTrainingMode(CurrentContext)
+                                         : RunDecisionCascade(CurrentContext);
 
-        // ---- Update counters ----
         TotalDecisions++;
         ConfidenceSum += CurrentDecision.confidence;
         if (CurrentDecision.confidence < confidenceThreshold) LowConfidenceCount++;
@@ -170,7 +147,6 @@ public class AIDecisionEngine : MonoBehaviour
             else if (CurrentDecision.source.StartsWith("Weighted"))  L3DecisionCount++;
         }
 
-        // ---- Fairness event ----
         bool fairNow = fairnessGuardian?.IsRelaxationActive ?? false;
         if (fairNow && !_prevFairnessActive) OnFairnessActivated?.Invoke();
         _prevFairnessActive = fairNow;
@@ -182,34 +158,38 @@ public class AIDecisionEngine : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (bossController != null)
-            bossController.OnDied -= HandleBossDiedForML;
-        if (playerHealth != null && playerDeathSubscribed)
-            playerHealth.OnDamageTaken -= HandlePlayerDamagedForML;
-
         if (persistWeights) SaveWeights();
     }
 
-    // =========================================================
-    // Three-Layer Decision Cascade
-    // =========================================================
+    // ── Training Mode (ML owns everything) ─────────────────────
+    private BossDecision RunTrainingMode(GameContext ctx)
+    {
+        if (mlBrain == null) return BossDecision.Default;
+        mlBrain.CurrentContext = ctx;
+        BossDecision ml = mlBrain.Evaluate(ctx);
+        MLConfidence = ml.confidence;
+        return ml;
+    }
 
+    // ── Normal Cascade (with layer toggles) ────────────────────
     private BossDecision RunDecisionCascade(GameContext ctx)
     {
-        // ---- Layer 1: Heuristic critical overrides ----
-        BossDecision heuristic = heuristicBrain.Evaluate(ctx);
-        if (heuristic.isCriticalOverride)
+        BossDecision heuristic = BossDecision.Default;
+
+        // L1: Heuristic critical overrides
+        if (enableL1)
         {
-            var final1 = fairnessGuardian.ApplyOverride(heuristic);
-            if (DebugMode && final1.action != CurrentDecision.action)
-                Debug.Log($"[AIEngine] L1 OVERRIDE → {final1.action} (conf={final1.confidence:F2})");
-            return final1;
+            heuristic = heuristicBrain.Evaluate(ctx);
+            if (heuristic.isCriticalOverride)
+            {
+                var f = fairnessGuardian.ApplyOverride(heuristic);
+                if (DebugMode) Debug.Log($"[AIEngine] L1 OVERRIDE → {f.action}");
+                return f;
+            }
         }
 
-        // ---- Layer 2: ML Brain ----
-        // mlConfidenceThreshold defaults to 1.1 so ML never wins until
-        // you lower it to 0.6 after training a model and assigning the .onnx
-        if (mlBrain != null && mlBrain.IsModelLoaded)
+        // L2: ML Brain
+        if (enableL2 && mlBrain != null && mlBrain.IsModelLoaded)
         {
             mlBrain.CurrentContext = ctx;
             BossDecision ml = mlBrain.Evaluate(ctx);
@@ -217,46 +197,39 @@ public class AIDecisionEngine : MonoBehaviour
 
             if (ml.confidence >= mlConfidenceThreshold)
             {
-                var finalML = fairnessGuardian.ApplyOverride(ml);
-                if (DebugMode && finalML.action != CurrentDecision.action)
-                    Debug.Log($"[AIEngine] L2 ML → {finalML.action} (conf={finalML.confidence:F2})");
-                return finalML;
+                var f = fairnessGuardian.ApplyOverride(ml);
+                if (DebugMode) Debug.Log($"[AIEngine] L2 ML → {f.action} (conf={ml.confidence:F2})");
+                return f;
             }
-
-            if (DebugMode)
-                Debug.Log($"[AIEngine] ML conf {ml.confidence:F2} < threshold {mlConfidenceThreshold:F2} — falling to L3");
         }
 
-        // ---- Layer 3: Weighted strategy fallback ----
-        BossDecision weighted = weightedBrain.Evaluate(ctx);
-        if (weighted.confidence > confidenceThreshold)
+        // L3: Weighted strategy
+        if (enableL3)
         {
-            var final3 = fairnessGuardian.ApplyOverride(weighted);
-            if (DebugMode && final3.action != CurrentDecision.action)
-                Debug.Log($"[AIEngine] L3 Weighted → {final3.action} (conf={final3.confidence:F2})");
-            return final3;
+            BossDecision w = weightedBrain.Evaluate(ctx);
+            if (w.confidence > confidenceThreshold)
+            {
+                var f = fairnessGuardian.ApplyOverride(w);
+                if (DebugMode) Debug.Log($"[AIEngine] L3 Weighted → {f.action} (conf={w.confidence:F2})");
+                return f;
+            }
         }
 
-        // ---- Fallback: heuristic recommendation ----
-        var fallback = fairnessGuardian.ApplyOverride(heuristic);
-        if (DebugMode && fallback.action != CurrentDecision.action)
-            Debug.Log($"[AIEngine] Fallback heuristic → {fallback.action}");
+        // Fallback
+        var fallback = fairnessGuardian.ApplyOverride(
+            enableL1 ? heuristic : BossDecision.Default);
+        if (DebugMode) Debug.Log($"[AIEngine] Fallback → {fallback.action}");
         return fallback;
     }
 
-    // =========================================================
-    // Context Building
-    // =========================================================
-
+    // ── Context Building ───────────────────────────────────────
     private GameContext BuildContext()
     {
-        PlayerProfile playerProfile = tracker != null ? tracker.Profile : new PlayerProfile();
+        PlayerProfile pp = tracker != null ? tracker.Profile : new PlayerProfile();
         PlayerStyle style = adaptationManager != null
             ? adaptationManager.CurrentStyle : PlayerStyle.Balanced;
 
         AdaptationProfile profile = bossController.ActiveProfile;
-        float artilleryBonus = profile?.artilleryPriorityBonus ?? 0f;
-        float dashBonus      = profile?.dashPriorityBonus ?? 0f;
 
         float bossHP = 1f;
         if (bossHealth != null && bossHealth.MaxHealth > 0f)
@@ -272,20 +245,18 @@ public class AIDecisionEngine : MonoBehaviour
             playerHealthNormalized   = playerHP,
             distanceToPlayer         = bossController.GetDistanceToPlayer(),
             canMeleeAttack           = goddess != null && goddess.CanAttack,
-            canUseArtillery          = goddess != null && goddess.CanUseArtillery && !fairnessGuardian.BlockArtillery,
+            canUseArtillery          = goddess != null && goddess.CanUseArtillery
+                                       && !fairnessGuardian.BlockArtillery,
             isPlayerInAttackRange    = bossController.PlayerInAttackRange(),
             isPlayerInDetectionRange = bossController.PlayerInDetectionRange(),
-            playerProfile            = playerProfile,
+            playerProfile            = pp,
             currentPlayerStyle       = style,
-            artilleryPriorityBonus   = artilleryBonus,
-            dashPriorityBonus        = dashBonus,
+            artilleryPriorityBonus   = profile?.artilleryPriorityBonus ?? 0f,
+            dashPriorityBonus        = profile?.dashPriorityBonus ?? 0f,
         };
     }
 
-    // =========================================================
-    // Outcome Tracking
-    // =========================================================
-
+    // ── Outcome Tracking ───────────────────────────────────────
     public void OnBossActionStarted(BossActionType action)
     {
         lastActionTaken           = action;
@@ -296,9 +267,6 @@ public class AIDecisionEngine : MonoBehaviour
         trackingOutcome = true;
 
         AISessionLogger.Instance?.RecordAction(action, CurrentDecision.source);
-
-        if (DebugMode)
-            Debug.Log($"[AIEngine] Action started: {action} | BossHP={bossHealthAtActionStart:F0} PlayerHP={playerHealthAtActionStart:F0}");
     }
 
     public void OnBossActionCompleted(BossActionType action)
@@ -306,32 +274,24 @@ public class AIDecisionEngine : MonoBehaviour
         if (!trackingOutcome || action != lastActionTaken) return;
         trackingOutcome = false;
 
-        float bossHealthNow   = bossHealth   != null ? bossHealth.currentHealth   : 0f;
-        float playerHealthNow = playerHealth != null ? playerHealth.currentHealth : 0f;
+        float bossNow   = bossHealth   != null ? bossHealth.currentHealth   : 0f;
+        float playerNow = playerHealth != null ? playerHealth.currentHealth : 0f;
 
-        float damageDealt = playerHealthAtActionStart - playerHealthNow;
-        float damageTaken = bossHealthAtActionStart   - bossHealthNow;
+        float dealt = playerHealthAtActionStart - playerNow;
+        float taken = bossHealthAtActionStart   - bossNow;
 
-        // Reward for weighted brain: binary hit/miss table
-        float weightedReward = (damageDealt > 0f ? 1f : -0.2f) + (damageTaken > 0f ? -0.3f : 0f);
-        weightedBrain.UpdateWeight(action, styleAtActionStart, weightedReward);
+        float wReward = (dealt > 0f ? 1f : -0.2f) + (taken > 0f ? -0.3f : 0f);
+        weightedBrain.UpdateWeight(action, styleAtActionStart, wReward);
 
-        // Reward for ML brain: +1 per full-HP dealt, −1 per full-HP taken
-        float playerMax = playerHealth != null ? playerHealth.MaxHealth : 1f;
-        float bossMax   = bossHealth   != null ? bossHealth.MaxHealth   : 1f;
-        mlBrain?.ReceiveActionOutcome(damageDealt / playerMax, damageTaken / bossMax);
-
-        if (playerHealthNow <= 0f) mlBrain?.OnFightWon();
-        if (bossHealthNow   <= 0f) mlBrain?.OnFightLost();
+        float pMax = playerHealth != null ? playerHealth.MaxHealth : 1f;
+        float bMax = bossHealth   != null ? bossHealth.MaxHealth   : 1f;
+        mlBrain?.ReceiveActionOutcome(dealt / pMax, taken / bMax);
 
         if (DebugMode)
-            Debug.Log($"[AIEngine] Action completed: {action} | Dealt={damageDealt:F0} Taken={damageTaken:F0} → wReward={weightedReward:F2}");
+            Debug.Log($"[AIEngine] {action} done | dealt={dealt:F0} taken={taken:F0} wR={wReward:F2}");
     }
 
-    // =========================================================
-    // Helpers
-    // =========================================================
-
+    // ── Helpers ────────────────────────────────────────────────
     private void FindPlayerReferences()
     {
         if (tracker == null)
@@ -339,65 +299,30 @@ public class AIDecisionEngine : MonoBehaviour
 
         if (playerHealth == null)
         {
-            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-            if (playerObj != null)
-                playerHealth = playerObj.GetComponent<Health>();
-        }
-
-        if (playerHealth != null && !playerDeathSubscribed)
-        {
-            playerHealth.OnDamageTaken += HandlePlayerDamagedForML;
-            playerDeathSubscribed = true;
+            var obj = GameObject.FindGameObjectWithTag("Player");
+            if (obj != null) playerHealth = obj.GetComponent<Health>();
         }
     }
 
-    // =========================================================
-    // ML Episode — death event handlers
-    // =========================================================
-
-    private void HandleBossDiedForML()
-    {
-        mlBrain?.OnFightLost();
-    }
-
-    private void HandlePlayerDamagedForML(float damage)
-    {
-        if (playerHealth != null && playerHealth.currentHealth <= 0f)
-            mlBrain?.OnFightWon();
-    }
-
-    // =========================================================
-    // Persistence
-    // =========================================================
-
+    // ── Persistence ────────────────────────────────────────────
     private void SaveWeights()
     {
         try
         {
-            string json = weightedBrain.SerializeWeights();
-            File.WriteAllText(SavePath, json);
-            if (DebugMode) Debug.Log($"[AIEngine] Weights saved to {SavePath}");
+            File.WriteAllText(SavePath, weightedBrain.SerializeWeights());
+            if (DebugMode) Debug.Log($"[AIEngine] Weights saved.");
         }
-        catch (System.Exception e)
-        {
-            Debug.LogWarning($"[AIEngine] Failed to save weights: {e.Message}");
-        }
+        catch (System.Exception e) { Debug.LogWarning($"[AIEngine] Save failed: {e.Message}"); }
     }
 
     private void LoadWeights()
     {
         try
         {
-            if (File.Exists(SavePath))
-            {
-                string json = File.ReadAllText(SavePath);
-                weightedBrain.DeserializeWeights(json);
-                if (DebugMode) Debug.Log($"[AIEngine] Weights loaded from {SavePath}");
-            }
+            if (!File.Exists(SavePath)) return;
+            weightedBrain.DeserializeWeights(File.ReadAllText(SavePath));
+            if (DebugMode) Debug.Log($"[AIEngine] Weights loaded.");
         }
-        catch (System.Exception e)
-        {
-            Debug.LogWarning($"[AIEngine] Failed to load weights: {e.Message}");
-        }
+        catch (System.Exception e) { Debug.LogWarning($"[AIEngine] Load failed: {e.Message}"); }
     }
 }

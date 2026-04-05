@@ -6,12 +6,9 @@ using UnityEngine;
 
 /// <summary>
 /// Layer 2: ML-Agents neural network brain.
-/// Observes only raw PlayerProfile metrics + health + feasibility flags.
-/// The network must implicitly learn to classify player behavior from
-/// raw data to maximize net damage (dealt − taken).
-///
-/// Observation space: 15 floats.  Action space: 1 discrete branch, size 3.
-/// Set BehaviorParameters → Space Size = 15, Branches = {3}.
+/// Observations: normalized PlayerProfile floats + health + feasibility (13 total).
+/// Actions: 1 discrete branch, size 3 (Chase / Melee / Artillery).
+/// Set BehaviorParameters → Space Size = 13, Branches = {3}.
 /// </summary>
 public class MLBrain : Agent, IBossDecisionModule
 {
@@ -53,23 +50,22 @@ public class MLBrain : Agent, IBossDecisionModule
         restartManager    = FindFirstObjectByType<RestartManager>();
     }
 
-    // ═══════════════════════════════════════════
-    // Episode lifecycle
-    // ═══════════════════════════════════════════
+    // ── Episode lifecycle ──────────────────────────────────────
 
     public override void OnEpisodeBegin()
     {
         AISessionLogger.Instance?.EndFight(false);
         AIDecisionLogger.Instance?.EndFight(false);
 
+        CancelDeathSequences();
+
         if (restartManager != null)
             restartManager.ResetEncounter();
         else
         {
-            var boss = GetComponent<BossController>();
-            boss?.Respawn(transform.position);
-            var player = FindFirstObjectByType<PlayerController>();
-            player?.Respawn(player.transform.position);
+            GetComponent<BossController>()?.Respawn(transform.position);
+            var p = FindFirstObjectByType<PlayerController>();
+            p?.Respawn(p.transform.position);
         }
 
         decisionEngine?.ResetForNewEpisode();
@@ -80,9 +76,7 @@ public class MLBrain : Agent, IBossDecisionModule
         lastDecision  = BossDecision.Default;
     }
 
-    // ═══════════════════════════════════════════
-    // Called by AIDecisionEngine each eval tick
-    // ═══════════════════════════════════════════
+    // ── Called by AIDecisionEngine each eval tick ───────────────
 
     public BossDecision Evaluate(GameContext ctx)
     {
@@ -102,9 +96,7 @@ public class MLBrain : Agent, IBossDecisionModule
         return lastDecision;
     }
 
-    // ═══════════════════════════════════════════
-    // Observations — 15 floats (raw metrics only)
-    // ═══════════════════════════════════════════
+    // ── Observations — 13 floats (raw metrics, no style enum) ──
 
     public override void CollectObservations(VectorSensor sensor)
     {
@@ -118,23 +110,18 @@ public class MLBrain : Agent, IBossDecisionModule
         sensor.AddObservation(CurrentContext.canMeleeAttack        ? 1f : 0f);
         sensor.AddObservation(CurrentContext.canUseArtillery       ? 1f : 0f);
 
-        // Raw PlayerProfile — the network learns style classification implicitly (9)
+        // Raw PlayerProfile — network learns style implicitly (7)
         PlayerProfile p = CurrentContext.playerProfile;
         sensor.AddObservation(Mathf.Clamp01(p.attackFrequency / 5f));
         sensor.AddObservation(p.meleeRatio);
-        // sensor.AddObservation(p.uppercutRatio);
         sensor.AddObservation(p.jumpAttackRatio);
         sensor.AddObservation(p.rangedRatio);
         sensor.AddObservation(Mathf.Clamp01(p.averageDistance / 20f));
         sensor.AddObservation(p.aggressionScore);
-        
-        
         sensor.AddObservation(Mathf.Clamp01(p.jumpFrequency / 3f));
     }
 
-    // ═══════════════════════════════════════════
-    // Actions — discrete branch size 3
-    // ═══════════════════════════════════════════
+    // ── Actions ────────────────────────────────────────────────
 
     public override void OnActionReceived(ActionBuffers actions)
     {
@@ -161,10 +148,7 @@ public class MLBrain : Agent, IBossDecisionModule
         actionsOut.DiscreteActions.Array[0] = 0;
     }
 
-    // ═══════════════════════════════════════════
-    // Rewards: +1 per HP-normalized damage dealt
-    //          −1 per HP-normalized damage taken
-    // ═══════════════════════════════════════════
+    // ── Rewards ────────────────────────────────────────────────
 
     public void ReceiveActionOutcome(float normalizedDealt, float normalizedTaken)
     {
@@ -189,10 +173,20 @@ public class MLBrain : Agent, IBossDecisionModule
         EndEpisode();
     }
 
+    public void ForceEndEpisode()
+    {
+        if (episodeEnding) return;
+        episodeEnding = true;
+        CancelDeathSequences();
+        EndEpisode();
+    }
+
+    // ── Safety ─────────────────────────────────────────────────
+
     private void CancelDeathSequences()
     {
-        var bossHealth = GetComponent<Health>();
-        if (bossHealth != null) bossHealth.StopAllCoroutines();
+        var bh = GetComponent<Health>();
+        if (bh != null) bh.StopAllCoroutines();
 
         var playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)

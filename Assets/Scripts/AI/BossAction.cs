@@ -8,9 +8,11 @@ public enum BossActionType
     Chase,             // Move toward the player
     MeleeAttack,       // Transition to melee attack state
     ArtilleryAttack,   // Transition to artillery attack state
-    Retreat,           // Move away from player (future)
-    Dodge,             // Dodge player attack (future)
-    Dash               // Dash attack (future)
+
+    
+    // Retreat,           // Move away from player (future)
+    // Dodge,             // Dodge player attack (future)
+    // Dash               // Dash attack (future)
 }
 
 /// <summary>

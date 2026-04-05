@@ -19,7 +19,7 @@ behaviors:
       num_epoch: 3        # passes over the buffer per update
 
     network_settings:
-      # 2 hidden layers of 128 — 15 obs: health(3) + feasibility(3) + raw PlayerProfile(9)
+      # 2 hidden layers of 128 — 13 obs: health(3) + feasibility(3) + raw PlayerProfile(7)
       num_layers: 2
       hidden_units: 128
       normalize: true
@@ -32,7 +32,7 @@ behaviors:
     # ---- Episode and logging settings ----
     # 500000 steps at ~12 decisions/sec = ~11 hours of real fight time
     # raise to 2000000 for a well-trained model
-    max_steps: 5000
+    max_steps: 500000
 
 
     # How many steps of experience each episode contributes before cut off

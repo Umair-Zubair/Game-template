@@ -22,6 +22,11 @@
 # Evaluations generated after each run
 [Aa]ssets/Evaluation
 
+
+venv/
+
+results/
+
 # Visual Studio cache directory
 .vs/
 
