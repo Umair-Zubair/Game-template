@@ -3,57 +3,33 @@ using UnityEngine;
 // ============================================================================
 // HUNTER BALANCED FSM
 //
-// Profile: Controlled mid-range shooter. Finds a sweet spot (4–5f), fires
-// short 2-shot bursts, slides back after each burst, occasionally jumps for
-// aerial shots, and re-engages once 50% ammo has reloaded.
+// Positions at mid range, briefly aims before firing a random-sized burst
+// (1-3 shots), slides back, waits for partial reload. Nothing is perfectly
+// timed — burst size, shot intervals, and slide duration all vary each cycle.
 //
-// Compared to other Hunter profiles:
-//   AGGRESSIVE   Range 3f | advances during reload | 50% air shots | retreat at 0.8f | threshold 12f
-//   BALANCED     Range 4.5f | partial reload wait   | 30% air shots | retreat at 2f  | threshold 35%
-//   DEFENSIVE    Range 7f  | full reload wait       | 70% air shots | retreat at 4f  | threshold 55%
-//
-// States: FindRange → Shoot / JumpShoot → SlideBack → FindRange (or WaitAmmo)
+// States: FindRange → Aim → Shoot / JumpShoot → SlideBack → FindRange / WaitAmmo
 // ============================================================================
 public class HunterBalancedFSM : PlayerFSMController
 {
     [Header("Hunter Balanced — Tuning")]
-    [Tooltip("Ideal shooting distance.")]
-    [SerializeField] private float preferredRange = 4.5f;
-
-    [Tooltip("Acceptable band around preferredRange before the bot repositions.")]
-    [SerializeField] private float rangeTolerance = 0.8f;
-
-    [Tooltip("Distance that triggers a moderate retreat.")]
+    [SerializeField] private float preferredRange        = 4.5f;
+    [SerializeField] private float rangeTolerance        = 0.8f;
     [SerializeField] private float retreatTriggerDistance = 2.0f;
-
-    [Tooltip("Number of shots per burst before the bot slides back.")]
-    [SerializeField] private int shotsPerBurst = 2;
-
-    [Tooltip("Delay between shots within a burst (seconds).")]
-    [SerializeField] private float burstShotInterval = 0.15f;
-
-    [Tooltip("Stamina ratio (0–1) required before engaging.")]
     [SerializeField] private float staminaThresholdRatio = 0.35f;
+    [SerializeField] private float reloadThresholdRatio  = 0.50f;
+    [SerializeField] private float jumpShootChance       = 0.30f;
 
-    [Tooltip("Ammo ratio (0–1) required to re-engage after sliding back.")]
-    [SerializeField] private float reloadThresholdRatio = 0.50f;
-
-    [Tooltip("Probability (0–1) of a jump-shot instead of a ground shot.")]
-    [SerializeField] private float jumpShootChance = 0.30f;
-
-    [Tooltip("How long the bot slides away after a burst.")]
-    [SerializeField] private float slideBackDuration = 0.40f;
-
-    // ── State Instances ────────────────────────────────────────────────────
-    public HB_FindRange  FindRangeState  { get; private set; }
-    public HB_Shoot      ShootState      { get; private set; }
-    public HB_JumpShoot  JumpShootState  { get; private set; }
-    public HB_SlideBack  SlideBackState  { get; private set; }
-    public HB_WaitAmmo   WaitAmmoState   { get; private set; }
+    public HB_FindRange FindRangeState { get; private set; }
+    public HB_Aim       AimState       { get; private set; }
+    public HB_Shoot     ShootState     { get; private set; }
+    public HB_JumpShoot JumpShootState { get; private set; }
+    public HB_SlideBack SlideBackState { get; private set; }
+    public HB_WaitAmmo  WaitAmmoState  { get; private set; }
 
     protected override void InitializeStates()
     {
         FindRangeState = new HB_FindRange();
+        AimState       = new HB_Aim();
         ShootState     = new HB_Shoot();
         JumpShootState = new HB_JumpShoot();
         SlideBackState = new HB_SlideBack();
@@ -63,9 +39,8 @@ public class HunterBalancedFSM : PlayerFSMController
     protected override void StartFSM() => FSM.Initialize(FindRangeState, this);
 
     // ==========================================================================
-    // FIND RANGE STATE
-    // Adjusts position to maintain the preferred distance band.
-    // Picks an attack type when in range and ready.
+    // FIND RANGE — Adjusts position to the preferred band. Once in range and
+    // ready, transitions to Aim rather than shooting instantly.
     // ==========================================================================
     public class HB_FindRange : IPlayerFSMState
     {
@@ -78,45 +53,21 @@ public class HunterBalancedFSM : PlayerFSMController
 
             ctrl.FaceTarget();
 
-            // Moderate retreat if boss too close
-            if (dist < hb.retreatTriggerDistance)
-            {
-                ctrl.MoveAway();
-                return;
-            }
+            if (dist < hb.retreatTriggerDistance) { ctrl.MoveAway(); return; }
 
-            // No ammo → wait for partial reload
-            bool hasAmmo = hb.RangedAttack != null
-                        && hb.RangedAttack.CurrentAmmo > 0
-                        && !hb.RangedAttack.IsReloading;
-            if (!hasAmmo)
-            {
-                hb.FSM.ChangeState(hb.WaitAmmoState, ctrl);
-                return;
-            }
+            bool hasAmmo = hb.RangedAttack != null && hb.RangedAttack.CurrentAmmo > 0 && !hb.RangedAttack.IsReloading;
+            if (!hasAmmo) { hb.FSM.ChangeState(hb.WaitAmmoState, ctrl); return; }
 
-            float minRange = hb.preferredRange - hb.rangeTolerance;
-            float maxRange = hb.preferredRange + hb.rangeTolerance;
+            float min = hb.preferredRange - hb.rangeTolerance;
+            float max = hb.preferredRange + hb.rangeTolerance;
 
-            if (dist < minRange)
-            {
-                ctrl.MoveAway();
-            }
-            else if (dist > maxRange)
-            {
-                ctrl.MoveTowardAt(0.70f);
-            }
+            if      (dist < min) ctrl.MoveAway();
+            else if (dist > max) ctrl.MoveTowardAt(0.70f);
             else
             {
                 ctrl.StopMoving();
-
-                if (ctrl.StaminaRatio() < hb.staminaThresholdRatio) return;
-
-                // 30% chance of jump-shot; only when grounded
-                bool doJumpShot = ctrl.IsGrounded() && Random.value < hb.jumpShootChance;
-                hb.FSM.ChangeState(
-                    doJumpShot ? (IPlayerFSMState)hb.JumpShootState : hb.ShootState,
-                    ctrl);
+                if (ctrl.StaminaRatio() >= hb.staminaThresholdRatio)
+                    hb.FSM.ChangeState(hb.AimState, ctrl);
             }
         }
 
@@ -124,13 +75,49 @@ public class HunterBalancedFSM : PlayerFSMController
     }
 
     // ==========================================================================
-    // SHOOT STATE
-    // Fires a burst of shotsPerBurst shots with burstShotInterval spacing,
-    // then slides back. This burst-and-retreat rhythm is the defining visual
-    // behaviour of the Balanced profile.
+    // AIM — Brief stop before the burst. Decides whether to jump-shoot.
+    // The random duration (0.15-0.45s) means the "aim time" varies each burst.
+    // ==========================================================================
+    public class HB_Aim : IPlayerFSMState
+    {
+        private float timer;
+        private bool  willJump;
+
+        public void OnEnter(PlayerFSMController ctrl)
+        {
+            var hb = (HunterBalancedFSM)ctrl;
+            ctrl.StopMoving();
+            ctrl.FaceTarget();
+            timer    = Random.Range(0.15f, 0.45f);
+            willJump = ctrl.IsGrounded() && Random.value < hb.jumpShootChance;
+        }
+
+        public void OnUpdate(PlayerFSMController ctrl)
+        {
+            var hb = (HunterBalancedFSM)ctrl;
+            ctrl.FaceTarget();
+
+            if (ctrl.DistanceToTarget() < hb.retreatTriggerDistance)
+            {
+                hb.FSM.ChangeState(hb.SlideBackState, ctrl);
+                return;
+            }
+
+            timer -= Time.deltaTime;
+            if (timer <= 0f)
+                hb.FSM.ChangeState(willJump ? (IPlayerFSMState)hb.JumpShootState : hb.ShootState, ctrl);
+        }
+
+        public void OnExit(PlayerFSMController ctrl) { }
+    }
+
+    // ==========================================================================
+    // SHOOT — Random burst size (1-3 shots), random interval between shots.
+    // Each engagement has a different rhythm because of this.
     // ==========================================================================
     public class HB_Shoot : IPlayerFSMState
     {
+        private int   targetBurst;
         private int   shotsFired;
         private float shotTimer;
 
@@ -138,9 +125,10 @@ public class HunterBalancedFSM : PlayerFSMController
         {
             ctrl.StopMoving();
             ctrl.FaceTarget();
-            shotsFired = 0;
-            shotTimer  = 0f;
-            ctrl.RequestAttack(); // first shot immediately
+            targetBurst = Random.Range(1, 4); // 1, 2, or 3 shots
+            shotsFired  = 0;
+            shotTimer   = 0f;
+            ctrl.RequestAttack();
             shotsFired++;
         }
 
@@ -149,21 +137,12 @@ public class HunterBalancedFSM : PlayerFSMController
             var hb = (HunterBalancedFSM)ctrl;
             ctrl.FaceTarget();
 
-            // Moderate retreat override
-            if (ctrl.DistanceToTarget() < hb.retreatTriggerDistance)
+            if (ctrl.DistanceToTarget() < hb.retreatTriggerDistance || shotsFired >= targetBurst)
             {
                 hb.FSM.ChangeState(hb.SlideBackState, ctrl);
                 return;
             }
 
-            // Burst complete → slide back
-            if (shotsFired >= hb.shotsPerBurst)
-            {
-                hb.FSM.ChangeState(hb.SlideBackState, ctrl);
-                return;
-            }
-
-            // Continue burst with spacing
             shotTimer -= Time.deltaTime;
             if (shotTimer <= 0f)
             {
@@ -172,7 +151,7 @@ public class HunterBalancedFSM : PlayerFSMController
                 {
                     ctrl.RequestAttack();
                     shotsFired++;
-                    shotTimer = hb.burstShotInterval;
+                    shotTimer = Random.Range(0.10f, 0.25f);
                 }
                 else
                 {
@@ -185,9 +164,7 @@ public class HunterBalancedFSM : PlayerFSMController
     }
 
     // ==========================================================================
-    // JUMP SHOOT STATE
-    // Jumps then fires one aerial shot (uses BlobRangedAttack's air variant).
-    // After landing, always slides back regardless of ammo.
+    // JUMP SHOOT — Jumps, fires one aerial shot, slides back on landing.
     // ==========================================================================
     public class HB_JumpShoot : IPlayerFSMState
     {
@@ -198,8 +175,8 @@ public class HunterBalancedFSM : PlayerFSMController
         {
             ctrl.StopMoving();
             ctrl.FaceTarget();
-            ctrl.RequestJump(0.25f);
-            airTimer  = 0.10f;
+            ctrl.RequestJump(Random.Range(0.20f, 0.28f));
+            airTimer  = Random.Range(0.08f, 0.13f);
             shotFired = false;
         }
 
@@ -207,25 +184,17 @@ public class HunterBalancedFSM : PlayerFSMController
         {
             var hb = (HunterBalancedFSM)ctrl;
             ctrl.FaceTarget();
-
             airTimer -= Time.deltaTime;
-            if (!shotFired && airTimer <= 0f)
-            {
-                ctrl.RequestAttack();
-                shotFired = true;
-            }
-
-            if (shotFired && ctrl.IsGrounded())
-                hb.FSM.ChangeState(hb.SlideBackState, ctrl);
+            if (!shotFired && airTimer <= 0f) { ctrl.RequestAttack(); shotFired = true; }
+            if (shotFired && ctrl.IsGrounded()) hb.FSM.ChangeState(hb.SlideBackState, ctrl);
         }
 
         public void OnExit(PlayerFSMController ctrl) { }
     }
 
     // ==========================================================================
-    // SLIDE BACK STATE
-    // Retreats for a fixed duration after every burst or aerial shot.
-    // After the slide, checks ammo: if below threshold → WaitAmmo, else → FindRange.
+    // SLIDE BACK — Random duration. After the slide, checks ammo level to
+    // decide between re-engaging or waiting.
     // ==========================================================================
     public class HB_SlideBack : IPlayerFSMState
     {
@@ -233,7 +202,7 @@ public class HunterBalancedFSM : PlayerFSMController
 
         public void OnEnter(PlayerFSMController ctrl)
         {
-            timer = ((HunterBalancedFSM)ctrl).slideBackDuration;
+            timer = Random.Range(0.30f, 0.60f);
         }
 
         public void OnUpdate(PlayerFSMController ctrl)
@@ -241,17 +210,13 @@ public class HunterBalancedFSM : PlayerFSMController
             var hb = (HunterBalancedFSM)ctrl;
             ctrl.MoveAway();
             timer -= Time.deltaTime;
-
             if (timer <= 0f)
             {
                 float ammoRatio = hb.RangedAttack == null
                     ? 1f
                     : (float)hb.RangedAttack.CurrentAmmo / Mathf.Max(1, hb.RangedAttack.MaxAmmo);
-
                 hb.FSM.ChangeState(
-                    ammoRatio >= hb.reloadThresholdRatio
-                        ? (IPlayerFSMState)hb.FindRangeState
-                        : hb.WaitAmmoState,
+                    ammoRatio >= hb.reloadThresholdRatio ? (IPlayerFSMState)hb.FindRangeState : hb.WaitAmmoState,
                     ctrl);
             }
         }
@@ -260,38 +225,44 @@ public class HunterBalancedFSM : PlayerFSMController
     }
 
     // ==========================================================================
-    // WAIT AMMO STATE
-    // Holds position (or backs up) until ammo ratio reaches 50%.
-    // Unlike the Defensive bot (100%), this bot re-engages at half a magazine.
+    // WAIT AMMO — Holds distance until 50% ammo and stamina are back.
+    // Adds a short extra pause even once conditions are met.
     // ==========================================================================
     public class HB_WaitAmmo : IPlayerFSMState
     {
-        public void OnEnter(PlayerFSMController ctrl) => ctrl.StopMoving();
+        private float extraWait;
+        private bool  conditionsMet;
+
+        public void OnEnter(PlayerFSMController ctrl) { ctrl.StopMoving(); conditionsMet = false; extraWait = 0f; }
 
         public void OnUpdate(PlayerFSMController ctrl)
         {
             var hb   = (HunterBalancedFSM)ctrl;
             float dist = ctrl.DistanceToTarget();
-
             ctrl.FaceTarget();
 
-            // Maintain comfortable distance while waiting
             float minComfort = hb.preferredRange - hb.rangeTolerance;
-            if (dist < minComfort)
-                ctrl.MoveAway();
-            else
-                ctrl.StopMoving();
+            if (dist < minComfort) ctrl.MoveAway();
+            else ctrl.StopMoving();
 
-            // Check partial reload threshold
             float ammoRatio = hb.RangedAttack == null
                 ? 1f
                 : (float)hb.RangedAttack.CurrentAmmo / Mathf.Max(1, hb.RangedAttack.MaxAmmo);
 
-            bool ready = ammoRatio >= hb.reloadThresholdRatio
-                      && ctrl.StaminaRatio() >= hb.staminaThresholdRatio;
+            bool ready = ammoRatio >= hb.reloadThresholdRatio && ctrl.StaminaRatio() >= hb.staminaThresholdRatio;
 
-            if (ready)
-                hb.FSM.ChangeState(hb.FindRangeState, ctrl);
+            if (ready && !conditionsMet)
+            {
+                conditionsMet = true;
+                extraWait     = Random.Range(0.40f, 1.20f);
+            }
+
+            if (conditionsMet)
+            {
+                extraWait -= Time.deltaTime;
+                if (extraWait <= 0f)
+                    hb.FSM.ChangeState(hb.FindRangeState, ctrl);
+            }
         }
 
         public void OnExit(PlayerFSMController ctrl) => ctrl.StopMoving();

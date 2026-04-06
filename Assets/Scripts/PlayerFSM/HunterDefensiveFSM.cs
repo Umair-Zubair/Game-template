@@ -3,38 +3,24 @@ using UnityEngine;
 // ============================================================================
 // HUNTER DEFENSIVE FSM
 //
-// Profile: Maximum-range sniper. Maintains 7f distance, fires single shots,
-// strongly prefers aerial shots (70%), hard-retreats the moment the boss
-// closes in, and waits for a FULL reload before re-engaging.
+// Deliberate and patient. Holds its preferred distance, "observes" for a
+// moment before shooting, fires one shot at a time, then repositions. Hard
+// retreats when the boss closes in. Waits for full ammo AND adds extra time
+// after reload before re-engaging.
 //
-// Compared to other Hunter profiles:
-//   AGGRESSIVE   Range 3f | advances during reload | 50% air shots | retreat at 0.8f | threshold 12f
-//   BALANCED     Range 4.5f | partial reload wait   | 30% air shots | retreat at 2f  | threshold 35%
-//   DEFENSIVE    Range 7f  | full reload wait       | 70% air shots | retreat at 4f  | threshold 55%
-//
-// States: WaitReload → Position → ShootSingle → Position
-//                                              ↓ (boss < 4f)
-//                                         HardRetreat → WaitReload
+// States: WaitReload → Position (with observation) → ShootSingle → Position
+//                                                   ↓ (boss < 4f)
+//                                              HardRetreat → WaitReload
 // ============================================================================
 public class HunterDefensiveFSM : PlayerFSMController
 {
     [Header("Hunter Defensive — Tuning")]
-    [Tooltip("Ideal distance from the boss. Bot tries to hold this at all times.")]
-    [SerializeField] private float preferredRange = 7.0f;
-
-    [Tooltip("Acceptable drift around preferredRange before the bot repositions.")]
-    [SerializeField] private float rangeTolerance = 1.0f;
-
-    [Tooltip("Distance that triggers a hard retreat — much wider than other profiles.")]
+    [SerializeField] private float preferredRange         = 7.0f;
+    [SerializeField] private float rangeTolerance         = 1.0f;
     [SerializeField] private float retreatTriggerDistance = 4.0f;
+    [SerializeField] private float staminaRequiredRatio   = 0.55f;
+    [SerializeField] private float airShotProbability     = 0.70f;
 
-    [Tooltip("Stamina ratio (0–1) required before shooting. High — very conservative.")]
-    [SerializeField] private float staminaRequiredRatio = 0.55f;
-
-    [Tooltip("Probability (0–1) of jumping before shooting. Defensive bot prefers air shots.")]
-    [SerializeField] private float airShotProbability = 0.70f;
-
-    // ── State Instances ────────────────────────────────────────────────────
     public HD_Position    PositionState    { get; private set; }
     public HD_ShootSingle ShootSingleState { get; private set; }
     public HD_HardRetreat HardRetreatState { get; private set; }
@@ -48,24 +34,31 @@ public class HunterDefensiveFSM : PlayerFSMController
         WaitReloadState  = new HD_WaitReload();
     }
 
-    // Start in WaitReload — defensive bot checks ammo and stamina before anything
     protected override void StartFSM() => FSM.Initialize(WaitReloadState, this);
 
     // ==========================================================================
-    // POSITION STATE
-    // Maintains preferredRange ± tolerance. Backs up if too close, inches in
-    // if too far. Shoots only when in the sweet spot and fully ready.
+    // POSITION — Holds preferred distance. Before deciding to shoot, the bot
+    // must stay in the sweet spot for an "observation window" — a random 0.8-1.8s.
+    // This makes the bot look like it's lining up the shot rather than firing
+    // the instant conditions are met.
     // ==========================================================================
     public class HD_Position : IPlayerFSMState
     {
-        public void OnEnter(PlayerFSMController ctrl) { ctrl.FaceTarget(); }
+        private float observeTimer;
+        private bool  observing;
+
+        public void OnEnter(PlayerFSMController ctrl)
+        {
+            ctrl.FaceTarget();
+            observing    = false;
+            observeTimer = 0f;
+        }
 
         public void OnUpdate(PlayerFSMController ctrl)
         {
-            var hd  = (HunterDefensiveFSM)ctrl;
+            var hd   = (HunterDefensiveFSM)ctrl;
             float dist = ctrl.DistanceToTarget();
 
-            // Hard retreat override — highest priority
             if (dist < hd.retreatTriggerDistance)
             {
                 hd.FSM.ChangeState(hd.HardRetreatState, ctrl);
@@ -77,42 +70,48 @@ public class HunterDefensiveFSM : PlayerFSMController
             float minRange = hd.preferredRange - hd.rangeTolerance;
             float maxRange = hd.preferredRange + hd.rangeTolerance;
 
-            if (dist < minRange)
-            {
-                ctrl.MoveAway(); // back up to sweet spot
-            }
-            else if (dist > maxRange)
-            {
-                ctrl.MoveTowardAt(0.5f); // inch in slowly
-            }
-            else
-            {
-                // In sweet spot — decide whether to shoot
-                ctrl.StopMoving();
+            bool inSweet = dist >= minRange && dist <= maxRange;
 
-                bool hasAmmo    = hd.RangedAttack != null
-                               && hd.RangedAttack.CurrentAmmo > 0
-                               && !hd.RangedAttack.IsReloading;
-                bool hasStamina = ctrl.StaminaRatio() >= hd.staminaRequiredRatio;
+            if (!inSweet)
+            {
+                observing = false; // reset observation if we drift out
+                if (dist < minRange) ctrl.MoveAway();
+                else                 ctrl.MoveTowardAt(0.45f);
+                return;
+            }
 
-                if (hasAmmo && hasStamina)
-                    hd.FSM.ChangeState(hd.ShootSingleState, ctrl);
-                else if (hd.RangedAttack != null && hd.RangedAttack.IsReloading)
+            ctrl.StopMoving();
+
+            bool hasAmmo    = hd.RangedAttack != null && hd.RangedAttack.CurrentAmmo > 0 && !hd.RangedAttack.IsReloading;
+            bool hasStamina = ctrl.StaminaRatio() >= hd.staminaRequiredRatio;
+
+            if (!hasAmmo || !hasStamina)
+            {
+                observing = false;
+                if (hd.RangedAttack != null && hd.RangedAttack.IsReloading)
                     hd.FSM.ChangeState(hd.WaitReloadState, ctrl);
+                return;
             }
+
+            // Start the observation window
+            if (!observing)
+            {
+                observing    = true;
+                observeTimer = Random.Range(0.80f, 1.80f);
+            }
+
+            observeTimer -= Time.deltaTime;
+            if (observeTimer <= 0f)
+                hd.FSM.ChangeState(hd.ShootSingleState, ctrl);
         }
 
         public void OnExit(PlayerFSMController ctrl) => ctrl.StopMoving();
     }
 
     // ==========================================================================
-    // SHOOT SINGLE STATE
-    // Fires ONE shot — with a 70% chance of jumping first for an aerial shot.
-    // Immediately returns to Position after firing (single-shot discipline).
-    //
-    // Key difference from Aggressive: one shot then full reposition, not
-    // continuous fire. Combined with the air-first preference this creates
-    // a very different visual rhythm.
+    // SHOOT SINGLE — 70% chance to jump first for aerial shot. One shot then
+    // back to Position. The observation in Position means this state fires
+    // infrequently and deliberately.
     // ==========================================================================
     public class HD_ShootSingle : IPlayerFSMState
     {
@@ -127,17 +126,16 @@ public class HunterDefensiveFSM : PlayerFSMController
             ctrl.FaceTarget();
             shotFired = false;
 
-            bool doAirShot = Random.value < hd.airShotProbability;
-            if (doAirShot && ctrl.IsGrounded())
+            if (Random.value < hd.airShotProbability && ctrl.IsGrounded())
             {
-                ctrl.RequestJump(0.20f);
+                ctrl.RequestJump(Random.Range(0.18f, 0.28f));
                 jumped   = true;
-                airTimer = 0.12f;
+                airTimer = Random.Range(0.10f, 0.15f);
             }
             else
             {
                 jumped = false;
-                ctrl.RequestAttack(); // ground shot immediately
+                ctrl.RequestAttack();
                 shotFired = true;
             }
         }
@@ -147,25 +145,18 @@ public class HunterDefensiveFSM : PlayerFSMController
             var hd = (HunterDefensiveFSM)ctrl;
             ctrl.FaceTarget();
 
-            // Hard retreat always overrides
             if (ctrl.DistanceToTarget() < hd.retreatTriggerDistance)
             {
                 hd.FSM.ChangeState(hd.HardRetreatState, ctrl);
                 return;
             }
 
-            // Aerial shot: wait until airborne, then fire
             if (jumped && !shotFired)
             {
                 airTimer -= Time.deltaTime;
-                if (airTimer <= 0f)
-                {
-                    ctrl.RequestAttack(); // fires air variant when !IsGrounded
-                    shotFired = true;
-                }
+                if (airTimer <= 0f) { ctrl.RequestAttack(); shotFired = true; }
             }
 
-            // Shot committed — reposition
             if (shotFired)
                 hd.FSM.ChangeState(hd.PositionState, ctrl);
         }
@@ -174,9 +165,7 @@ public class HunterDefensiveFSM : PlayerFSMController
     }
 
     // ==========================================================================
-    // HARD RETREAT STATE
-    // Jumps AND runs away simultaneously for maximum escape distance.
-    // Keeps moving until at preferredRange, then transitions to WaitReload.
+    // HARD RETREAT — Jumps and sprints away. Continues until at preferred range.
     // ==========================================================================
     public class HD_HardRetreat : IPlayerFSMState
     {
@@ -187,16 +176,8 @@ public class HunterDefensiveFSM : PlayerFSMController
         public void OnUpdate(PlayerFSMController ctrl)
         {
             var hd = (HunterDefensiveFSM)ctrl;
-
             ctrl.MoveAway();
-
-            // Jump on first grounded frame for extra clearance
-            if (!jumped && ctrl.IsGrounded())
-            {
-                ctrl.RequestJump(0.30f);
-                jumped = true;
-            }
-
+            if (!jumped && ctrl.IsGrounded()) { ctrl.RequestJump(0.30f); jumped = true; }
             if (ctrl.DistanceToTarget() >= hd.preferredRange)
                 hd.FSM.ChangeState(hd.WaitReloadState, ctrl);
         }
@@ -205,14 +186,21 @@ public class HunterDefensiveFSM : PlayerFSMController
     }
 
     // ==========================================================================
-    // WAIT RELOAD STATE
-    // Stays at or beyond preferred range, doing nothing until BOTH ammo is full
-    // AND stamina is above the threshold. Unlike Balanced (50% ammo) this bot
-    // waits for a complete reload — it never rushes back under-equipped.
+    // WAIT RELOAD — Waits for full ammo + stamina, PLUS a mandatory extra pause
+    // (1.5-3s) even after everything is ready. The defensive bot takes its time
+    // before every engagement — it doesn't rush back the instant it can.
     // ==========================================================================
     public class HD_WaitReload : IPlayerFSMState
     {
-        public void OnEnter(PlayerFSMController ctrl) => ctrl.StopMoving();
+        private float extraWait;
+        private bool  conditionsMet;
+
+        public void OnEnter(PlayerFSMController ctrl)
+        {
+            ctrl.StopMoving();
+            conditionsMet = false;
+            extraWait     = 0f;
+        }
 
         public void OnUpdate(PlayerFSMController ctrl)
         {
@@ -221,27 +209,26 @@ public class HunterDefensiveFSM : PlayerFSMController
 
             ctrl.FaceTarget();
 
-            // Hard retreat override even here
-            if (dist < hd.retreatTriggerDistance)
-            {
-                hd.FSM.ChangeState(hd.HardRetreatState, ctrl);
-                return;
-            }
+            if (dist < hd.retreatTriggerDistance) { hd.FSM.ChangeState(hd.HardRetreatState, ctrl); return; }
+            if (dist < hd.preferredRange) ctrl.MoveAway();
+            else ctrl.StopMoving();
 
-            // Maintain safe distance while waiting
-            if (dist < hd.preferredRange)
-                ctrl.MoveAway();
-            else
-                ctrl.StopMoving();
-
-            // Only re-engage when FULLY loaded and stamina is high
             bool fullyLoaded = hd.RangedAttack == null
-                            || (hd.RangedAttack.CurrentAmmo == hd.RangedAttack.MaxAmmo
-                                && !hd.RangedAttack.IsReloading);
+                            || (hd.RangedAttack.CurrentAmmo == hd.RangedAttack.MaxAmmo && !hd.RangedAttack.IsReloading);
             bool hasStamina  = ctrl.StaminaRatio() >= hd.staminaRequiredRatio;
 
-            if (fullyLoaded && hasStamina)
-                hd.FSM.ChangeState(hd.PositionState, ctrl);
+            if (fullyLoaded && hasStamina && !conditionsMet)
+            {
+                conditionsMet = true;
+                extraWait     = Random.Range(1.5f, 3.0f); // extra patience before re-engaging
+            }
+
+            if (conditionsMet)
+            {
+                extraWait -= Time.deltaTime;
+                if (extraWait <= 0f)
+                    hd.FSM.ChangeState(hd.PositionState, ctrl);
+            }
         }
 
         public void OnExit(PlayerFSMController ctrl) { }

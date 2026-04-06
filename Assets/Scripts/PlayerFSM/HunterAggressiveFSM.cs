@@ -3,34 +3,23 @@ using UnityEngine;
 // ============================================================================
 // HUNTER AGGRESSIVE FSM
 //
-// Profile: Close-range fire pressure. Gets inside the boss's comfort zone,
-// fires all ammo without pausing, uses aerial shots frequently, and keeps
-// advancing even while reloading. Almost never retreats.
+// Closes in fast, reacts quickly but not instantly (small reaction delay),
+// fires and immediately repositions in a loop. Keeps advancing during reload.
+// Jump-shoots opportunistically. The loop feels fast but not perfectly mechanical
+// because every timer has variance.
 //
-// Compared to other Hunter profiles:
-//   AGGRESSIVE   Range 3f | advances during reload | 50% air shots | retreat at 0.8f | threshold 12f
-//   BALANCED     Range 4.5f | partial reload wait   | 30% air shots | retreat at 2f  | threshold 35%
-//   DEFENSIVE    Range 7f  | full reload wait       | 70% air shots | retreat at 4f  | threshold 55%
-//
-// States: Press → Shoot / JumpShoot → Press (or ReloadAdvance if reloading)
+// States: Press → React → Shoot / JumpShoot → Press (or ReloadAdvance)
 // ============================================================================
 public class HunterAggressiveFSM : PlayerFSMController
 {
     [Header("Hunter Aggressive — Tuning")]
-    [Tooltip("Preferred shooting distance. Bot presses in until it reaches this.")]
-    [SerializeField] private float preferredRange = 3.0f;
-
-    [Tooltip("Only distance that forces a retreat — literally inside the boss.")]
+    [SerializeField] private float preferredRange     = 3.0f;
     [SerializeField] private float pointBlankDistance = 0.8f;
+    [SerializeField] private float staminaThreshold   = 12f;
+    [SerializeField] private float jumpShootChance    = 0.50f;
 
-    [Tooltip("Minimum stamina (absolute) before shooting.")]
-    [SerializeField] private float staminaThreshold = 12f;
-
-    [Tooltip("Probability (0–1) of choosing a jump-shot over a ground shot when in range.")]
-    [SerializeField] private float jumpShootChance = 0.50f;
-
-    // ── State Instances ────────────────────────────────────────────────────
     public HA_Press         PressState         { get; private set; }
+    public HA_React         ReactState         { get; private set; }
     public HA_Shoot         ShootState         { get; private set; }
     public HA_JumpShoot     JumpShootState     { get; private set; }
     public HA_ReloadAdvance ReloadAdvanceState { get; private set; }
@@ -38,6 +27,7 @@ public class HunterAggressiveFSM : PlayerFSMController
     protected override void InitializeStates()
     {
         PressState         = new HA_Press();
+        ReactState         = new HA_React();
         ShootState         = new HA_Shoot();
         JumpShootState     = new HA_JumpShoot();
         ReloadAdvanceState = new HA_ReloadAdvance();
@@ -46,9 +36,8 @@ public class HunterAggressiveFSM : PlayerFSMController
     protected override void StartFSM() => FSM.Initialize(PressState, this);
 
     // ==========================================================================
-    // PRESS STATE
-    // Closes distance toward the boss. Detects reloading and routes accordingly.
-    // Makes an attack decision as soon as it's in range.
+    // PRESS — Advances toward the boss. Backs off if too close.
+    // When in range and ready, moves to React rather than shooting instantly.
     // ==========================================================================
     public class HA_Press : IPlayerFSMState
     {
@@ -59,7 +48,6 @@ public class HunterAggressiveFSM : PlayerFSMController
             var ha = (HunterAggressiveFSM)ctrl;
             float dist = ctrl.DistanceToTarget();
 
-            // Only retreat when literally touching the boss
             if (dist < ha.pointBlankDistance)
             {
                 ctrl.MoveAway();
@@ -69,7 +57,6 @@ public class HunterAggressiveFSM : PlayerFSMController
             ctrl.MoveToward();
             ctrl.FaceTarget();
 
-            // If reloading, keep advancing rather than stopping
             if (ha.RangedAttack != null && ha.RangedAttack.IsReloading)
             {
                 ha.FSM.ChangeState(ha.ReloadAdvanceState, ctrl);
@@ -80,30 +67,29 @@ public class HunterAggressiveFSM : PlayerFSMController
             bool hasStamina = ctrl.Stamina == null || ctrl.Stamina.CurrentStamina > ha.staminaThreshold;
 
             if (dist <= ha.preferredRange && hasAmmo && hasStamina)
-            {
-                // 50% chance to jump-shoot; only jump if grounded
-                bool doJumpShot = ctrl.IsGrounded() && Random.value < ha.jumpShootChance;
-                ha.FSM.ChangeState(
-                    doJumpShot ? (IPlayerFSMState)ha.JumpShootState : ha.ShootState,
-                    ctrl);
-            }
+                ha.FSM.ChangeState(ha.ReactState, ctrl);
         }
 
         public void OnExit(PlayerFSMController ctrl) { }
     }
 
     // ==========================================================================
-    // SHOOT STATE
-    // Fires one shot from the ground, then immediately returns to Press.
-    // The loop Press→Shoot→Press creates rapid sustained fire.
+    // REACT — Brief pause before shooting. Simulates the human moment of
+    // "lining up the shot" rather than firing the instant you're in range.
+    // Decides here whether to jump-shoot or stay grounded.
     // ==========================================================================
-    public class HA_Shoot : IPlayerFSMState
+    public class HA_React : IPlayerFSMState
     {
+        private float timer;
+        private bool  willJump;
+
         public void OnEnter(PlayerFSMController ctrl)
         {
+            var ha = (HunterAggressiveFSM)ctrl;
             ctrl.StopMoving();
             ctrl.FaceTarget();
-            ctrl.RequestAttack(); // one-shot signal; BlobRangedAttack handles cooldown
+            timer    = Random.Range(0.08f, 0.22f);
+            willJump = ctrl.IsGrounded() && Random.value < ha.jumpShootChance;
         }
 
         public void OnUpdate(PlayerFSMController ctrl)
@@ -111,6 +97,38 @@ public class HunterAggressiveFSM : PlayerFSMController
             var ha = (HunterAggressiveFSM)ctrl;
             ctrl.FaceTarget();
 
+            // Boss moved away — back to pressing
+            if (ctrl.DistanceToTarget() > ha.preferredRange * 1.4f)
+            {
+                ha.FSM.ChangeState(ha.PressState, ctrl);
+                return;
+            }
+
+            timer -= Time.deltaTime;
+            if (timer <= 0f)
+                ha.FSM.ChangeState(willJump ? (IPlayerFSMState)ha.JumpShootState : ha.ShootState, ctrl);
+        }
+
+        public void OnExit(PlayerFSMController ctrl) { }
+    }
+
+    // ==========================================================================
+    // SHOOT — Fires one shot, returns to Press. The React→Shoot→Press loop
+    // creates rapid fire with just enough timing variation to not look scripted.
+    // ==========================================================================
+    public class HA_Shoot : IPlayerFSMState
+    {
+        public void OnEnter(PlayerFSMController ctrl)
+        {
+            ctrl.StopMoving();
+            ctrl.FaceTarget();
+            ctrl.RequestAttack();
+        }
+
+        public void OnUpdate(PlayerFSMController ctrl)
+        {
+            var ha = (HunterAggressiveFSM)ctrl;
+            ctrl.FaceTarget();
             if (ha.RangedAttack != null && ha.RangedAttack.IsReloading)
                 ha.FSM.ChangeState(ha.ReloadAdvanceState, ctrl);
             else
@@ -121,10 +139,7 @@ public class HunterAggressiveFSM : PlayerFSMController
     }
 
     // ==========================================================================
-    // JUMP SHOOT STATE
-    // Jumps then fires an aerial shot (BlobRangedAttack uses JumpRangeAttack
-    // when IsGrounded() == false). Waits until airborne before requesting
-    // the attack to ensure the air variant fires.
+    // JUMP SHOOT — Jumps then fires. Random hold duration so jump height varies.
     // ==========================================================================
     public class HA_JumpShoot : IPlayerFSMState
     {
@@ -135,8 +150,8 @@ public class HunterAggressiveFSM : PlayerFSMController
         {
             ctrl.StopMoving();
             ctrl.FaceTarget();
-            ctrl.RequestJump(0.25f);
-            airTimer  = 0.10f; // let the jump physics register before firing
+            ctrl.RequestJump(Random.Range(0.18f, 0.30f));
+            airTimer  = Random.Range(0.08f, 0.14f);
             shotFired = false;
         }
 
@@ -144,27 +159,17 @@ public class HunterAggressiveFSM : PlayerFSMController
         {
             var ha = (HunterAggressiveFSM)ctrl;
             ctrl.FaceTarget();
-
             airTimer -= Time.deltaTime;
-
-            if (!shotFired && airTimer <= 0f)
-            {
-                ctrl.RequestAttack(); // fires air-shot if !IsGrounded, ground shot fallback
-                shotFired = true;
-            }
-
-            // Return to Press after landing
-            if (shotFired && ctrl.IsGrounded())
-                ha.FSM.ChangeState(ha.PressState, ctrl);
+            if (!shotFired && airTimer <= 0f) { ctrl.RequestAttack(); shotFired = true; }
+            if (shotFired && ctrl.IsGrounded()) ha.FSM.ChangeState(ha.PressState, ctrl);
         }
 
         public void OnExit(PlayerFSMController ctrl) { }
     }
 
     // ==========================================================================
-    // RELOAD ADVANCE STATE
-    // Keeps moving toward the boss while the magazine reloads.
-    // Aggressive bot never stops for ammo — it closes the gap instead.
+    // RELOAD ADVANCE — Keeps closing distance during reload. Aggressive bot
+    // never stops moving just because it's out of ammo.
     // ==========================================================================
     public class HA_ReloadAdvance : IPlayerFSMState
     {
@@ -175,7 +180,6 @@ public class HunterAggressiveFSM : PlayerFSMController
             var ha = (HunterAggressiveFSM)ctrl;
             ctrl.MoveToward();
             ctrl.FaceTarget();
-
             if (ha.RangedAttack == null || !ha.RangedAttack.IsReloading)
                 ha.FSM.ChangeState(ha.PressState, ctrl);
         }

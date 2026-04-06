@@ -22,12 +22,15 @@ public abstract class PlayerFSMController : MonoBehaviour
     [Tooltip("Tag of the target this bot fights against.")]
     [SerializeField] private string targetTag = "Enemy";
 
+    [Tooltip("How fast horizontal input ramps to the target value (higher = snappier, lower = smoother). 5-7 feels human.")]
+    [SerializeField] private float inputSmoothSpeed = 6f;
+
     // ── Component References (auto-found on same GameObject) ───────────────
     [HideInInspector] public PlayerController PC;
     [HideInInspector] public PlayerStamina Stamina;
     [HideInInspector] public Health Health;
-    [HideInInspector] public MeleeAttack MeleeAttack;          // non-null on Warrior
-    [HideInInspector] public BlobRangedAttack RangedAttack;    // non-null on Hunter
+    [HideInInspector] public MeleeAttack MeleeAttack;
+    [HideInInspector] public BlobRangedAttack RangedAttack;
 
     // ── FSM ────────────────────────────────────────────────────────────────
     public PlayerFSMStateMachine FSM { get; private set; }
@@ -35,8 +38,12 @@ public abstract class PlayerFSMController : MonoBehaviour
     // ── Runtime ────────────────────────────────────────────────────────────
     public Transform Target { get; private set; }
 
-    // Jump hold timer: RequestJump() sets a duration; PC.AIJumpHeld stays true
-    // until it elapses, producing a variable-height jump.
+    // Input smoothing — states set targetInput; Update() lerps smoothedInput
+    // toward it each frame so direction changes accelerate/decelerate naturally.
+    private float targetInput;
+    private float smoothedInput;
+
+    // Jump hold timer
     private float jumpHoldTimer;
 
     // ── Lifecycle ──────────────────────────────────────────────────────────
@@ -53,6 +60,8 @@ public abstract class PlayerFSMController : MonoBehaviour
 
     protected virtual void OnEnable()
     {
+        targetInput  = 0f;
+        smoothedInput = 0f;
         if (PC != null) PC.IsAIControlled = true;
         FindTarget();
         InitializeStates();
@@ -61,6 +70,8 @@ public abstract class PlayerFSMController : MonoBehaviour
 
     protected virtual void OnDisable()
     {
+        targetInput  = 0f;
+        smoothedInput = 0f;
         if (PC == null) return;
         PC.IsAIControlled    = false;
         PC.AIHorizontalInput = 0f;
@@ -70,19 +81,24 @@ public abstract class PlayerFSMController : MonoBehaviour
 
     protected virtual void Update()
     {
-        // Stop FSM when PlayerController is disabled (character is dead)
         if (PC == null || !PC.enabled) return;
 
         if (Target == null) FindTarget();
 
-        // Tick jump-hold duration so the bot releases the jump button naturally
+        // Jump hold
         if (jumpHoldTimer > 0f)
         {
             jumpHoldTimer -= Time.deltaTime;
             PC.AIJumpHeld = jumpHoldTimer > 0f;
         }
 
+        // Let the current state set targetInput via the movement helpers
         FSM.Update(this);
+
+        // Smoothly ramp horizontal input toward the target — this is what makes
+        // direction changes feel like a human rather than an instant state flip.
+        smoothedInput        = Mathf.MoveTowards(smoothedInput, targetInput, inputSmoothSpeed * Time.deltaTime);
+        PC.AIHorizontalInput = smoothedInput;
     }
 
     private void FindTarget()
@@ -93,10 +109,7 @@ public abstract class PlayerFSMController : MonoBehaviour
 
     // ── Abstract ───────────────────────────────────────────────────────────
 
-    /// <summary>Create and assign all state instances here.</summary>
     protected abstract void InitializeStates();
-
-    /// <summary>Call FSM.Initialize() with the starting state here.</summary>
     protected abstract void StartFSM();
 
     // ── Distance / Direction ───────────────────────────────────────────────
@@ -114,7 +127,6 @@ public abstract class PlayerFSMController : MonoBehaviour
         return Target.position.x > transform.position.x ? 1 : -1;
     }
 
-    /// <summary>Positive = target is above; negative = target is below.</summary>
     public float HeightDifferenceToTarget()
     {
         if (Target == null) return 0f;
@@ -125,39 +137,22 @@ public abstract class PlayerFSMController : MonoBehaviour
 
     public bool IsGrounded() => PC != null && PC.IsGrounded();
 
-    /// <summary>Stamina as a 0–1 ratio (1 = full).</summary>
     public float StaminaRatio() => Stamina != null ? Stamina.StaminaRatio : 1f;
 
-    /// <summary>Health as a 0–1 ratio (1 = full).</summary>
     public float HealthRatio() => Health != null ? Health.currentHealth / Health.MaxHealth : 1f;
 
     // ── Movement ───────────────────────────────────────────────────────────
+    // These set targetInput only. The actual PC.AIHorizontalInput is applied
+    // at the end of Update() with smoothing applied. This means all direction
+    // changes — whether the bot turns around, decelerates, or stops —
+    // are visually gradual rather than instant snaps.
 
-    /// <summary>Move at full speed toward the target.</summary>
-    public void MoveToward()
-    {
-        if (PC != null) PC.AIHorizontalInput = DirectionToTarget();
-    }
+    public void MoveToward()                    => targetInput = DirectionToTarget();
+    public void MoveTowardAt(float fraction)    => targetInput = DirectionToTarget() * Mathf.Clamp01(fraction);
+    public void MoveAway()                      => targetInput = -DirectionToTarget();
+    public void StopMoving()                    => targetInput = 0f;
 
-    /// <summary>Move toward the target at a fraction of full speed (0–1).</summary>
-    public void MoveTowardAt(float speedFraction)
-    {
-        if (PC != null)
-            PC.AIHorizontalInput = DirectionToTarget() * Mathf.Clamp01(speedFraction);
-    }
-
-    /// <summary>Move away from the target at full speed.</summary>
-    public void MoveAway()
-    {
-        if (PC != null) PC.AIHorizontalInput = -DirectionToTarget();
-    }
-
-    public void StopMoving()
-    {
-        if (PC != null) PC.AIHorizontalInput = 0f;
-    }
-
-    /// <summary>Face the target without changing movement.</summary>
+    /// <summary>Face the target without affecting movement input.</summary>
     public void FaceTarget()
     {
         if (PC != null && Target != null) PC.ForceFlip(DirectionToTarget());
@@ -165,11 +160,7 @@ public abstract class PlayerFSMController : MonoBehaviour
 
     // ── Jumping ────────────────────────────────────────────────────────────
 
-    /// <summary>
-    /// Request a jump. holdDuration controls height:
-    ///   0.30f = full height jump
-    ///   0.05f = short hop
-    /// </summary>
+    /// <summary>0.30f = full height, 0.05f = short hop.</summary>
     public void RequestJump(float holdDuration = 0.3f)
     {
         if (PC == null) return;
@@ -181,11 +172,8 @@ public abstract class PlayerFSMController : MonoBehaviour
     // ── Attacking ─────────────────────────────────────────────────────────
 
     /// <summary>
-    /// Sets the attack-request flag for ONE frame.
-    /// Call every frame to hold down the attack button (aggressive/combo behavior).
-    /// Call once for a single shot/hit.
-    /// The underlying attack script (MeleeAttack / BlobRangedAttack) consumes
-    /// the flag and handles cooldowns internally.
+    /// Call every frame to simulate holding the attack button (chains combos).
+    /// Call once for a single hit.
     /// </summary>
     public void RequestAttack()
     {

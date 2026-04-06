@@ -50,7 +50,7 @@ GameObject:
   - component: {fileID: 2881411524104010969}
   - component: {fileID: 7537724188964175649}
   - component: {fileID: 8481082117813233341}
-  - component: {fileID: -1446255644544424858}
+  - component: {fileID: -5923013886691296237}
   m_Layer: 10
   m_Name: Warrior
   m_TagString: Player
@@ -338,7 +338,7 @@ MonoBehaviour:
   windowDuration: 3
   sampleInterval: 0.5
   DebugMode: 1
---- !u!114 &-1446255644544424858
+--- !u!114 &-5923013886691296237
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -347,18 +347,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 5963178899783550497}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a72f8fce516e8da448169eea71d1cb6c, type: 3}
+  m_Script: {fileID: 11500000, guid: 1b6e2ee898c28ce4abd5656c92f63568, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WarriorDefensiveFSM
+  m_EditorClassIdentifier: Assembly-CSharp::WarriorAggressiveFSM
   targetTag: Enemy
+  inputSmoothSpeed: 6
   PC: {fileID: 0}
   Stamina: {fileID: 0}
   Health: {fileID: 0}
   MeleeAttack: {fileID: 0}
   RangedAttack: {fileID: 0}
-  attackRange: 3
-  safeDistance: 5.5
-  panicDistance: 1.5
-  staminaRequiredRatio: 0.7
-  attackPauseSeconds: 0.15
-  approachSpeedFraction: 0.6
+  attackRange: 2
+  staminaThreshold: 5
+  jumpHeightThreshold: 1.5

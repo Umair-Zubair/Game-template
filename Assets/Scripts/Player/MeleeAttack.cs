@@ -37,6 +37,14 @@ public class MeleeAttack : MonoBehaviour
     [HideInInspector] public bool AIAttackRequested;
     /// <summary>True when a new attack can begin (cooldown ready, not hit-stunned).</summary>
     public bool CanAttack => cooldownTimer > attackCooldown && hitStunTimer <= 0f;
+    /// <summary>True while the combo input window is open (set by Animation Event).</summary>
+    public bool ComboWindowOpen => comboWindowOpen;
+
+    // Timer-based lock so FSMs know not to move/transition while a swing is playing.
+    // Set in Attack(), extended in ComboAttack(). No animation events needed.
+    private float attackSequenceTimer;
+    /// <summary>True while an attack or combo animation is estimated to be playing.</summary>
+    public bool IsInAttackSequence => attackSequenceTimer > 0f;
 
     // Combo tracking
     private bool comboWindowOpen = false;  // Set true by Animation Event, false when window closes
@@ -59,6 +67,9 @@ public class MeleeAttack : MonoBehaviour
 
     private void Update()
     {
+        // Tick down attack sequence timer
+        if (attackSequenceTimer > 0f) attackSequenceTimer -= Time.deltaTime;
+
         // Tick down hit stun timer
         if (hitStunTimer > 0)
         {
@@ -105,6 +116,7 @@ public class MeleeAttack : MonoBehaviour
         anim.SetTrigger("attack");
         cooldownTimer = 0;
         comboQueued = false;
+        attackSequenceTimer = 0.85f;
         OnAttackPerformed?.Invoke("melee");
 
         DealDamage(damage);
@@ -119,6 +131,7 @@ public class MeleeAttack : MonoBehaviour
 
         anim.SetTrigger("comboAttack");
         cooldownTimer = 0;
+        attackSequenceTimer = 0.85f; // extend the lock for the combo swing
         OnAttackPerformed?.Invoke("meleeCombo");
 
         DealDamage(comboDamage);
