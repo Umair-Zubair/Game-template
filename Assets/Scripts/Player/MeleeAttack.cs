@@ -32,6 +32,12 @@ public class MeleeAttack : MonoBehaviour
     private BoxCollider2D boxCollider;
     private float cooldownTimer = Mathf.Infinity;
 
+    // ── AI Control Override (set by PlayerFSMController) ──────────────────
+    /// <summary>FSM sets this true to request an attack; consumed each frame.</summary>
+    [HideInInspector] public bool AIAttackRequested;
+    /// <summary>True when a new attack can begin (cooldown ready, not hit-stunned).</summary>
+    public bool CanAttack => cooldownTimer > attackCooldown && hitStunTimer <= 0f;
+
     // Combo tracking
     private bool comboWindowOpen = false;  // Set true by Animation Event, false when window closes
     private bool comboQueued = false;      // True if player clicked LMB during the combo window
@@ -61,12 +67,17 @@ public class MeleeAttack : MonoBehaviour
             return; // Block all attack input while stunned
         }
 
-        // LMB — buffer input for combo if the window is open, otherwise start a new attack
-        if (Input.GetMouseButtonDown(0) && playerController != null && Time.timeScale > 0)
+        // Determine attack input: AI override or player mouse button
+        bool aiMode = playerController != null && playerController.IsAIControlled;
+        bool attackInput = aiMode ? AIAttackRequested : Input.GetMouseButtonDown(0);
+        if (aiMode) AIAttackRequested = false; // consume one-shot signal
+
+        // LMB / AI — buffer input for combo if the window is open, otherwise start a new attack
+        if (attackInput && playerController != null && Time.timeScale > 0)
         {
             if (comboWindowOpen)
             {
-                // Player clicked during the combo window — queue the second hit
+                // Clicked during the combo window — queue the second hit
                 comboQueued = true;
             }
             else if (cooldownTimer > attackCooldown)

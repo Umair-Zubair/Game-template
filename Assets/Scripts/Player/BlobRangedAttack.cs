@@ -29,6 +29,16 @@ public class BlobRangedAttack : MonoBehaviour
     private float reloadTimer;
     private bool isReloading;
 
+    // ── AI Control Override (set by PlayerFSMController) ──────────────────
+    /// <summary>FSM sets this true to request a shot; consumed each frame.</summary>
+    [HideInInspector] public bool AIAttackRequested;
+    /// <summary>Current ammo count (read-only for FSM decision-making).</summary>
+    public int CurrentAmmo => currentAmmo;
+    /// <summary>True while the magazine is reloading.</summary>
+    public bool IsReloading => isReloading;
+    /// <summary>Maximum magazine size.</summary>
+    public int MaxAmmo => maxAmmo;
+
     [Header("Hit Stun")]
     [Tooltip("How long the player is locked out of attacking after being hit.")]
     [SerializeField] private float hitStunDuration = 0.4f;
@@ -104,20 +114,24 @@ public class BlobRangedAttack : MonoBehaviour
 
         bool hasAmmo = maxAmmo <= 0 || currentAmmo > 0;
 
-        if (Input.GetMouseButtonDown(0) && hasAmmo && cooldownTimer > attackCooldown
+        // Determine attack input: AI override or player mouse button
+        bool aiMode = playerController != null && playerController.IsAIControlled;
+        bool attackInput = aiMode ? AIAttackRequested : Input.GetMouseButtonDown(0);
+        if (aiMode) AIAttackRequested = false; // consume one-shot signal
+
+        if (attackInput && hasAmmo && cooldownTimer > attackCooldown
             && playerController != null && Time.timeScale > 0)
         {
             bool isGrounded = playerController.IsGrounded();
+            float cost = stamina != null ? stamina.Data.rangedAttackCost : 0f;
 
             if (isGrounded)
             {
-                float cost = stamina != null ? stamina.Data.rangedAttackCost : 0f;
                 if (stamina == null || stamina.TryConsume(cost))
                     Attack();
             }
             else
             {
-                float cost = stamina != null ? stamina.Data.rangedAttackCost : 0f;
                 if (stamina == null || stamina.TryConsume(cost))
                     JumpRangeAttack();
             }

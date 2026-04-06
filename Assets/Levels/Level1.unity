@@ -5228,6 +5228,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3647629301635541336, guid: 0cd5ddff8b596404182275a636514347, type: 3}
+      propertyPath: startingHealth
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 3647629301635541336, guid: 0cd5ddff8b596404182275a636514347, type: 3}
       propertyPath: components.Array.size
       value: 2
       objectReference: {fileID: 0}
@@ -5603,7 +5607,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -8}
+  m_AnchoredPosition: {x: 0, y: -8.000061}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1305240361

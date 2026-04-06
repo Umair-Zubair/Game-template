@@ -39,6 +39,16 @@ public class PlayerController : MonoBehaviour
     // Runtime
     public int FacingDirection { get; private set; } = 1;
 
+    // ── AI Control Override (used by PlayerFSM bots) ──────────────────────
+    /// <summary>When true, movement/jump input is read from AI fields instead of Unity Input.</summary>
+    [HideInInspector] public bool IsAIControlled = false;
+    /// <summary>AI horizontal axis. -1 = left, 0 = stop, 1 = right.</summary>
+    [HideInInspector] public float AIHorizontalInput = 0f;
+    /// <summary>One-shot jump press; consumed each frame by ProcessInput.</summary>
+    [HideInInspector] public bool AIJumpPressed = false;
+    /// <summary>Hold true for full-height jump, false for short hop.</summary>
+    [HideInInspector] public bool AIJumpHeld = false;
+
     private void Awake()
     {
         StateMachine = new PlayerStateMachine();
@@ -94,9 +104,19 @@ public class PlayerController : MonoBehaviour
 
     private void ProcessInput()
     {
-        HorizontalInput = Input.GetAxisRaw("Horizontal");
-        JumpPressed = Input.GetButtonDown("Jump"); // Usually Space
-        JumpHeld = Input.GetButton("Jump");
+        if (IsAIControlled)
+        {
+            HorizontalInput = AIHorizontalInput;
+            JumpPressed = AIJumpPressed;
+            JumpHeld = AIJumpHeld;
+            AIJumpPressed = false; // consumed; FSM must re-set each frame it wants a press
+        }
+        else
+        {
+            HorizontalInput = Input.GetAxisRaw("Horizontal");
+            JumpPressed = Input.GetButtonDown("Jump"); // Usually Space
+            JumpHeld = Input.GetButton("Jump");
+        }
 
         if (JumpPressed)
         {

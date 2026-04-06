@@ -50,6 +50,7 @@ GameObject:
   - component: {fileID: 2881411524104010969}
   - component: {fileID: 7537724188964175649}
   - component: {fileID: 8481082117813233341}
+  - component: {fileID: -1446255644544424858}
   m_Layer: 10
   m_Name: Warrior
   m_TagString: Player
@@ -278,6 +279,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   attackSound: {fileID: 8300000, guid: 74a334d41fab92d48a31cd0d6025506e, type: 3}
+  AIAttackRequested: 0
   hitStunDuration: 0.4
 --- !u!114 &2881411524104010969
 MonoBehaviour:
@@ -304,6 +306,10 @@ MonoBehaviour:
   CoyoteTimeCounter: 0
   JumpBufferCounter: 0
   WallJumpLockCounter: 0
+  IsAIControlled: 0
+  AIHorizontalInput: 0
+  AIJumpPressed: 0
+  AIJumpHeld: 0
 --- !u!114 &7537724188964175649
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -332,3 +338,27 @@ MonoBehaviour:
   windowDuration: 3
   sampleInterval: 0.5
   DebugMode: 1
+--- !u!114 &-1446255644544424858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5963178899783550497}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a72f8fce516e8da448169eea71d1cb6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WarriorDefensiveFSM
+  targetTag: Enemy
+  PC: {fileID: 0}
+  Stamina: {fileID: 0}
+  Health: {fileID: 0}
+  MeleeAttack: {fileID: 0}
+  RangedAttack: {fileID: 0}
+  attackRange: 3
+  safeDistance: 5.5
+  panicDistance: 1.5
+  staminaRequiredRatio: 0.7
+  attackPauseSeconds: 0.15
+  approachSpeedFraction: 0.6
