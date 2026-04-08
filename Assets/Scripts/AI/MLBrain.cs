@@ -40,7 +40,8 @@ public class MLBrain : Agent, IBossDecisionModule
 
     public bool IsModelLoaded =>
         behaviorParams != null &&
-        behaviorParams.BehaviorType != BehaviorType.HeuristicOnly;
+        behaviorParams.BehaviorType != BehaviorType.HeuristicOnly &&
+        behaviorParams.Model != null;
 
     public override void Initialize()
     {

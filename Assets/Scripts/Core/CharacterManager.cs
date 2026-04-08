@@ -54,5 +54,12 @@ public class CharacterManager : MonoBehaviour
 
         if (staminaBar != null)
             staminaBar.SetPlayer(newPlayer.GetComponent<PlayerStamina>());
+
+        // Tell RestartManager about the freshly-spawned player so it can subscribe to its
+        // Health.OnDamageTaken event — this is necessary because RestartManager.Start()
+        // may run before CharacterManager.Start() instantiates the player.
+        var restartManager = Object.FindFirstObjectByType<RestartManager>();
+        if (restartManager != null)
+            restartManager.InitPlayer(newPlayer.GetComponent<PlayerController>());
     }
 }
