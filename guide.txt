@@ -5,9 +5,6 @@
 --------------------------------------------------------------------
  1. THE GOLDEN DEPENDENCY LIST
 --------------------------------------------------------------------
-To prevent infinite loops, version clashes, and timeout errors, your 
-Python environment MUST use these exact versions:
-
 PYTHON PACKAGES:
 - mlagents: 0.28.0 (Core Python trainer)
 - torch: 2.1.2 (Highly stable math engine)
@@ -16,19 +13,56 @@ PYTHON PACKAGES:
 - onnx: 1.13.1 (Exporter that respects the older Protobuf version)
 
 UNITY PACKAGES:
-- ML Agents: 2.0.1 or higher (Install via Unity Package Manager)
+- ML Agents: 2.0.2 
+- Barracuda: 3.0.0
 
+PYTHON VERSION:
+- Python 3.10.1
 
 --------------------------------------------------------------------
- 2. ONE-CLICK ENVIRONMENT SETUP
+ 2. ENVIRONMENT SETUP
 --------------------------------------------------------------------
-Run these exact commands in a fresh Python virtual environment to 
-lock everything in safely:
+python -m venv venv
 
-pip install mlagents==0.30.0
-pip install torch==2.1.2 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+venv\Scripts\activate ---> powershell
+venv\Scripts\activate.bat ---> cmd
+
+pip install mlagents==0.28.0
+pip install torch==2.1.2 
 pip install numpy==1.23.5 protobuf==3.20.3 onnx==1.13.1
 
+KNOWN TO WORK WITH THIS:
+absl-py                 2.4.0
+attrs                   26.1.0
+cattrs                  1.5.0
+cloudpickle             3.1.2
+filelock                3.25.2
+fsspec                  2026.3.0
+grpcio                  1.80.0
+h5py                    3.16.0
+Jinja2                  3.1.6
+Markdown                3.10.2
+MarkupSafe              3.0.3
+ml_dtypes               0.5.4
+mlagents                0.28.0
+mlagents-envs           0.28.0
+mpmath                  1.3.0
+networkx                3.4.2
+numpy                   1.23.5
+onnx                    1.13.1
+packaging               26.0
+pillow                  12.2.0
+pip                     21.2.4
+protobuf                3.20.3 
+pywin32                 311
+PyYAML                  6.0.3
+setuptools              58.1.0
+sympy                   1.14.0
+tensorboard             2.20.0 
+tensorboard-data-server 0.7.2
+torch                   2.1.2
+typing_extensions       4.15.0
+Werkzeug                3.1.8
 
 --------------------------------------------------------------------
  3. UNITY INSPECTOR CHECKLIST (PRE-TRAINING)
@@ -49,7 +83,6 @@ Select the Boss GameObject and verify these exact settings:
 [ ] AI DECISION ENGINE (Custom Script)
     - Is Training Mode: TRUE (Bypasses Layer 1, Layer 3, and Guardian) for training 
 
-
 --------------------------------------------------------------------
  4. HOW TO RUN THE TRAINING
 --------------------------------------------------------------------
@@ -66,6 +99,5 @@ Select the Boss GameObject and verify these exact settings:
 6. Click once inside the Game Window to focus it, then DO NOT TOUCH IT.
    (Clicking the hierarchy or other windows during 100x time-scale 
    training can cause Unity to freeze, resulting in a Timeout Error).
-
 
 ====================================================================
