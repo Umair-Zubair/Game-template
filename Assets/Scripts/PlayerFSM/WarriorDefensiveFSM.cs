@@ -3,31 +3,28 @@ using UnityEngine;
 // ============================================================================
 // WARRIOR DEFENSIVE FSM
 //
-// Cautious, methodical. Approaches with stops — like someone sneaking up.
-// Stands at attack range for a moment before committing to the strike.
-// After hitting, runs far away and STAYS away for a meaningful amount of time
-// before considering another approach.
-//
-// The previous version had a 0.15s pause and came back in under a second —
-// this version mandates a 2.5-4.5s minimum retreat, which actually reads as
-// defensive.
+// Cautious and methodical. Approaches with pauses, commits to one hit, then
+// retreats. Now reacts to boss attacks — if the boss swings during approach
+// or commit, the bot evades rather than eating the hit. Health influences
+// how long it stays back between engagements.
 //
 // States: Wait → Approach → Commit → Retreat → Wait
+//         Any state → Evade (boss attack or artillery)
 // ============================================================================
 public class WarriorDefensiveFSM : PlayerFSMController
 {
     [Header("Warrior Defensive — Tuning")]
-    [SerializeField] private float attackRange            = 3.0f;
-    [SerializeField] private float panicDistance          = 1.5f;
-    [SerializeField] private float staminaRequiredRatio   = 0.70f;
-    [SerializeField] private float approachSpeedFraction  = 0.55f;
-    [SerializeField] private float minRetreatDistance     = 6.0f;
-    [SerializeField] private float maxRetreatDistance     = 7.5f;
+    [SerializeField] private float attackRange           = 3.0f;
+    [SerializeField] private float panicDistance         = 1.5f;
+    [SerializeField] private float approachSpeedFraction = 0.55f;
+    [SerializeField] private float minRetreatDistance    = 5.0f;
+    [SerializeField] private float maxRetreatDistance    = 6.5f;
 
     public WD_Wait     WaitState     { get; private set; }
     public WD_Approach ApproachState { get; private set; }
     public WD_Commit   CommitState   { get; private set; }
     public WD_Retreat  RetreatState  { get; private set; }
+    public WD_Evade    EvadeState    { get; private set; }
 
     protected override void InitializeStates()
     {
@@ -35,15 +32,14 @@ public class WarriorDefensiveFSM : PlayerFSMController
         ApproachState = new WD_Approach();
         CommitState   = new WD_Commit();
         RetreatState  = new WD_Retreat();
+        EvadeState    = new WD_Evade();
     }
 
     protected override void StartFSM() => FSM.Initialize(WaitState, this);
 
     // ==========================================================================
-    // WAIT — Stands at safe distance. Has a mandatory minimum wait time that
-    // must expire before the bot will approach, regardless of stamina.
-    // This is the key fix: previously the bot came back in ~1s because stamina
-    // recovers fast. Now it stays away for 2.5-4.5 real seconds minimum.
+    // WAIT — Stands at safe distance. Mandatory wait time scales with damage
+    // taken — if hurt, stays back longer before re-engaging.
     // ==========================================================================
     public class WD_Wait : IPlayerFSMState
     {
@@ -52,12 +48,22 @@ public class WarriorDefensiveFSM : PlayerFSMController
         public void OnEnter(PlayerFSMController ctrl)
         {
             ctrl.StopMoving();
-            mandatoryWait = Random.Range(2.5f, 4.5f);
+            // Low health → wait slightly longer before committing again
+            float healthMod = 1f + (1f - ctrl.HealthRatio()) * 0.5f;
+            mandatoryWait   = Random.Range(0.80f, 1.50f) * healthMod;
         }
 
         public void OnUpdate(PlayerFSMController ctrl)
         {
             var wd = (WarriorDefensiveFSM)ctrl;
+
+            if (ctrl.ArtilleryEvadeRequested)
+            {
+                ctrl.ConsumeArtilleryEvade();
+                ctrl.RequestJump(Random.Range(0.25f, 0.35f));
+                wd.FSM.ChangeState(wd.EvadeState, ctrl);
+                return;
+            }
 
             if (ctrl.DistanceToTarget() < wd.panicDistance)
             {
@@ -68,7 +74,7 @@ public class WarriorDefensiveFSM : PlayerFSMController
             ctrl.FaceTarget();
             mandatoryWait -= Time.deltaTime;
 
-            if (mandatoryWait <= 0f && ctrl.StaminaRatio() >= wd.staminaRequiredRatio)
+            if (mandatoryWait <= 0f)
                 wd.FSM.ChangeState(wd.ApproachState, ctrl);
         }
 
@@ -76,21 +82,20 @@ public class WarriorDefensiveFSM : PlayerFSMController
     }
 
     // ==========================================================================
-    // APPROACH — Moves slowly toward the boss with natural intermittent pauses,
-    // like someone being cautious. The stops make it feel like the bot is
-    // checking the situation rather than walking on a timer.
+    // APPROACH — Moves slowly with natural pauses. If the boss swings during
+    // approach, evade rather than walking into it.
     // ==========================================================================
     public class WD_Approach : IPlayerFSMState
     {
-        private float stopTimer;   // how long to pause for
-        private float moveTimer;   // how long to move before next pause
+        private float stopTimer;
+        private float moveTimer;
         private bool  isStopped;
 
         public void OnEnter(PlayerFSMController ctrl)
         {
-            isStopped  = false;
-            moveTimer  = Random.Range(0.5f, 1.0f);
-            stopTimer  = 0f;
+            isStopped = false;
+            moveTimer = Random.Range(0.5f, 1.0f);
+            stopTimer = 0f;
         }
 
         public void OnUpdate(PlayerFSMController ctrl)
@@ -98,15 +103,24 @@ public class WarriorDefensiveFSM : PlayerFSMController
             var wd   = (WarriorDefensiveFSM)ctrl;
             float dist = ctrl.DistanceToTarget();
 
-            if (dist < wd.panicDistance)
+            if (ctrl.ArtilleryEvadeRequested)
             {
-                wd.FSM.ChangeState(wd.RetreatState, ctrl);
+                ctrl.ConsumeArtilleryEvade();
+                ctrl.RequestJump(Random.Range(0.25f, 0.35f));
+                wd.FSM.ChangeState(wd.EvadeState, ctrl);
                 return;
             }
 
-            if (ctrl.StaminaRatio() < wd.staminaRequiredRatio)
+            // Boss attacks while we're approaching — evade, don't commit
+            if (ctrl.BossIsAttacking && dist < wd.dangerRange)
             {
-                wd.FSM.ChangeState(wd.WaitState, ctrl);
+                wd.FSM.ChangeState(wd.EvadeState, ctrl);
+                return;
+            }
+
+            if (dist < wd.panicDistance)
+            {
+                wd.FSM.ChangeState(wd.RetreatState, ctrl);
                 return;
             }
 
@@ -145,9 +159,8 @@ public class WarriorDefensiveFSM : PlayerFSMController
     }
 
     // ==========================================================================
-    // COMMIT — Arrives at attack range and waits a moment before striking.
-    // Standing at attack distance without immediately attacking looks intentional
-    // rather than robotic. One hit, no combo, then mandatory retreat.
+    // COMMIT — Sizes up the boss, attacks once, then retreats. If the boss
+    // starts swinging during the size-up, cancel — don't get hit for free.
     // ==========================================================================
     public class WD_Commit : IPlayerFSMState
     {
@@ -159,7 +172,7 @@ public class WarriorDefensiveFSM : PlayerFSMController
         {
             ctrl.StopMoving();
             ctrl.FaceTarget();
-            sizeUpTimer = Random.Range(0.20f, 0.45f); // "sizing up" pause
+            sizeUpTimer = Random.Range(0.20f, 0.45f);
             attacked    = false;
             afterTimer  = 0f;
         }
@@ -169,12 +182,27 @@ public class WarriorDefensiveFSM : PlayerFSMController
             var wd = (WarriorDefensiveFSM)ctrl;
             ctrl.FaceTarget();
 
+            if (ctrl.ArtilleryEvadeRequested)
+            {
+                ctrl.ConsumeArtilleryEvade();
+                ctrl.RequestJump(Random.Range(0.25f, 0.35f));
+                wd.FSM.ChangeState(wd.EvadeState, ctrl);
+                return;
+            }
+
             if (!attacked)
             {
+                // Boss winds up while we're sizing up — don't commit, evade
+                if (ctrl.BossIsAttacking)
+                {
+                    wd.FSM.ChangeState(wd.EvadeState, ctrl);
+                    return;
+                }
+
                 sizeUpTimer -= Time.deltaTime;
                 if (sizeUpTimer <= 0f)
                 {
-                    ctrl.RequestAttack(); // single hit, no combo
+                    ctrl.RequestAttack();
                     attacked   = true;
                     afterTimer = Random.Range(0.30f, 0.50f);
                 }
@@ -191,8 +219,7 @@ public class WarriorDefensiveFSM : PlayerFSMController
     }
 
     // ==========================================================================
-    // RETREAT — Runs away to a randomised safe distance (not the same spot
-    // every time). Then transitions to Wait.
+    // RETREAT — Runs to a randomised safe distance, then waits.
     // ==========================================================================
     public class WD_Retreat : IPlayerFSMState
     {
@@ -201,16 +228,49 @@ public class WarriorDefensiveFSM : PlayerFSMController
         public void OnEnter(PlayerFSMController ctrl)
         {
             var wd = (WarriorDefensiveFSM)ctrl;
-            targetDistance = Random.Range(wd.minRetreatDistance, wd.maxRetreatDistance);
+            // Hurt → retreat farther
+            float healthMod    = 1f + (1f - ctrl.HealthRatio()) * 0.5f;
+            targetDistance     = Random.Range(wd.minRetreatDistance, wd.maxRetreatDistance) * healthMod;
         }
 
         public void OnUpdate(PlayerFSMController ctrl)
         {
             var wd = (WarriorDefensiveFSM)ctrl;
             ctrl.MoveAway();
-
             if (ctrl.DistanceToTarget() >= targetDistance)
                 wd.FSM.ChangeState(wd.WaitState, ctrl);
+        }
+
+        public void OnExit(PlayerFSMController ctrl) => ctrl.StopMoving();
+    }
+
+    // ==========================================================================
+    // EVADE — Triggered by boss attack or artillery during approach/commit.
+    // Defensive bot always dashes away rather than jumping — keeps ground.
+    // After evading, goes straight to Retreat → Wait (doesn't immediately
+    // re-approach, that would defeat the defensive style).
+    // ==========================================================================
+    public class WD_Evade : IPlayerFSMState
+    {
+        private float timer;
+
+        public void OnEnter(PlayerFSMController ctrl)
+        {
+            ctrl.ConsumeArtilleryEvade();
+            // Defensive bot prefers dash-back over jump, but occasionally jumps
+            if (ctrl.IsGrounded() && Random.value < 0.30f)
+                ctrl.RequestJump(Random.Range(0.15f, 0.25f));
+            timer = Random.Range(0.30f, 0.55f);
+        }
+
+        public void OnUpdate(PlayerFSMController ctrl)
+        {
+            var wd = (WarriorDefensiveFSM)ctrl;
+            ctrl.MoveAway();
+            ctrl.FaceTarget();
+            timer -= Time.deltaTime;
+            if (timer <= 0f)
+                wd.FSM.ChangeState(wd.RetreatState, ctrl);
         }
 
         public void OnExit(PlayerFSMController ctrl) => ctrl.StopMoving();

@@ -50,6 +50,7 @@ GameObject:
   - component: {fileID: 5739552593001750824}
   - component: {fileID: 2548767403431450800}
   - component: {fileID: -8182996424340938370}
+  - component: {fileID: 742026018143251897}
   m_Layer: 10
   m_Name: Hunter
   m_TagString: Player
@@ -251,6 +252,10 @@ MonoBehaviour:
   CoyoteTimeCounter: 0
   JumpBufferCounter: 0
   WallJumpLockCounter: 0
+  IsAIControlled: 0
+  AIHorizontalInput: 0
+  AIJumpPressed: 0
+  AIJumpHeld: 0
 --- !u!114 &6765074287762816614
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -273,6 +278,7 @@ MonoBehaviour:
   maxAmmo: 3
   reloadTime: 1
   reloadSound: {fileID: 0}
+  AIAttackRequested: 0
   hitStunDuration: 0.4
 --- !u!114 &7103587418571317392
 MonoBehaviour:
@@ -329,3 +335,30 @@ MonoBehaviour:
   windowDuration: 3
   sampleInterval: 0.5
   DebugMode: 1
+--- !u!114 &742026018143251897
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5536329845775654271}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6a6cac896718b9468c8a853834771fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HunterBalancedFSM
+  targetTag: Enemy
+  inputSmoothSpeed: 6
+  dangerRange: 3
+  reactionDelayMin: 0.1
+  reactionDelayMax: 0.26
+  PC: {fileID: 0}
+  Stamina: {fileID: 0}
+  Health: {fileID: 0}
+  MeleeAttack: {fileID: 0}
+  RangedAttack: {fileID: 0}
+  preferredRange: 4.5
+  rangeTolerance: 0.8
+  retreatTriggerDistance: 2
+  reloadThresholdRatio: 0.2
+  jumpShootChance: 0.3

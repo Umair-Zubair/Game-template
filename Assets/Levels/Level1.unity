@@ -4038,6 +4038,39 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &962360064 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5536329845775654271, guid: 876ccb7512133544e82e544c241ac2c4, type: 3}
+  m_PrefabInstance: {fileID: 3256203011038729510}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &962360076
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 962360064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6a6cac896718b9468c8a853834771fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HunterBalancedFSM
+  targetTag: Enemy
+  inputSmoothSpeed: 6
+  dangerRange: 3
+  reactionDelayMin: 0.1
+  reactionDelayMax: 0.26
+  PC: {fileID: 0}
+  Stamina: {fileID: 0}
+  Health: {fileID: 0}
+  MeleeAttack: {fileID: 0}
+  RangedAttack: {fileID: 0}
+  preferredRange: 4.5
+  rangeTolerance: 0.8
+  retreatTriggerDistance: 2
+  staminaThresholdRatio: 0.35
+  reloadThresholdRatio: 0.5
+  jumpShootChance: 0.3
 --- !u!1 &965743983
 GameObject:
   m_ObjectHideFlags: 0
@@ -8764,7 +8797,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5536329845775654271, guid: 876ccb7512133544e82e544c241ac2c4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 962360076}
   m_SourcePrefab: {fileID: 100100000, guid: 876ccb7512133544e82e544c241ac2c4, type: 3}
 --- !u!4 &3637007278001867891 stripped
 Transform:
