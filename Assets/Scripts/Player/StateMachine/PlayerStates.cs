@@ -143,7 +143,7 @@ public class FallState : IPlayerState
              return;
         }
 
-        if (player.IsTouchingWall() && player.IsPushingAgainstWall())
+        if (player.WallSlideState != null && player.IsTouchingWall() && player.IsPushingAgainstWall())
         {
              player.StateMachine.ChangeState(player.WallSlideState, player);
         }

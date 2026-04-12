@@ -299,7 +299,7 @@ MonoBehaviour:
     m_Bits: 256
   wallLayer:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 0
   RB: {fileID: 0}
   Anim: {fileID: 0}
   Collider: {fileID: 0}
@@ -345,18 +345,20 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5963178899783550497}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1b6e2ee898c28ce4abd5656c92f63568, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WarriorAggressiveFSM
   targetTag: Enemy
   inputSmoothSpeed: 6
+  dangerRange: 3
+  reactionDelayMin: 0.1
+  reactionDelayMax: 0.26
   PC: {fileID: 0}
   Stamina: {fileID: 0}
   Health: {fileID: 0}
   MeleeAttack: {fileID: 0}
   RangedAttack: {fileID: 0}
   attackRange: 2
-  staminaThreshold: 5
   jumpHeightThreshold: 1.5

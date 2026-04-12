@@ -7088,8 +7088,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AIDecisionEngine
   isTrainingMode: 0
-  enableL1: 0
-  enableL2: 1
+  enableL1: 1
+  enableL2: 0
   enableL3: 0
   evaluationInterval: 0.3
   confidenceThreshold: 0.4

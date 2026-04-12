@@ -245,7 +245,7 @@ MonoBehaviour:
     m_Bits: 256
   wallLayer:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 0
   RB: {fileID: 0}
   Anim: {fileID: 0}
   Collider: {fileID: 0}

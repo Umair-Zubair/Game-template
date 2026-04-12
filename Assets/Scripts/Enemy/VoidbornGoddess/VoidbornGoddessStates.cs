@@ -574,23 +574,17 @@ public class VoidbornArtilleryState : IBossState
         switch (animWait)
         {
             case AnimWait.WaitingForNewState:
-                // Don't check during a blend — the source state info is unreliable
                 if (inTransition) return false;
-                // Must be in a different state from when we triggered
                 if (info.fullPathHash == triggerStateHash) return false;
-                // We've settled into the new animation — record its hash
                 targetStateHash = info.fullPathHash;
                 animWait = AnimWait.WaitingForCompletion;
-                return false; // let it play at least one frame
+                return false;
 
             case AnimWait.WaitingForCompletion:
-                // Still in the target state — wait for it to finish
                 if (!inTransition && info.fullPathHash == targetStateHash)
-                    return info.normalizedTime >= 0.95f;
-                // Animator already moved on (the clip finished and auto-transitioned)
+                    return info.normalizedTime >= 0.99f;
                 if (!inTransition && info.fullPathHash != targetStateHash)
                     return true;
-                // Mid-transition FROM the target state — it's wrapping up
                 if (inTransition && info.fullPathHash == targetStateHash)
                     return true;
                 return false;

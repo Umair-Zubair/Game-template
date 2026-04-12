@@ -36,45 +36,53 @@ public class VoidbornArtilleryProjectile : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private Animator anim;
     private BoxCollider2D boxCollider;
+    private Rigidbody2D rb;
+
+    private int playerLayerMask;
+    private int groundLayerMask;
+    private Vector2 hitDetectionSize;
 
     private void Awake()
     {
         SetupComponents();
     }
 
-    /// <summary>
-    /// Creates or retrieves the required components (SpriteRenderer, Collider, Rigidbody2D).
-    /// Follows the same pattern as the existing ArtilleryProjectile.
-    /// </summary>
     private void SetupComponents()
     {
-        // SpriteRenderer
         spriteRenderer = GetComponent<SpriteRenderer>();
         if (spriteRenderer == null)
             spriteRenderer = gameObject.AddComponent<SpriteRenderer>();
 
         spriteRenderer.sortingOrder = 10;
 
-        // Animator — used for spawn/idle/explosion animations
         anim = GetComponent<Animator>();
 
-        // BoxCollider2D — trigger-based, same as ArtilleryProjectile
+        bool colliderCreated = false;
         boxCollider = GetComponent<BoxCollider2D>();
         if (boxCollider == null)
+        {
             boxCollider = gameObject.AddComponent<BoxCollider2D>();
+            colliderCreated = true;
+        }
         boxCollider.isTrigger = true;
-        boxCollider.size = new Vector2(1f, 1f);
+        if (colliderCreated)
+            boxCollider.size = new Vector2(0.3f, 0.3f);
 
-        // Rigidbody2D — kinematic, we control movement manually
-        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody2D>();
         if (rb == null)
             rb = gameObject.AddComponent<Rigidbody2D>();
+        rb.bodyType = RigidbodyType2D.Dynamic;
         rb.gravityScale = 0f;
-        rb.isKinematic = true;
+        rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 
-        // Use the EnemyProjectile layer for proper collision filtering
-        int layer = LayerMask.NameToLayer("EnemyProjectile");
-        gameObject.layer = layer != -1 ? layer : LayerMask.NameToLayer("Default");
+        playerLayerMask = LayerMask.GetMask("Player");
+        groundLayerMask = LayerMask.GetMask("Ground");
+
+        float scale = Mathf.Abs(transform.localScale.x);
+        float colliderWidth = boxCollider.size.x * scale;
+        float visualHeight = spriteRenderer.bounds.size.y;
+        hitDetectionSize = new Vector2(colliderWidth, Mathf.Max(visualHeight, boxCollider.size.y * scale));
     }
 
     /// <summary>
@@ -92,42 +100,44 @@ public class VoidbornArtilleryProjectile : MonoBehaviour
         lifeTimer = 0f;
         hasHit = false;
 
-        // Apply sprite (custom or placeholder)
+        if (rb != null)
+            rb.linearVelocity = Vector2.zero;
+
+        if (boxCollider != null)
+            boxCollider.enabled = true;
+
         if (spriteRenderer != null)
-        {
             spriteRenderer.sprite = projectileSprite != null ? projectileSprite : CreatePlaceholderSprite();
-        }
 
         gameObject.SetActive(true);
     }
 
     private void Update()
     {
+        lifeTimer += Time.deltaTime;
+
         switch (currentState)
         {
-            // STATE 1 — FORMING: stays suspended briefly
             case ProjectileState.Forming:
-                lifeTimer += Time.deltaTime;
                 stateTimer += Time.deltaTime;
-
                 if (stateTimer >= formDuration)
                 {
                     currentState = ProjectileState.Falling;
+                    if (rb != null)
+                        rb.linearVelocity = Vector2.down * fallSpeed;
                 }
                 break;
 
-            // STATE 2 — FALLING: simple downward velocity
             case ProjectileState.Falling:
-                lifeTimer += Time.deltaTime;
                 if (lifeTimer > lifetime)
                 {
                     Destroy(gameObject);
                     return;
                 }
-                transform.position += Vector3.down * fallSpeed * Time.deltaTime;
+                if (!hasHit)
+                    CheckForHit();
                 break;
 
-            // STATE 3 — EXPLODING: wait for the HandExplosion animation to finish, then destroy
             case ProjectileState.Exploding:
                 if (anim != null)
                 {
@@ -141,33 +151,46 @@ public class VoidbornArtilleryProjectile : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// IMPACT: deals damage on player contact, plays explosion on any valid collision.
-    /// After the explosion animation finishes, the projectile is destroyed.
-    /// </summary>
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void CheckForHit()
     {
-        if (hasHit) return;
+        Vector2 center = transform.position;
 
-        // Player hit — deal damage then explode
-        if (collision.CompareTag("Player"))
+        Collider2D playerHit = Physics2D.OverlapBox(center, hitDetectionSize, 0f, playerLayerMask);
+        if (playerHit != null)
         {
-            Health playerHealth = collision.GetComponent<Health>();
+            Health playerHealth = playerHit.GetComponent<Health>();
             if (playerHealth != null)
-            {
                 playerHealth.TakeDamage(damage);
-                Debug.Log($"[VoidbornArtillery] Hit player for {damage} damage!");
-            }
             hasHit = true;
             PlayExplosion();
             return;
         }
 
-        // Ground hit — explode without damage
+        Collider2D groundHit = Physics2D.OverlapBox(center, hitDetectionSize, 0f, groundLayerMask);
+        if (groundHit != null)
+        {
+            hasHit = true;
+            PlayExplosion();
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (hasHit) return;
+
+        if (collision.CompareTag("Player"))
+        {
+            Health playerHealth = collision.GetComponent<Health>();
+            if (playerHealth != null)
+                playerHealth.TakeDamage(damage);
+            hasHit = true;
+            PlayExplosion();
+            return;
+        }
+
         if (collision.CompareTag("Ground") || collision.gameObject.layer == LayerMask.NameToLayer("Ground"))
         {
             hasHit = true;
-            Debug.Log("[VoidbornArtillery] Hit ground.");
             PlayExplosion();
         }
     }
@@ -180,18 +203,18 @@ public class VoidbornArtilleryProjectile : MonoBehaviour
     {
         currentState = ProjectileState.Exploding;
 
-        // Disable collider so it can't hit anything else during the explosion
+        if (rb != null)
+            rb.linearVelocity = Vector2.zero;
+
         if (boxCollider != null)
             boxCollider.enabled = false;
 
-        // Trigger the explosion animation
         if (anim != null)
         {
             anim.SetTrigger("explode");
         }
         else
         {
-            // No Animator — fall back to immediate destroy
             Destroy(gameObject);
         }
     }

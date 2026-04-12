@@ -65,6 +65,7 @@ public abstract class BossController : MonoBehaviour
             RB.gravityScale = gravityScale;
             RB.freezeRotation = true;
             RB.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+            RB.mass = 10000f;
         }
 
         initScale = transform.localScale;

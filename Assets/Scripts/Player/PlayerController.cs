@@ -18,7 +18,7 @@ public class PlayerController : MonoBehaviour
     // State Machine
     public PlayerStateMachine StateMachine { get; private set; }
 
-    // States
+    // States (wall states are null when wallLayer is unassigned, e.g. Hunter)
     public IdleState IdleState { get; private set; }
     public RunState RunState { get; private set; }
     public JumpState JumpState { get; private set; }
@@ -56,8 +56,10 @@ public class PlayerController : MonoBehaviour
         RunState = new RunState();
         JumpState = new JumpState();
         FallState = new FallState();
-        WallSlideState = new WallSlideState();
-        WallJumpState = new WallJumpState();
+
+        bool hasWallLayer = wallLayer.value != 0;
+        WallSlideState = hasWallLayer ? new WallSlideState() : null;
+        WallJumpState  = hasWallLayer ? new WallJumpState()  : null;
 
         RB = GetComponent<Rigidbody2D>();
         Anim = GetComponent<Animator>();
@@ -137,7 +139,7 @@ public class PlayerController : MonoBehaviour
             CoyoteTimeCounter -= Time.deltaTime;
         }
 
-        if (WallJumpLockCounter > 0)
+        if (WallJumpState != null && WallJumpLockCounter > 0)
         {
             WallJumpLockCounter -= Time.deltaTime;
         }
@@ -145,10 +147,9 @@ public class PlayerController : MonoBehaviour
 
     private void ApplyGravity()
     {
-        // 1. Wall Logic (States handle their own gravity usually, but we can override here if needed)
-        if (StateMachine.CurrentState == WallSlideState || StateMachine.CurrentState == WallJumpState)
+        if (WallSlideState != null &&
+            (StateMachine.CurrentState == WallSlideState || StateMachine.CurrentState == WallJumpState))
         {
-             // Let states handle it
              return;
         }
 

@@ -56,30 +56,26 @@ public class ArtilleryProjectile : MonoBehaviour
         spriteRenderer.color = spriteColor;
         spriteRenderer.sortingOrder = 10;
 
-        // Setup collider
+        bool colliderCreated = false;
         boxCollider = GetComponent<BoxCollider2D>();
         if (boxCollider == null)
         {
             boxCollider = gameObject.AddComponent<BoxCollider2D>();
+            colliderCreated = true;
         }
         boxCollider.isTrigger = true;
-        boxCollider.size = new Vector2(1f, 1f);
+        if (colliderCreated)
+            boxCollider.size = new Vector2(0.3f, 0.3f);
 
-        // Setup Rigidbody2D for physics
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
         if (rb == null)
         {
             rb = gameObject.AddComponent<Rigidbody2D>();
         }
-        rb.gravityScale = 0; // We control movement manually
-        rb.isKinematic = true;
-
-        // Set layer for proper collision
-        gameObject.layer = LayerMask.NameToLayer("EnemyProjectile");
-        if (gameObject.layer == -1)
-        {
-            gameObject.layer = LayerMask.NameToLayer("Default");
-        }
+        rb.bodyType = RigidbodyType2D.Dynamic;
+        rb.gravityScale = 0f;
+        rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
     }
 
     /// <summary>
