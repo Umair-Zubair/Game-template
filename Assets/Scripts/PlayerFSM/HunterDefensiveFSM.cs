@@ -15,7 +15,7 @@ using UnityEngine;
 public class HunterDefensiveFSM : PlayerFSMController
 {
     [Header("Hunter Defensive — Tuning")]
-    [SerializeField] private float preferredRange         = 7.0f;
+    [SerializeField] private float preferredRange         = 8.0f;
     [SerializeField] private float rangeTolerance         = 1.0f;
     [SerializeField] private float retreatTriggerDistance = 4.0f;
     [SerializeField] private float airShotProbability     = 0.70f;

@@ -50,7 +50,7 @@ GameObject:
   - component: {fileID: 5739552593001750824}
   - component: {fileID: 2548767403431450800}
   - component: {fileID: -8182996424340938370}
-  - component: {fileID: 742026018143251897}
+  - component: {fileID: 7391054212139527422}
   m_Layer: 10
   m_Name: Hunter
   m_TagString: Player
@@ -335,7 +335,7 @@ MonoBehaviour:
   windowDuration: 3
   sampleInterval: 0.5
   DebugMode: 1
---- !u!114 &742026018143251897
+--- !u!114 &7391054212139527422
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -344,9 +344,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 5536329845775654271}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c6a6cac896718b9468c8a853834771fb, type: 3}
+  m_Script: {fileID: 11500000, guid: 6f5446ac898679243b6f7a5309ea9bb7, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HunterBalancedFSM
+  m_EditorClassIdentifier: Assembly-CSharp::HunterAggressiveFSM
   targetTag: Enemy
   inputSmoothSpeed: 6
   dangerRange: 3
@@ -358,7 +358,5 @@ MonoBehaviour:
   MeleeAttack: {fileID: 0}
   RangedAttack: {fileID: 0}
   preferredRange: 4.5
-  rangeTolerance: 0.8
-  retreatTriggerDistance: 2
-  reloadThresholdRatio: 0.2
+  pointBlankDistance: 4
   jumpShootChance: 0.3

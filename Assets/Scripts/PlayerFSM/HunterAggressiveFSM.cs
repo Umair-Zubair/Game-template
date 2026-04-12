@@ -14,9 +14,9 @@ using UnityEngine;
 public class HunterAggressiveFSM : PlayerFSMController
 {
     [Header("Hunter Aggressive — Tuning")]
-    [SerializeField] private float preferredRange     = 3.0f;
-    [SerializeField] private float pointBlankDistance = 0.8f;
-    [SerializeField] private float jumpShootChance    = 0.50f;
+    [SerializeField] private float preferredRange     = 4.5f;
+    [SerializeField] private float pointBlankDistance = 4.0f;
+    [SerializeField] private float jumpShootChance    = 0.30f;
 
     public HA_Press         PressState         { get; private set; }
     public HA_React         ReactState         { get; private set; }

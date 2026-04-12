@@ -13,11 +13,11 @@ using UnityEngine;
 public class HunterBalancedFSM : PlayerFSMController
 {
     [Header("Hunter Balanced — Tuning")]
-    [SerializeField] private float preferredRange         = 4.5f;
+    [SerializeField] private float preferredRange         = 6.0f;
     [SerializeField] private float rangeTolerance         = 0.8f;
     [SerializeField] private float retreatTriggerDistance = 2.0f;
     [SerializeField] private float reloadThresholdRatio   = 0.20f;  // re-engage with just 1/3 ammo
-    [SerializeField] private float jumpShootChance        = 0.30f;
+    [SerializeField] private float jumpShootChance        = 0.20f;
 
     public HB_FindRange FindRangeState { get; private set; }
     public HB_Aim       AimState       { get; private set; }
