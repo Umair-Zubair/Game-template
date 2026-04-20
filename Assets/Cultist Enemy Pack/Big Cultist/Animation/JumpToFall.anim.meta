@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 3825211e312981f45ba2e73cf091b119
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 195196
+  packageName: Cultist Enemy Pack
+  packageVersion: 1.0
+  assetPath: Assets/Cultist Enemy Pack/Big Cultist/Animation/JumpToFall.anim
+  uploadId: 432876

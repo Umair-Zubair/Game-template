@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 875355bc7c5eb494a84b326a959e1c48
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 195196
+  packageName: Cultist Enemy Pack
+  packageVersion: 1.0
+  assetPath: Assets/Cultist Enemy Pack/Big Cultist/Animation/Big Cultist.controller
+  uploadId: 432876

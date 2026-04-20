@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d186185183afaca4ea0ada077c454ea3
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 195196
+  packageName: Cultist Enemy Pack
+  packageVersion: 1.0
+  assetPath: Assets/Cultist Enemy Pack/Assassin Cultist/Animation/Assassin Cultist.controller
+  uploadId: 432876
