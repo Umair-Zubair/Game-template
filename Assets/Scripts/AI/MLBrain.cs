@@ -36,7 +36,7 @@ public class MLBrain : Agent, IBossDecisionModule
     private const float WinReward         = +5f;
     private const float LoseReward        = -5f;
     private const float TimeoutReward     = -1f;
-    private const float InfeasiblePenalty = -0.1f;
+    private const float InfeasiblePenalty = -0.05f;
 
     public bool IsModelLoaded =>
         behaviorParams != null &&
@@ -136,12 +136,16 @@ public class MLBrain : Agent, IBossDecisionModule
         if (chosen == BossActionType.ArtilleryAttack && !CurrentContext.canUseArtillery)
             AddReward(InfeasiblePenalty);
 
+        float dynamicConf = CalculateDynamicConfidence(chosen, CurrentContext);
+
         lastDecision = new BossDecision
         {
             action     = chosen,
-            confidence = 0.8f,
+            confidence = dynamicConf, 
             source     = ModuleName
         };
+
+
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
@@ -198,4 +202,34 @@ public class MLBrain : Agent, IBossDecisionModule
 
         if (restartManager != null) restartManager.StopAllCoroutines();
     }
+
+    private float CalculateDynamicConfidence(BossActionType chosenAction, GameContext ctx)
+    {
+        float baseConfidence = 0.5f; // Start neutral
+
+        switch (chosenAction)
+        {
+            case BossActionType.MeleeAttack:
+                if (!ctx.canMeleeAttack) return 0.0f; // Literally impossible, 0 confidence
+                if (ctx.isPlayerInAttackRange) baseConfidence += 0.4f; // Perfect situation
+                else baseConfidence -= 0.3f; // Risky, player isn't close enough
+                break;
+
+            case BossActionType.ArtilleryAttack:
+                if (!ctx.canUseArtillery) return 0.0f; // On cooldown, 0 confidence
+                if (!ctx.isPlayerInAttackRange) baseConfidence += 0.4f; // Great for long range
+                if (ctx.playerHealthNormalized < 0.3f) baseConfidence += 0.2f; // Good for finishing a weak player
+                break;
+
+            case BossActionType.Chase:
+                if (ctx.distanceToPlayer > 15f) baseConfidence += 0.4f; // Makes sense to close gap
+                if (ctx.isPlayerInAttackRange) baseConfidence -= 0.3f; // Why chase if already in melee range?
+                break;
+        }
+
+        // Clamp the result between 0.0 and 1.0 just to be safe
+        return Mathf.Clamp01(baseConfidence);
+    }
 }
+
+

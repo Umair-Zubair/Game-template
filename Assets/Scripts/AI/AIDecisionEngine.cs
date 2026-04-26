@@ -26,12 +26,12 @@ public class AIDecisionEngine : MonoBehaviour
 
     [Header("Decision Engine Settings")]
     [SerializeField] private float evaluationInterval = 0.3f;
-    [SerializeField] private float confidenceThreshold = 0.4f;
+    [SerializeField] private float confidenceThreshold = 0.4f; // for weighted conf
     [SerializeField] private bool  persistWeights = true;
 
     [Header("ML Brain")]
     [SerializeField] private MLBrain mlBrain;
-    [SerializeField] private float mlConfidenceThreshold = 1.1f;
+    [SerializeField] private float mlConfidenceThreshold = 0.7f; // for ml conf
 
     [Header("Debug")]
     public bool DebugMode = true;
