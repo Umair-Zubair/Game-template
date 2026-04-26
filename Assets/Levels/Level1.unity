@@ -1971,7 +1971,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TwistedCultistController
   detectionRange: 50
-  attackRange: 2
+  attackRange: 1.5
   retreatRange: 1
   gravityScale: 2
   fallGravityMultiplier: 1.5
@@ -1998,6 +1998,7 @@ MonoBehaviour:
   postAttackReengageChance: 0.55
   lowHealthRetreatThreshold: 0.35
   hurtMemoryDuration: 1.5
+  directionDeadzone: 0.5
   rangedAttackPoint: {fileID: 0}
   rangedAttackOffset: {x: 1.1, y: 0.25}
   rangedAttackRadius: 1.35
@@ -2007,6 +2008,20 @@ MonoBehaviour:
   attackFallbackEndDelay: 0.95
   spawnFallbackDuration: 0.9
   logMissingAnimationStates: 0
+--- !u!114 &498594527
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 498594520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8e26f534ea637349a0bc6f44b578ba9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Health
+  startingHealth: 7
+  components: []
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -5692,7 +5707,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -8.000122}
+  m_AnchoredPosition: {x: 0, y: -7.9999695}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1305240361
@@ -9173,7 +9188,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7510121693570181259, guid: d983f24482c95794db4b03a291952898, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.59
+      value: -1.5
       objectReference: {fileID: 0}
     - target: {fileID: 7510121693570181259, guid: d983f24482c95794db4b03a291952898, type: 3}
       propertyPath: m_LocalPosition.z
@@ -9230,6 +9245,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7588782773994181271, guid: d983f24482c95794db4b03a291952898, type: 3}
       insertIndex: -1
       addedObject: {fileID: 498594526}
+    - targetCorrespondingSourceObject: {fileID: 7588782773994181271, guid: d983f24482c95794db4b03a291952898, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 498594527}
   m_SourcePrefab: {fileID: 100100000, guid: d983f24482c95794db4b03a291952898, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

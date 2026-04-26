@@ -148,7 +148,14 @@ public class TwistedCultistController : BossController
         base.Start();
         if (Health != null)
             Health.OnDamageTaken += OnTakeDamage;
+        OnDied += OnDeathAnimation;
         TryIgnorePlayerCollision();
+    }
+
+    private void OnDeathAnimation()
+    {
+        SetWalking(false);
+        Anim?.SetTrigger("death");
     }
 
     protected override void Update()
@@ -162,8 +169,12 @@ public class TwistedCultistController : BossController
     private void TryIgnorePlayerCollision()
     {
         if (collisionIgnored || Player == null || Collider == null) return;
+        int playerLayer = LayerMask.NameToLayer("Player");
         foreach (Collider2D pc in Player.root.GetComponentsInChildren<Collider2D>(true))
-            Physics2D.IgnoreCollision(Collider, pc, true);
+        {
+            if (pc.gameObject.layer == playerLayer)
+                Physics2D.IgnoreCollision(Collider, pc, true);
+        }
         collisionIgnored = true;
     }
 
