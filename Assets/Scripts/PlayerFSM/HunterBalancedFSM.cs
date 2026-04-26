@@ -4,8 +4,11 @@ using UnityEngine;
 // HUNTER BALANCED FSM
 //
 // Positions at mid range, briefly aims before firing a random burst (1-3 shots),
-// slides back, then re-engages. Stamina is NOT checked by the FSM — the attack
-// component handles it. The bot never stands idle waiting for stamina.
+// slides back, then re-engages. Stamina is factored into every decision:
+//   - Low stamina  → shorter bursts, longer aim hesitation, wider comfort range
+//   - Exhausted    → won't engage, holds back until recovered
+//   - Jump-shoots are skipped when stamina can't afford the jump
+//   - WaitAmmo also waits for stamina before re-engaging
 //
 // States: FindRange → Aim → Shoot / JumpShoot → SlideBack → FindRange / WaitAmmo
 //         Any state → Evade (artillery or boss attack at close range)
@@ -16,8 +19,16 @@ public class HunterBalancedFSM : PlayerFSMController
     [SerializeField] private float preferredRange         = 6.0f;
     [SerializeField] private float rangeTolerance         = 0.8f;
     [SerializeField] private float retreatTriggerDistance = 2.0f;
-    [SerializeField] private float reloadThresholdRatio   = 0.20f;  // re-engage with just 1/3 ammo
+    [SerializeField] private float reloadThresholdRatio   = 0.20f;
     [SerializeField] private float jumpShootChance        = 0.20f;
+
+    [Header("Stamina Awareness")]
+    [Tooltip("Below this ratio the bot plays cautiously — shorter bursts, longer aim, wider range.")]
+    [SerializeField] private float lowStaminaThreshold    = 0.30f;
+    [Tooltip("Extra distance added to preferred range when stamina is low.")]
+    [SerializeField] private float lowStaminaRangeBuffer  = 1.5f;
+    [Tooltip("Stamina ratio required before re-engaging after waiting.")]
+    [SerializeField] private float reengageStaminaRatio   = 0.35f;
 
     public HB_FindRange FindRangeState { get; private set; }
     public HB_Aim       AimState       { get; private set; }
@@ -26,6 +37,18 @@ public class HunterBalancedFSM : PlayerFSMController
     public HB_SlideBack SlideBackState { get; private set; }
     public HB_WaitAmmo  WaitAmmoState  { get; private set; }
     public HB_Evade     EvadeState     { get; private set; }
+
+    public bool  IsLowStamina      => StaminaRatio() < lowStaminaThreshold;
+    public bool  IsExhaustedStamina => Stamina != null && Stamina.IsExhausted;
+
+    /// <summary>
+    /// Preferred range widens when stamina is low so the bot plays safer.
+    /// </summary>
+    public float EffectiveRange => IsExhaustedStamina
+        ? preferredRange + lowStaminaRangeBuffer
+        : IsLowStamina
+            ? preferredRange + lowStaminaRangeBuffer * 0.5f
+            : preferredRange;
 
     protected override void InitializeStates()
     {
@@ -41,8 +64,9 @@ public class HunterBalancedFSM : PlayerFSMController
     protected override void StartFSM() => FSM.Initialize(FindRangeState, this);
 
     // ==========================================================================
-    // FIND RANGE — Adjusts position to the preferred band. No stamina gate —
-    // as soon as in range with any ammo, transitions straight to Aim.
+    // FIND RANGE — Adjusts position to the preferred band.  Uses EffectiveRange
+    // so the bot stands farther back when stamina is low.  Won't engage while
+    // exhausted — holds distance and waits for recovery first.
     // ==========================================================================
     public class HB_FindRange : IPlayerFSMState
     {
@@ -75,28 +99,30 @@ public class HunterBalancedFSM : PlayerFSMController
                 return;
             }
 
-            // Reloading — hold range while waiting, don't go to WaitAmmo yet
+            float effRange = hb.EffectiveRange;
+            float minR     = effRange - hb.rangeTolerance;
+            float maxR     = effRange + hb.rangeTolerance;
+
             if (hb.RangedAttack != null && hb.RangedAttack.IsReloading)
             {
-                float min = hb.preferredRange - hb.rangeTolerance;
-                float max = hb.preferredRange + hb.rangeTolerance;
-                if      (dist < min) ctrl.MoveAway();
-                else if (dist > max) ctrl.MoveTowardAt(0.65f);
-                else                 ctrl.StopMoving();
+                if      (dist < minR) ctrl.MoveAway();
+                else if (dist > maxR) ctrl.MoveTowardAt(0.65f);
+                else                  ctrl.StopMoving();
                 return;
             }
 
             bool hasAmmo = hb.RangedAttack == null || hb.RangedAttack.CurrentAmmo > 0;
             if (!hasAmmo) { hb.FSM.ChangeState(hb.WaitAmmoState, ctrl); return; }
 
-            float minR = hb.preferredRange - hb.rangeTolerance;
-            float maxR = hb.preferredRange + hb.rangeTolerance;
-
             if      (dist < minR) ctrl.MoveAway();
             else if (dist > maxR) ctrl.MoveTowardAt(0.70f);
             else
             {
                 ctrl.StopMoving();
+
+                // Exhausted — hold position until stamina recovers enough to fight
+                if (hb.IsExhaustedStamina) return;
+
                 hb.FSM.ChangeState(hb.AimState, ctrl);
             }
         }
@@ -105,7 +131,8 @@ public class HunterBalancedFSM : PlayerFSMController
     }
 
     // ==========================================================================
-    // AIM — Brief stop before the burst. Bails on boss attack mid-aim.
+    // AIM — Brief stop before the burst. Low stamina means longer hesitation
+    // and no jump-shoots (conserves the jump cost). Bails on boss attack.
     // ==========================================================================
     public class HB_Aim : IPlayerFSMState
     {
@@ -117,8 +144,14 @@ public class HunterBalancedFSM : PlayerFSMController
             var hb = (HunterBalancedFSM)ctrl;
             ctrl.StopMoving();
             ctrl.FaceTarget();
-            timer    = Random.Range(0.08f, 0.18f);
-            willJump = ctrl.IsGrounded() && Random.value < hb.jumpShootChance;
+
+            // Low stamina → longer hesitation (cautious), high → snappy aim
+            timer = hb.IsLowStamina
+                ? Random.Range(0.18f, 0.35f)
+                : Random.Range(0.08f, 0.18f);
+
+            // Skip jump-shoot when stamina is low — jumping costs stamina
+            willJump = !hb.IsLowStamina && ctrl.IsGrounded() && Random.value < hb.jumpShootChance;
         }
 
         public void OnUpdate(PlayerFSMController ctrl)
@@ -155,8 +188,8 @@ public class HunterBalancedFSM : PlayerFSMController
     }
 
     // ==========================================================================
-    // SHOOT — Random burst (1-3 shots), variable inter-shot interval.
-    // Interrupts immediately if artillery fires mid-burst.
+    // SHOOT — Burst size scales with stamina: 1-3 when flush, capped to 1
+    // when low. Aborts immediately if exhausted mid-burst.
     // ==========================================================================
     public class HB_Shoot : IPlayerFSMState
     {
@@ -166,9 +199,11 @@ public class HunterBalancedFSM : PlayerFSMController
 
         public void OnEnter(PlayerFSMController ctrl)
         {
+            var hb = (HunterBalancedFSM)ctrl;
             ctrl.StopMoving();
             ctrl.FaceTarget();
-            targetBurst = Random.Range(1, 4);
+
+            targetBurst = hb.IsLowStamina ? 1 : Random.Range(1, 4);
             shotsFired  = 0;
             shotTimer   = 0f;
             ctrl.RequestAttack();
@@ -188,7 +223,9 @@ public class HunterBalancedFSM : PlayerFSMController
                 return;
             }
 
-            if (ctrl.DistanceToTarget() < hb.retreatTriggerDistance || shotsFired >= targetBurst)
+            // Exhausted mid-burst — stop firing and slide back
+            if (hb.IsExhaustedStamina || ctrl.DistanceToTarget() < hb.retreatTriggerDistance
+                                      || shotsFired >= targetBurst)
             {
                 hb.FSM.ChangeState(hb.SlideBackState, ctrl);
                 return;
@@ -216,6 +253,7 @@ public class HunterBalancedFSM : PlayerFSMController
 
     // ==========================================================================
     // JUMP SHOOT — Jumps, fires one aerial shot, slides back on landing.
+    // Falls back to ground Shoot if stamina is too low for the jump.
     // ==========================================================================
     public class HB_JumpShoot : IPlayerFSMState
     {
@@ -224,6 +262,15 @@ public class HunterBalancedFSM : PlayerFSMController
 
         public void OnEnter(PlayerFSMController ctrl)
         {
+            var hb = (HunterBalancedFSM)ctrl;
+
+            // Can't afford the jump — do a ground shot instead
+            if (hb.IsLowStamina)
+            {
+                hb.FSM.ChangeState(hb.ShootState, ctrl);
+                return;
+            }
+
             ctrl.StopMoving();
             ctrl.FaceTarget();
             ctrl.RequestJump(Random.Range(0.20f, 0.28f));
@@ -252,8 +299,9 @@ public class HunterBalancedFSM : PlayerFSMController
     }
 
     // ==========================================================================
-    // SLIDE BACK — Short retreat after a burst. Checks ammo on exit — re-engages
-    // with even 1 bullet left (20% threshold). Almost always goes to FindRange.
+    // SLIDE BACK — Short retreat after a burst. Slides farther when stamina is
+    // low. If exhausted, always goes to WaitAmmo for a breather regardless of
+    // ammo state.
     // ==========================================================================
     public class HB_SlideBack : IPlayerFSMState
     {
@@ -261,7 +309,10 @@ public class HunterBalancedFSM : PlayerFSMController
 
         public void OnEnter(PlayerFSMController ctrl)
         {
-            timer = Random.Range(0.15f, 0.35f);
+            var hb = (HunterBalancedFSM)ctrl;
+            timer = hb.IsLowStamina
+                ? Random.Range(0.30f, 0.55f)
+                : Random.Range(0.15f, 0.35f);
         }
 
         public void OnUpdate(PlayerFSMController ctrl)
@@ -280,6 +331,13 @@ public class HunterBalancedFSM : PlayerFSMController
             timer -= Time.deltaTime;
             if (timer <= 0f)
             {
+                // Exhausted — always pause to recover, even if ammo is fine
+                if (hb.IsExhaustedStamina)
+                {
+                    hb.FSM.ChangeState(hb.WaitAmmoState, ctrl);
+                    return;
+                }
+
                 float ammoRatio = hb.RangedAttack == null
                     ? 1f
                     : (float)hb.RangedAttack.CurrentAmmo / Mathf.Max(1, hb.RangedAttack.MaxAmmo);
@@ -293,9 +351,9 @@ public class HunterBalancedFSM : PlayerFSMController
     }
 
     // ==========================================================================
-    // WAIT AMMO — Holds comfortable distance during reload. No stamina gate.
-    // Tiny extra wait (0.05-0.15s) once ammo is back — feels like reacting,
-    // not like instantly springing back.
+    // WAIT AMMO — Holds comfortable distance during reload. Also waits for
+    // stamina to recover past reengageStaminaRatio before re-engaging — the
+    // bot won't spring back into the fight while gassed.
     // ==========================================================================
     public class HB_WaitAmmo : IPlayerFSMState
     {
@@ -318,9 +376,9 @@ public class HunterBalancedFSM : PlayerFSMController
                 return;
             }
 
-            // Keep preferred range even while waiting
-            float minComfort = hb.preferredRange - hb.rangeTolerance;
-            float maxComfort = hb.preferredRange + hb.rangeTolerance;
+            float effRange   = hb.EffectiveRange;
+            float minComfort = effRange - hb.rangeTolerance;
+            float maxComfort = effRange + hb.rangeTolerance;
             if      (dist < minComfort) ctrl.MoveAway();
             else if (dist > maxComfort) ctrl.MoveTowardAt(0.50f);
             else                        ctrl.StopMoving();
@@ -329,7 +387,10 @@ public class HunterBalancedFSM : PlayerFSMController
                 ? 1f
                 : (float)hb.RangedAttack.CurrentAmmo / Mathf.Max(1, hb.RangedAttack.MaxAmmo);
 
-            if (ammoRatio >= hb.reloadThresholdRatio && !conditionsMet)
+            bool ammoReady    = ammoRatio >= hb.reloadThresholdRatio;
+            bool staminaReady = !hb.IsExhaustedStamina && ctrl.StaminaRatio() >= hb.reengageStaminaRatio;
+
+            if (ammoReady && staminaReady && !conditionsMet)
             {
                 conditionsMet = true;
                 extraWait     = Random.Range(0.05f, 0.15f);
@@ -369,10 +430,11 @@ public class HunterBalancedFSM : PlayerFSMController
             var hb = (HunterBalancedFSM)ctrl;
             ctrl.FaceTarget();
 
-            float dist = ctrl.DistanceToTarget();
-            if (dist < hb.preferredRange * 0.8f)
+            float dist     = ctrl.DistanceToTarget();
+            float effRange = hb.EffectiveRange;
+            if (dist < effRange * 0.8f)
                 ctrl.MoveAway();
-            else if (dist > hb.preferredRange * 1.3f)
+            else if (dist > effRange * 1.3f)
                 ctrl.MoveTowardAt(0.60f);
 
             timer -= Time.deltaTime;

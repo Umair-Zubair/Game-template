@@ -40,6 +40,9 @@ public class VoidbornGoddessController : BossController
     // CULTIST SPAWN — summons a TwistedCultist in front of the boss
     // -----------------------------------------------------------------
     [Header("Cultist Spawning")]
+    [Tooltip("Master toggle — uncheck to completely disable cultist spawning at runtime.")]
+    public bool enableCultistSpawning = true;
+
     [Tooltip("TwistedCultist prefab to instantiate")]
     public GameObject cultistPrefab;
 
@@ -79,7 +82,8 @@ public class VoidbornGoddessController : BossController
 
     // Cultist spawn cooldown
     public float CultistSpawnTimer { get; private set; }
-    public bool CanSpawnCultist => CultistSpawnTimer <= 0f && !IsAttacking
+    public bool CanSpawnCultist => enableCultistSpawning
+        && CultistSpawnTimer <= 0f && !IsAttacking
         && cultistPrefab != null && CountLivingCultists() < maxLivingCultists;
 
     // ---- Effective values (scaled by active AdaptationProfile) ----

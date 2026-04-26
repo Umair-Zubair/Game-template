@@ -24,6 +24,10 @@ public class AIDecisionEngine : MonoBehaviour
     public bool enableL2 = true;
     public bool enableL3 = true;
 
+    [Header("Fairness Guardian")]
+    [Tooltip("Master switch — disable to let the boss act without any fairness throttling.")]
+    public bool enableFairnessGuardian = true;
+
     [Header("Decision Engine Settings")]
     [SerializeField] private float evaluationInterval = 0.3f;
     [SerializeField] private float confidenceThreshold = 0.4f; // for weighted conf
@@ -67,8 +71,9 @@ public class AIDecisionEngine : MonoBehaviour
     public GameContext  CurrentContext  { get; private set; }
 
     public string ActiveLayer          => CurrentDecision.source ?? "None";
-    public bool   IsFairnessActive     => fairnessGuardian?.IsRelaxationActive ?? false;
-    public float  FairnessCooldownMultiplier => fairnessGuardian?.CooldownMultiplier ?? 1f;
+    public bool   IsFairnessActive     => enableFairnessGuardian && (fairnessGuardian?.IsRelaxationActive ?? false);
+    public float  FairnessCooldownMultiplier => enableFairnessGuardian
+        ? (fairnessGuardian?.CooldownMultiplier ?? 1f) : 1f;
 
     public bool  MLBrainActive => mlBrain != null && mlBrain.IsModelLoaded;
     public float MLConfidence  { get; private set; }
@@ -125,6 +130,9 @@ public class AIDecisionEngine : MonoBehaviour
         evaluationTimer += Time.deltaTime;
         if (evaluationTimer < evaluationInterval) return;
         evaluationTimer = 0f;
+
+        if (fairnessGuardian != null)
+            fairnessGuardian.Enabled = enableFairnessGuardian;
 
         CurrentContext = BuildContext();
 
@@ -245,8 +253,7 @@ public class AIDecisionEngine : MonoBehaviour
             playerHealthNormalized   = playerHP,
             distanceToPlayer         = bossController.GetDistanceToPlayer(),
             canMeleeAttack           = goddess != null && goddess.CanAttack,
-            canUseArtillery          = goddess != null && goddess.CanUseArtillery
-                                       && !fairnessGuardian.BlockArtillery,
+            canUseArtillery          = goddess != null && goddess.CanUseArtillery,
             isPlayerInAttackRange    = bossController.PlayerInAttackRange(),
             isPlayerInDetectionRange = bossController.PlayerInDetectionRange(),
             playerProfile            = pp,
@@ -285,7 +292,7 @@ public class AIDecisionEngine : MonoBehaviour
 
         float pMax = playerHealth != null ? playerHealth.MaxHealth : 1f;
         float bMax = bossHealth   != null ? bossHealth.MaxHealth   : 1f;
-        mlBrain?.ReceiveActionOutcome(dealt / pMax, taken / bMax);
+        mlBrain?.ReceiveActionOutcome(action, dealt / pMax, taken / bMax);
 
         if (DebugMode)
             Debug.Log($"[AIEngine] {action} done | dealt={dealt:F0} taken={taken:F0} wR={wReward:F2}");

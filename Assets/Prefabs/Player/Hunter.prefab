@@ -51,6 +51,8 @@ GameObject:
   - component: {fileID: 2548767403431450800}
   - component: {fileID: -8182996424340938370}
   - component: {fileID: 7391054212139527422}
+  - component: {fileID: 2551572195314797279}
+  - component: {fileID: 6830410306596466865}
   m_Layer: 10
   m_Name: Hunter
   m_TagString: Player
@@ -360,3 +362,62 @@ MonoBehaviour:
   preferredRange: 4.5
   pointBlankDistance: 4
   jumpShootChance: 0.3
+--- !u!114 &2551572195314797279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5536329845775654271}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ee182bca2d8c5f49b1b8f6057805991, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HunterBalanceFSM
+  targetTag: Enemy
+  inputSmoothSpeed: 6
+  dangerRange: 3
+  reactionDelayMin: 0.1
+  reactionDelayMax: 0.26
+  PC: {fileID: 0}
+  Stamina: {fileID: 0}
+  Health: {fileID: 0}
+  MeleeAttack: {fileID: 0}
+  RangedAttack: {fileID: 0}
+  aggressiveRange: 4.5
+  defensiveRange: 7.5
+  rangeTolerance: 1
+  retreatTriggerDistance: 3.5
+  jumpShotChance: 0.35
+  highStaminaThreshold: 0.55
+  lowStaminaThreshold: 0.25
+  breatherRecoverTarget: 0.4
+  stanceLockMin: 2
+  stanceLockMax: 4
+--- !u!114 &6830410306596466865
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5536329845775654271}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6a6cac896718b9468c8a853834771fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HunterBalancedFSM
+  targetTag: Enemy
+  inputSmoothSpeed: 6
+  dangerRange: 2
+  reactionDelayMin: 0.3
+  reactionDelayMax: 0.7
+  PC: {fileID: 0}
+  Stamina: {fileID: 0}
+  Health: {fileID: 0}
+  MeleeAttack: {fileID: 0}
+  RangedAttack: {fileID: 0}
+  preferredRange: 4
+  rangeTolerance: 0.65
+  retreatTriggerDistance: 2
+  reloadThresholdRatio: 0.2
+  jumpShootChance: 0.5

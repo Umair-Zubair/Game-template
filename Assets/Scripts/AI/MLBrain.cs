@@ -38,6 +38,10 @@ public class MLBrain : Agent, IBossDecisionModule
     private const float TimeoutReward     = -1f;
     private const float InfeasiblePenalty = -0.05f;
 
+    private const float ArtilleryDamageBonus  = 0.5f;
+    private const float ConsecutiveMeleeBonus = 0.25f;
+    private int consecutiveMeleeHits;
+
     public bool IsModelLoaded =>
         behaviorParams != null &&
         behaviorParams.BehaviorType != BehaviorType.HeuristicOnly &&
@@ -75,6 +79,7 @@ public class MLBrain : Agent, IBossDecisionModule
         episodeEnding = false;
         episodeTimer  = 0f;
         lastDecision  = BossDecision.Default;
+        consecutiveMeleeHits = 0;
     }
 
     // ── Called by AIDecisionEngine each eval tick ───────────────
@@ -155,9 +160,25 @@ public class MLBrain : Agent, IBossDecisionModule
 
     // ── Rewards ────────────────────────────────────────────────
 
-    public void ReceiveActionOutcome(float normalizedDealt, float normalizedTaken)
+    public void ReceiveActionOutcome(BossActionType action, float normalizedDealt, float normalizedTaken)
     {
-        AddReward(normalizedDealt - normalizedTaken);
+        float adjustedDealt = normalizedDealt;
+
+        if (action == BossActionType.ArtilleryAttack && normalizedDealt > 0f)
+            adjustedDealt *= 1f + ArtilleryDamageBonus;
+
+        if (action == BossActionType.MeleeAttack && normalizedDealt > 0f)
+        {
+            consecutiveMeleeHits++;
+            if (consecutiveMeleeHits > 1)
+                adjustedDealt *= 1f + ConsecutiveMeleeBonus * (consecutiveMeleeHits - 1);
+        }
+        else
+        {
+            consecutiveMeleeHits = 0;
+        }
+
+        AddReward(adjustedDealt - normalizedTaken);
     }
 
     public void OnFightWon()
