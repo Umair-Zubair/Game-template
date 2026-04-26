@@ -1953,75 +1953,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!1 &498594520 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7588782773994181271, guid: d983f24482c95794db4b03a291952898, type: 3}
-  m_PrefabInstance: {fileID: 8955594525588451893}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &498594526
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 498594520}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1c63a6e238b677428963985aa8aa3be, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TwistedCultistController
-  detectionRange: 50
-  attackRange: 1.5
-  retreatRange: 1
-  gravityScale: 2
-  fallGravityMultiplier: 1.5
-  maxFallSpeed: 20
-  playerLayer:
-    serializedVersion: 2
-    m_Bits: 1024
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 256
-  playerDamageLayer:
-    serializedVersion: 2
-    m_Bits: 1024
-  RB: {fileID: 0}
-  Anim: {fileID: 0}
-  Collider: {fileID: 0}
-  Health: {fileID: 0}
-  StunTimer: 0
-  DebugMode: 1
-  pressSpeed: 2.6
-  evadeSpeed: 2.8
-  reactDelayMin: 0.07
-  reactDelayMax: 0.18
-  postAttackReengageChance: 0.55
-  lowHealthRetreatThreshold: 0.35
-  hurtMemoryDuration: 1.5
-  directionDeadzone: 0.5
-  rangedAttackPoint: {fileID: 0}
-  rangedAttackOffset: {x: 1.1, y: 0.25}
-  rangedAttackRadius: 1.35
-  rangedAttackDamage: 1
-  rangedAttackCooldown: 2.2
-  attackFallbackHitDelay: 0.3
-  attackFallbackEndDelay: 0.95
-  spawnFallbackDuration: 0.9
-  logMissingAnimationStates: 0
---- !u!114 &498594527
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 498594520}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8e26f534ea637349a0bc6f44b578ba9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Health
-  startingHealth: 7
-  components: []
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -5349,7 +5280,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4303414237555634310, guid: 0cd5ddff8b596404182275a636514347, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7017095160659475263, guid: 0cd5ddff8b596404182275a636514347, type: 3}
       propertyPath: m_LocalPosition.x
@@ -5368,8 +5299,16 @@ PrefabInstance:
       value: 193736679
       objectReference: {fileID: 0}
     - target: {fileID: 9210189640734394756, guid: 0cd5ddff8b596404182275a636514347, type: 3}
+      propertyPath: cultistPrefab
+      value: 
+      objectReference: {fileID: 7588782773994181271, guid: d983f24482c95794db4b03a291952898, type: 3}
+    - target: {fileID: 9210189640734394756, guid: 0cd5ddff8b596404182275a636514347, type: 3}
       propertyPath: detectionRange
       value: 17
+      objectReference: {fileID: 0}
+    - target: {fileID: 9210189640734394756, guid: 0cd5ddff8b596404182275a636514347, type: 3}
+      propertyPath: cultistSpawnOffset
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 9210189640734394756, guid: 0cd5ddff8b596404182275a636514347, type: 3}
       propertyPath: artillerySpawnHeight
@@ -5707,7 +5646,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -7.9999695}
+  m_AnchoredPosition: {x: 0, y: -7.999939}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1305240361
@@ -9162,26 +9101,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 218848745447687850, guid: d983f24482c95794db4b03a291952898, type: 3}
-      propertyPath: m_Constraints
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 4226279266432826672, guid: d983f24482c95794db4b03a291952898, type: 3}
-      propertyPath: m_FlipX
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7510121693570181259, guid: d983f24482c95794db4b03a291952898, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 7510121693570181259, guid: d983f24482c95794db4b03a291952898, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 7510121693570181259, guid: d983f24482c95794db4b03a291952898, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 5
-      objectReference: {fileID: 0}
     - target: {fileID: 7510121693570181259, guid: d983f24482c95794db4b03a291952898, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.25
@@ -9227,27 +9146,13 @@ PrefabInstance:
       value: TwistedCultist
       objectReference: {fileID: 0}
     - target: {fileID: 7588782773994181271, guid: d983f24482c95794db4b03a291952898, type: 3}
-      propertyPath: m_TagString
-      value: Enemy
-      objectReference: {fileID: 0}
-    - target: {fileID: 9203025772014942371, guid: d983f24482c95794db4b03a291952898, type: 3}
-      propertyPath: m_Size.x
-      value: 0.30630448
-      objectReference: {fileID: 0}
-    - target: {fileID: 9203025772014942371, guid: d983f24482c95794db4b03a291952898, type: 3}
-      propertyPath: m_Offset.x
-      value: 0.21169649
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 7588782773994181271, guid: d983f24482c95794db4b03a291952898, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 498594526}
-    - targetCorrespondingSourceObject: {fileID: 7588782773994181271, guid: d983f24482c95794db4b03a291952898, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 498594527}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d983f24482c95794db4b03a291952898, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

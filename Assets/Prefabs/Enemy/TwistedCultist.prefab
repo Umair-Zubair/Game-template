@@ -13,9 +13,11 @@ GameObject:
   - component: {fileID: 9203025772014942371}
   - component: {fileID: 218848745447687850}
   - component: {fileID: 90009583316862361}
+  - component: {fileID: 3303458045348813528}
+  - component: {fileID: 8758662678224063715}
   m_Layer: 11
   m_Name: TwistedCultist
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -30,7 +32,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1.25, y: -2.59, z: 0}
-  m_LocalScale: {x: 4, y: 4, z: 4}
+  m_LocalScale: {x: 5, y: 5, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -127,7 +129,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.28468418, y: -0.024385959}
+  m_Offset: {x: 0.21169649, y: -0.024385959}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -137,7 +139,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.20407045, y: 0.3712281}
+  m_Size: {x: 0.30630448, y: 0.3712281}
   m_EdgeRadius: 0
 --- !u!50 &218848745447687850
 Rigidbody2D:
@@ -165,7 +167,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!95 &90009583316862361
 Animator:
   serializedVersion: 7
@@ -188,3 +190,67 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &3303458045348813528
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7588782773994181271}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1c63a6e238b677428963985aa8aa3be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TwistedCultistController
+  detectionRange: 50
+  attackRange: 2
+  retreatRange: 1
+  gravityScale: 2
+  fallGravityMultiplier: 1.5
+  maxFallSpeed: 20
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 1024
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  playerDamageLayer:
+    serializedVersion: 2
+    m_Bits: 1024
+  RB: {fileID: 0}
+  Anim: {fileID: 0}
+  Collider: {fileID: 0}
+  Health: {fileID: 0}
+  StunTimer: 0
+  DebugMode: 1
+  pressSpeed: 2.6
+  evadeSpeed: 2.8
+  reactDelayMin: 0.07
+  reactDelayMax: 0.18
+  postAttackReengageChance: 0.55
+  lowHealthRetreatThreshold: 0.35
+  hurtMemoryDuration: 1.5
+  directionDeadzone: 0.5
+  rangedAttackPoint: {fileID: 0}
+  rangedAttackOffset: {x: 1.1, y: 0.25}
+  rangedAttackRadius: 1.35
+  rangedAttackDamage: 1
+  rangedAttackCooldown: 2.2
+  attackFallbackHitDelay: 0.3
+  attackFallbackEndDelay: 0.95
+  spawnFallbackDuration: 0.9
+  logMissingAnimationStates: 0
+--- !u!114 &8758662678224063715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7588782773994181271}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8e26f534ea637349a0bc6f44b578ba9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Health
+  startingHealth: 7
+  components: []

@@ -36,6 +36,25 @@ public class VoidbornGoddessController : BossController
     [Tooltip("Cooldown (seconds) between artillery attacks")]
     public float artilleryCooldown = 8f;
 
+    // -----------------------------------------------------------------
+    // CULTIST SPAWN — summons a TwistedCultist in front of the boss
+    // -----------------------------------------------------------------
+    [Header("Cultist Spawning")]
+    [Tooltip("TwistedCultist prefab to instantiate")]
+    public GameObject cultistPrefab;
+
+    [Tooltip("World units in front of the boss where the cultist spawns")]
+    [Min(0f)] public float cultistSpawnOffset = 3f;
+
+    [Tooltip("Cooldown (seconds) between cultist spawns")]
+    [Min(0f)] public float cultistSpawnCooldown = 30f;
+
+    [Tooltip("Total time (seconds) spent in the SpawnCultist state before returning to Chase")]
+    [Min(0f)] public float cultistSpawnDuration = 1.5f;
+
+    [Tooltip("Maximum number of cultists that may be alive at once")]
+    [Min(0)] public int maxLivingCultists = 2;
+
     // ---- Evaluation ----
     private bool fightStarted = false;
     public event System.Action OnMeleeAttempted;
@@ -48,6 +67,7 @@ public class VoidbornGoddessController : BossController
     public VoidbornMeleeAttackState MeleeState { get; private set; }
     public VoidbornArtilleryState ArtilleryState { get; private set; }
     public VoidbornHurtState HurtState { get; private set; }
+    public VoidbornSpawnCultistState SpawnCultistState { get; private set; }
     
     // Melee cooldown
     public float AttackTimer { get; private set; }
@@ -56,6 +76,11 @@ public class VoidbornGoddessController : BossController
     // Artillery cooldown
     public float ArtilleryTimer { get; private set; }
     public bool CanUseArtillery => ArtilleryTimer <= 0f && !IsAttacking;
+
+    // Cultist spawn cooldown
+    public float CultistSpawnTimer { get; private set; }
+    public bool CanSpawnCultist => CultistSpawnTimer <= 0f && !IsAttacking
+        && cultistPrefab != null && CountLivingCultists() < maxLivingCultists;
 
     // ---- Effective values (scaled by active AdaptationProfile) ----
     public float EffectiveChaseSpeed => Mathf.Clamp(
@@ -89,9 +114,11 @@ public class VoidbornGoddessController : BossController
         MeleeState = new VoidbornMeleeAttackState();
         ArtilleryState = new VoidbornArtilleryState();
         HurtState = new VoidbornHurtState();
+        SpawnCultistState = new VoidbornSpawnCultistState();
 
         AttackTimer = meleeAttackCooldown;
         ArtilleryTimer = artilleryCooldown;
+        CultistSpawnTimer = 0f;
     }
 
     protected override void StartState()
@@ -151,6 +178,9 @@ public class VoidbornGoddessController : BossController
 
         if (ArtilleryTimer > 0)
             ArtilleryTimer -= Time.deltaTime;
+
+        if (CultistSpawnTimer > 0)
+            CultistSpawnTimer -= Time.deltaTime;
     }
 
     public void ResetAttackTimer()
@@ -167,6 +197,8 @@ public class VoidbornGoddessController : BossController
     {
         ArtilleryTimer = EffectiveArtilleryCooldown;
     }
+
+    public void ResetCultistSpawnTimer() => CultistSpawnTimer = cultistSpawnCooldown;
 
     /// <summary>
     /// Performs the hitbox check for the melee attack.
@@ -233,11 +265,28 @@ public class VoidbornGoddessController : BossController
         Debug.Log($"[Voidborn] Artillery projectile spawned at {spawnPos}");
     }
 
+    public void SpawnCultist()
+    {
+        if (cultistPrefab == null) return;
+        float side = FacingDirection == 0 ? 1f : FacingDirection;
+        Vector3 spawnPos = transform.position + new Vector3(side * cultistSpawnOffset, 0f, 0f);
+        Instantiate(cultistPrefab, spawnPos, Quaternion.identity);
+    }
+
+    public int CountLivingCultists()
+    {
+        int count = 0;
+        foreach (TwistedCultistController c in Object.FindObjectsOfType<TwistedCultistController>())
+            if (!c.IsDead) count++;
+        return count;
+    }
+
     public override void Respawn(Vector3 spawnPosition)
     {
         base.Respawn(spawnPosition);
         AttackTimer = meleeAttackCooldown;
         ArtilleryTimer = artilleryCooldown;
+        CultistSpawnTimer = 0f;
         fightStarted = false;
     }
 

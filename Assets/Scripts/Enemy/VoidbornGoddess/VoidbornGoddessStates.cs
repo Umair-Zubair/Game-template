@@ -86,6 +86,14 @@ public class VoidbornChaseState : IBossState
             return;
         }
 
+        // --- Cultist spawn: priority override (fires whenever cooldown is ready) ---
+        if (goddess.CanSpawnCultist)
+        {
+            goddess.DecisionEngine?.OnBossActionStarted(BossActionType.SpawnCultist);
+            goddess.StateMachine.ChangeState(goddess.SpawnCultistState, goddess);
+            return;
+        }
+
         // --- Ask AIDecisionEngine for action (three-layer cascade) ---
         AIDecisionEngine engine = goddess.DecisionEngine;
         if (engine != null)
@@ -111,6 +119,7 @@ public class VoidbornChaseState : IBossState
                         return;
                     }
                     break;
+
             }
         }
         else
@@ -617,5 +626,65 @@ public class VoidbornArtilleryState : IBossState
         goddess.DecisionEngine?.OnBossActionCompleted(BossActionType.ArtilleryAttack);
 
         Debug.Log("[Voidborn] Artillery state exited, cooldown reset.");
+    }
+}
+
+// ============================================================================
+// SPAWN CULTIST STATE — Boss plays a cast animation and summons a TwistedCultist
+//
+// ANIMATOR REQUIREMENTS (set up from scratch):
+//   1. Add a Trigger parameter called "spawnCultist"
+//   2. Create a new animation state (e.g. "SpawnCultist") using your animation clip
+//   3. Any State → SpawnCultist  [Condition: spawnCultist | Has Exit Time: OFF | Duration: 0]
+//   4. SpawnCultist → Idle       [No condition | Has Exit Time: ON | Exit: 0.95 | Duration: 0.1]
+//
+// The cultist is instantiated at the midpoint of cultistSpawnDuration (configurable
+// in the Inspector on VoidbornGoddessController). cultistSpawnDuration should match
+// the length of your animation clip so the state exits cleanly.
+// ============================================================================
+public class VoidbornSpawnCultistState : IBossState
+{
+    private float timer;
+    private bool cultistSpawned;
+
+    public void OnEnter(BossController boss)
+    {
+        VoidbornGoddessController goddess = boss as VoidbornGoddessController;
+        timer = 0f;
+        cultistSpawned = false;
+        goddess.IsAttacking = true;
+        goddess.Stop();
+        goddess.SetMoving(false);
+        goddess.FacePlayer();
+        goddess.Anim?.SetTrigger("spawnCultist");
+        Debug.Log("[Voidborn] SpawnCultist state entered.");
+    }
+
+    public void OnUpdate(BossController boss)
+    {
+        VoidbornGoddessController goddess = boss as VoidbornGoddessController;
+        timer += Time.deltaTime;
+
+        // Spawn cultist at the midpoint of the animation
+        if (!cultistSpawned && timer >= goddess.cultistSpawnDuration * 0.5f)
+        {
+            goddess.SpawnCultist();
+            cultistSpawned = true;
+            Debug.Log("[Voidborn] Cultist spawned.");
+        }
+
+        if (timer >= goddess.cultistSpawnDuration)
+            goddess.StateMachine.ChangeState(goddess.ChaseState, goddess);
+    }
+
+    public void OnFixedUpdate(BossController boss) { }
+
+    public void OnExit(BossController boss)
+    {
+        VoidbornGoddessController goddess = boss as VoidbornGoddessController;
+        goddess.IsAttacking = false;
+        goddess.ResetCultistSpawnTimer();
+        goddess.DecisionEngine?.OnBossActionCompleted(BossActionType.SpawnCultist);
+        Debug.Log("[Voidborn] SpawnCultist state exited, cooldown reset.");
     }
 }
