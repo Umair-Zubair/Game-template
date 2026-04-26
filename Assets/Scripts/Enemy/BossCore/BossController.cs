@@ -31,7 +31,7 @@ public abstract class BossController : MonoBehaviour
 
     // Runtime variables
     public Transform Player { get; private set; }
-    public int FacingDirection { get; private set; } = -1; // -1 = left, 1 = right
+    public int FacingDirection { get; protected set; } = -1; // -1 = left, 1 = right
     private Vector3 initScale;
 
     // Timers
@@ -193,7 +193,7 @@ public abstract class BossController : MonoBehaviour
 
     #region Detection & Distance
 
-    public float GetDistanceToPlayer()
+    public virtual float GetDistanceToPlayer()
     {
         if (Player == null) return Mathf.Infinity;
         return Vector2.Distance(transform.position, Player.position);
@@ -203,7 +203,7 @@ public abstract class BossController : MonoBehaviour
     public bool PlayerInAttackRange() => GetDistanceToPlayer() <= attackRange;
     public bool PlayerTooClose() => GetDistanceToPlayer() <= retreatRange;
 
-    public int GetDirectionToPlayer()
+    public virtual int GetDirectionToPlayer()
     {
         if (Player == null) return FacingDirection;
         return Player.position.x > transform.position.x ? 1 : -1;
@@ -222,7 +222,7 @@ public abstract class BossController : MonoBehaviour
         }
     }
 
-    public void FaceDirection(int direction)
+    public virtual void FaceDirection(int direction)
     {
         if (direction == 0) return;
         FacingDirection = direction;

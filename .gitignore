@@ -77,3 +77,6 @@ CLAUDE.md
 /docs
 *.dwlt
 UserSettings/EditorUserSettings.asset
+
+#
+.onxx

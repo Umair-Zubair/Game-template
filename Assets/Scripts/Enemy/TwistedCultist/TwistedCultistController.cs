@@ -1,27 +1,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Boss-style FSM controller for the Twisted Cultist enemy.
-/// Uses the same base architecture as VoidbornGoddessController (BossController + IBossState).
-/// </summary>
 public class TwistedCultistController : BossController
 {
-    private const string BaseLayerPrefix = "Base Layer.";
-
-    [Header("Twisted Cultist - Heuristic Combat")]
+    [Header("Twisted Cultist - Combat")]
     [Min(0f)] public float pressSpeed = 2.6f;
     [Min(0f)] public float evadeSpeed = 2.8f;
-    [Min(0f)] public float minComfortRange = 1.6f;
-    [Min(0f)] public float maxComfortRange = 3.4f;
-    [Min(0f)] public float reengageRange = 4.8f;
     [Min(0f)] public float reactDelayMin = 0.07f;
     [Min(0f)] public float reactDelayMax = 0.18f;
-    [Range(0f, 1f)] public float jumpEngageChance = 0.28f;
-    [Range(0f, 1f)] public float jumpEvadeChance = 0.65f;
     [Range(0f, 1f)] public float postAttackReengageChance = 0.55f;
     [Min(0f)] public float lowHealthRetreatThreshold = 0.35f;
     [Min(0f)] public float hurtMemoryDuration = 1.5f;
+    [Tooltip("Hysteresis deadzone (world units) to prevent flip-flicker at collider center boundary")]
+    [Min(0f)] public float directionDeadzone = 0.5f;
 
     [Header("Twisted Cultist - Ranged Arm Attack")]
     public Transform rangedAttackPoint;
@@ -29,34 +20,11 @@ public class TwistedCultistController : BossController
     [Min(0f)] public float rangedAttackRadius = 1.35f;
     [Min(0)] public int rangedAttackDamage = 1;
     [Min(0f)] public float rangedAttackCooldown = 2.2f;
-    [Range(0f, 1f)] public float attackHitNormalizedTime = 0.42f;
     [Min(0f)] public float attackFallbackHitDelay = 0.30f;
     [Min(0f)] public float attackFallbackEndDelay = 0.95f;
 
-    [Header("Twisted Cultist - Jump")]
-    [Min(0f)] public float jumpForce = 7f;
-    [Min(0f)] public float jumpForwardSpeed = 2f;
-    [Min(0f)] public float jumpBackwardSpeed = 2.6f;
-    [Min(0f)] public float jumpCooldown = 2.4f;
-    [Min(0f)] public float jumpHeightThreshold = 1.3f;
-    [Min(0f)] public float jumpDistanceThreshold = 4f;
-    [Min(0f)] public float jumpMaxDuration = 1.25f;
-
-    [Header("Twisted Cultist - Evade")]
-    [Min(0f)] public float evadeDurationMin = 0.35f;
-    [Min(0f)] public float evadeDurationMax = 0.65f;
-
     [Header("Twisted Cultist - Spawn")]
-    public string spawnStateName = "Twisted";
     [Min(0f)] public float spawnFallbackDuration = 0.9f;
-
-    [Header("Twisted Cultist - Animation States")]
-    public string idleStateName = "Idle";
-    public string moveStateName = "Walk";
-    public string attackStateName = "Attack";
-    public string jumpStateName = "Jump";
-    public string fallStateName = "Fall";
-    public string hurtStateName = "Hurt";
 
     [Header("Twisted Cultist - Debug")]
     public bool logMissingAnimationStates = false;
@@ -67,29 +35,43 @@ public class TwistedCultistController : BossController
     public TwistedCultistPressState PressState { get; private set; }
     public TwistedCultistReactState ReactState { get; private set; }
     public TwistedCultistRangedAttackState RangedAttackState { get; private set; }
-    public TwistedCultistJumpRepositionState JumpRepositionState { get; private set; }
-    public TwistedCultistEvadeState EvadeState { get; private set; }
     public TwistedCultistHurtState HurtState { get; private set; }
 
-    // Runtime timers
     public float RangedAttackTimer { get; private set; }
-    public float JumpTimer { get; private set; }
 
-    // Optional evaluation hooks
     public event System.Action OnRangedAttackAttempted;
     public event System.Action<bool> OnRangedAttackResult;
 
+    private SpriteRenderer SR;
     private float lastDamageTime = -999f;
-    private bool queuedJumpAway;
-    private string lastMissingAnimationState = string.Empty;
+    private bool collisionIgnored = false;
+
+    // Tracks the "true" direction to player independently of FacingDirection.
+    // This breaks the feedback loop where MoveInDirection → FaceDirection → changes
+    // FacingDirection → next GetDirectionToPlayer returns opposite → oscillation.
+    private int resolvedDirection = -1;
 
     public bool CanUseRangedAttack => RangedAttackTimer <= 0f && !IsAttacking;
-    public bool CanJump => JumpTimer <= 0f && !IsAttacking && IsGrounded();
     public bool RecentlyDamaged => Time.time - lastDamageTime <= hurtMemoryDuration;
     public float HealthRatio => Health != null && Health.MaxHealth > 0f
-        ? Health.currentHealth / Health.MaxHealth
-        : 1f;
+        ? Health.currentHealth / Health.MaxHealth : 1f;
     public bool IsLowHealth => HealthRatio <= lowHealthRetreatThreshold;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        SR = GetComponent<SpriteRenderer>();
+    }
+
+    // Sprite faces LEFT natively; use flipX instead of negative scale to avoid
+    // visual jump from off-center pivot at scale 4.
+    public override void FaceDirection(int direction)
+    {
+        if (direction == 0) return;
+        FacingDirection = direction;
+        if (SR != null)
+            SR.flipX = direction == 1;
+    }
 
     protected override void InitializeStates()
     {
@@ -98,12 +80,9 @@ public class TwistedCultistController : BossController
         PressState = new TwistedCultistPressState();
         ReactState = new TwistedCultistReactState();
         RangedAttackState = new TwistedCultistRangedAttackState();
-        JumpRepositionState = new TwistedCultistJumpRepositionState();
-        EvadeState = new TwistedCultistEvadeState();
         HurtState = new TwistedCultistHurtState();
 
         RangedAttackTimer = rangedAttackCooldown;
-        JumpTimer = jumpCooldown;
     }
 
     protected override void StartState()
@@ -111,245 +90,166 @@ public class TwistedCultistController : BossController
         StateMachine.Initialize(SpawnState, this);
     }
 
+    // Collider is offset +1.14 world units right of transform (sprite pivot is at left edge).
+    // Use collider center for direction/distance so the cultist doesn't flip when the
+    // player touches the left edge of the collider before reaching the visual center.
+    public override float GetDistanceToPlayer()
+    {
+        if (Player == null || Collider == null) return Mathf.Infinity;
+        return Vector2.Distance(Collider.bounds.center, Player.position);
+    }
+
+    /// <summary>
+    /// Direction to player with hysteresis, stored in <see cref="resolvedDirection"/>
+    /// which is independent of <see cref="BossController.FacingDirection"/>.
+    /// Only changes when the player is at least <see cref="directionDeadzone"/>
+    /// world-units past the collider center. Inside the deadzone the last resolved
+    /// value is held, which prevents the flip-flicker feedback loop caused by
+    /// MoveInDirection ↔ FaceDirection ↔ FacingDirection ↔ GetDirectionToPlayer.
+    /// </summary>
+    public override int GetDirectionToPlayer()
+    {
+        if (Player == null || Collider == null) return resolvedDirection;
+
+        float diff = Player.position.x - Collider.bounds.center.x;
+
+        // Only update resolvedDirection when clearly on one side
+        if (diff > directionDeadzone)
+            resolvedDirection = 1;
+        else if (diff < -directionDeadzone)
+            resolvedDirection = -1;
+
+        // Inside deadzone: resolvedDirection is unchanged (no flip)
+        return resolvedDirection;
+    }
+
+    /// <summary>
+    /// Moves the cultist in <paramref name="direction"/> at <paramref name="speed"/>
+    /// WITHOUT changing FacingDirection or flipping the sprite.
+    /// Used for retreat so the cultist backs away while still facing the player.
+    /// </summary>
+    public void MoveWithoutFacing(int direction, float speed)
+    {
+        if (RB != null)
+            RB.linearVelocity = new Vector2(direction * speed, RB.linearVelocity.y);
+    }
+
+    // True while the player's X is inside the cultist's collider horizontal span.
+    // Used to suppress FacePlayer() during pass-through so no mid-body flip occurs.
+    public bool IsPlayerOverlapping()
+    {
+        if (Player == null || Collider == null) return false;
+        float px = Player.position.x;
+        return px >= Collider.bounds.min.x && px <= Collider.bounds.max.x;
+    }
+
     protected override void Start()
     {
         base.Start();
         if (Health != null)
-        {
             Health.OnDamageTaken += OnTakeDamage;
-        }
+        TryIgnorePlayerCollision();
+    }
+
+    protected override void Update()
+    {
+        base.Update();
+        TryIgnorePlayerCollision();
+    }
+
+    // Per-collider only — does not touch the global layer matrix so VoidbornGoddess
+    // and other layer-11 enemies are unaffected.
+    private void TryIgnorePlayerCollision()
+    {
+        if (collisionIgnored || Player == null || Collider == null) return;
+        foreach (Collider2D pc in Player.root.GetComponentsInChildren<Collider2D>(true))
+            Physics2D.IgnoreCollision(Collider, pc, true);
+        collisionIgnored = true;
     }
 
     private void OnDestroy()
     {
         if (Health != null)
-        {
             Health.OnDamageTaken -= OnTakeDamage;
-        }
     }
 
     public void OnTakeDamage(float damage)
     {
-        if (IsDead) return;
-        if (Health == null) return;
-        if (Health.currentHealth <= 0f) return;
-
+        if (IsDead || Health == null || Health.currentHealth <= 0f) return;
         lastDamageTime = Time.time;
         if (IsAttacking) return;
-
         StateMachine.ChangeState(HurtState, this);
     }
 
     protected override void UpdateBossTimers()
     {
         if (RangedAttackTimer > 0f)
-        {
             RangedAttackTimer -= Time.deltaTime;
-        }
-
-        if (JumpTimer > 0f)
-        {
-            JumpTimer -= Time.deltaTime;
-        }
     }
 
-    public void ResetRangedAttackTimer()
+    public void ResetRangedAttackTimer() => RangedAttackTimer = rangedAttackCooldown;
+
+    // --- Animation helpers ---
+
+    public void SetWalking(bool walking)
     {
-        RangedAttackTimer = rangedAttackCooldown;
+        if (Anim != null) Anim.SetBool("walk", walking);
     }
 
-    public void ResetJumpTimer()
+    public void TriggerAttackAnimation()
     {
-        JumpTimer = jumpCooldown;
+        if (Anim != null) Anim.SetTrigger("attack");
     }
 
-    public bool ShouldAttemptEngageJump()
-    {
-        if (Player == null) return false;
-
-        float verticalGap = Player.position.y - transform.position.y;
-        if (verticalGap >= jumpHeightThreshold)
-        {
-            return true;
-        }
-
-        if (GetDistanceToPlayer() >= jumpDistanceThreshold)
-        {
-            return Random.value < jumpEngageChance;
-        }
-
-        return false;
-    }
-
-    public bool ShouldAttemptEvadeJump()
-    {
-        return Random.value < jumpEvadeChance;
-    }
-
-    public void QueueJumpToward()
-    {
-        queuedJumpAway = false;
-    }
-
-    public void QueueJumpAway()
-    {
-        queuedJumpAway = true;
-    }
-
-    public bool ConsumeQueuedJumpAway()
-    {
-        bool jumpAway = queuedJumpAway;
-        queuedJumpAway = false;
-        return jumpAway;
-    }
-
-    public void JumpTowardPlayer()
-    {
-        JumpInDirection(GetDirectionToPlayer(), jumpForwardSpeed);
-    }
-
-    public void JumpAwayFromPlayer()
-    {
-        JumpInDirection(-GetDirectionToPlayer(), jumpBackwardSpeed);
-    }
-
-    public void JumpInDirection(int direction, float horizontalSpeed)
-    {
-        if (RB == null || !IsGrounded()) return;
-
-        int dir = direction >= 0 ? 1 : -1;
-        FaceDirection(dir);
-        RB.linearVelocity = new Vector2(dir * horizontalSpeed, jumpForce);
-    }
+    // --- Combat ---
 
     public void PerformExtendedArmAttack()
     {
-        Vector2 attackOrigin = GetRangedAttackOrigin();
-        Collider2D[] hits = Physics2D.OverlapCircleAll(attackOrigin, rangedAttackRadius, playerDamageLayer);
+        Vector2 origin = GetRangedAttackOrigin();
+        Collider2D[] hits = Physics2D.OverlapCircleAll(origin, rangedAttackRadius, playerDamageLayer);
+        OnRangedAttackAttempted?.Invoke();
+
         if (hits == null || hits.Length == 0)
         {
-            OnRangedAttackAttempted?.Invoke();
             OnRangedAttackResult?.Invoke(false);
             return;
         }
 
-        OnRangedAttackAttempted?.Invoke();
         bool landed = false;
-        HashSet<Health> damagedTargets = new HashSet<Health>();
-
+        HashSet<Health> damaged = new HashSet<Health>();
         foreach (Collider2D hit in hits)
         {
-            Health playerHealth = hit.GetComponent<Health>();
-            if (playerHealth == null || damagedTargets.Contains(playerHealth)) continue;
-
-            playerHealth.TakeDamage(rangedAttackDamage);
-            damagedTargets.Add(playerHealth);
+            Health h = hit.GetComponent<Health>();
+            if (h == null || damaged.Contains(h)) continue;
+            h.TakeDamage(rangedAttackDamage);
+            damaged.Add(h);
             landed = true;
         }
-
         OnRangedAttackResult?.Invoke(landed);
     }
 
     public Vector2 GetRangedAttackOrigin()
     {
-        if (rangedAttackPoint != null)
-        {
-            return rangedAttackPoint.position;
-        }
-
+        if (rangedAttackPoint != null) return rangedAttackPoint.position;
         float facing = FacingDirection == 0 ? 1f : FacingDirection;
         return (Vector2)transform.position + new Vector2(rangedAttackOffset.x * facing, rangedAttackOffset.y);
-    }
-
-    public void PlayAnimationState(string stateName, bool forceRestart = false)
-    {
-        if (Anim == null) return;
-        string resolvedStateName = ResolveAnimationStateName(stateName);
-        if (string.IsNullOrEmpty(resolvedStateName)) return;
-
-        bool alreadyPlaying = IsPlayingAnimationState(stateName);
-        if (!forceRestart && alreadyPlaying)
-        {
-            return;
-        }
-
-        Anim.Play(resolvedStateName, 0, 0f);
-    }
-
-    public bool IsPlayingAnimationState(string stateName)
-    {
-        if (Anim == null || string.IsNullOrWhiteSpace(stateName)) return false;
-
-        AnimatorStateInfo info = Anim.GetCurrentAnimatorStateInfo(0);
-        return info.IsName(stateName) || info.IsName(BaseLayerPrefix + stateName);
-    }
-
-    public bool HasAnimationReached(string stateName, float normalizedThreshold)
-    {
-        if (!IsPlayingAnimationState(stateName) || Anim == null) return false;
-        if (Anim.IsInTransition(0)) return false;
-
-        AnimatorStateInfo info = Anim.GetCurrentAnimatorStateInfo(0);
-        return info.normalizedTime >= normalizedThreshold;
-    }
-
-    public bool HasAnimationFinished(string stateName, float normalizedThreshold = 0.98f)
-    {
-        return HasAnimationReached(stateName, normalizedThreshold);
     }
 
     public override void Respawn(Vector3 spawnPosition)
     {
         base.Respawn(spawnPosition);
         RangedAttackTimer = rangedAttackCooldown;
-        JumpTimer = jumpCooldown;
         lastDamageTime = -999f;
-        queuedJumpAway = false;
-        lastMissingAnimationState = string.Empty;
     }
 
-    public void Deactivate()
-    {
-        gameObject.SetActive(false);
-    }
-
-    private string ResolveAnimationStateName(string stateName)
-    {
-        if (Anim == null || string.IsNullOrWhiteSpace(stateName))
-        {
-            return null;
-        }
-
-        int shortHash = Animator.StringToHash(stateName);
-        if (Anim.HasState(0, shortHash))
-        {
-            return stateName;
-        }
-
-        string fullPath = BaseLayerPrefix + stateName;
-        int fullPathHash = Animator.StringToHash(fullPath);
-        if (Anim.HasState(0, fullPathHash))
-        {
-            return fullPath;
-        }
-
-        if (logMissingAnimationStates && DebugMode && lastMissingAnimationState != stateName)
-        {
-            Debug.LogWarning($"[TwistedCultist] Animation state '{stateName}' not found on animator '{Anim.runtimeAnimatorController?.name}'.");
-            lastMissingAnimationState = stateName;
-        }
-
-        return null;
-    }
+    public void Deactivate() => gameObject.SetActive(false);
 
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectionRange);
-
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
-
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(GetRangedAttackOrigin(), rangedAttackRadius);
     }

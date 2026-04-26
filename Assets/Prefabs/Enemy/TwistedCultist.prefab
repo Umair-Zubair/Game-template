@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 9203025772014942371}
   - component: {fileID: 218848745447687850}
   - component: {fileID: 90009583316862361}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: TwistedCultist
   m_TagString: Untagged
   m_Icon: {fileID: 0}
