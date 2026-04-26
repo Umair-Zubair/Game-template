@@ -78,5 +78,5 @@ CLAUDE.md
 *.dwlt
 UserSettings/EditorUserSettings.asset
 
-#
-.onxx
+# Onnx Files
+*.onnx

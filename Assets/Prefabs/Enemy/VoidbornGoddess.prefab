@@ -359,3 +359,9 @@ MonoBehaviour:
   artillerySpawnHeight: 5
   artilleryDamage: 2
   artilleryCooldown: 6
+  enableCultistSpawning: 0
+  cultistPrefab: {fileID: 0}
+  cultistSpawnOffset: 3
+  cultistSpawnCooldown: 30
+  cultistSpawnDuration: 1.5
+  maxLivingCultists: 2
