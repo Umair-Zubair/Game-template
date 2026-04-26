@@ -1431,8 +1431,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterManager
   playerPrefabs:
-  - {fileID: 5963178899783550497, guid: 577e1bd8d75c0a648be516ea4b64a3e2, type: 3}
   - {fileID: 5536329845775654271, guid: 876ccb7512133544e82e544c241ac2c4, type: 3}
+  - {fileID: 5963178899783550497, guid: 577e1bd8d75c0a648be516ea4b64a3e2, type: 3}
   spawnPoint: {fileID: 271092032}
   healthBar: {fileID: 27520355}
   staminaBar: {fileID: 2031141652}
@@ -5185,7 +5185,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.00012207031, y: -0.000030517578}
+  m_AnchoredPosition: {x: -0.00012207031, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1117328479
@@ -5905,6 +5905,10 @@ PrefabInstance:
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 9210189640734394756, guid: 0cd5ddff8b596404182275a636514347, type: 3}
+      propertyPath: enableCultistSpawning
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9210189640734394756, guid: 0cd5ddff8b596404182275a636514347, type: 3}
       propertyPath: artilleryAnchorPosition.x
       value: 8.35
       objectReference: {fileID: 0}
@@ -6236,7 +6240,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -8.0000305}
+  m_AnchoredPosition: {x: 0, y: -8}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1305240361
@@ -7775,7 +7779,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1260625189}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 419cecac1877669499fc10954292d099, type: 3}
   m_Name: 
@@ -7795,7 +7799,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AIDecisionEngine
   isTrainingMode: 0
-  enableL1: 0
+  enableL1: 1
   enableL2: 1
   enableL3: 1
   enableFairnessGuardian: 1
@@ -8618,7 +8622,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.000061035156, y: -1.0075989}
+  m_AnchoredPosition: {x: -0.000061035156, y: -1.0075684}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1875994701

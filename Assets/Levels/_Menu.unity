@@ -1641,7 +1641,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &335706489
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3702,6 +3702,8 @@ MonoBehaviour:
   gameOverScreen: {fileID: 1768471499}
   gameOverSound: {fileID: 8300000, guid: 363a938ca73b3584db2b4669a1d37e27, type: 3}
   disableGameOver: 0
+  winScreen: {fileID: 0}
+  winSound: {fileID: 0}
   pauseScreen: {fileID: 0}
 --- !u!114 &1049045547
 MonoBehaviour:
