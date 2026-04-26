@@ -7,8 +7,12 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject gameOverScreen;
     [SerializeField] private AudioClip gameOverSound;
 
-    [Tooltip("When true the Game Over screen is suppressed (useful for AI training loops).")]
+    [Tooltip("When true the Game Over and Victory screens are suppressed (useful for AI training loops).")]
     public bool disableGameOver;
+
+    [Header("Victory")]
+    [SerializeField] private GameObject winScreen;
+    [SerializeField] private AudioClip winSound;
 
     [Header("Pause")]
     [SerializeField] private GameObject pauseScreen;
@@ -17,11 +21,21 @@ public class UIManager : MonoBehaviour
     {
         if (gameOverScreen != null)
             gameOverScreen.SetActive(false);
+        if (winScreen != null)
+            winScreen.SetActive(false);
         if (pauseScreen != null)
             pauseScreen.SetActive(false);
+
+        EnsureBossHealthBar();
     }
+    private bool IsEndScreenActive =>
+        (gameOverScreen != null && gameOverScreen.activeInHierarchy) ||
+        (winScreen != null && winScreen.activeInHierarchy);
+
     private void Update()
     {
+        if (IsEndScreenActive) return;
+
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             PauseGame(!pauseScreen.activeInHierarchy);
@@ -33,8 +47,28 @@ public class UIManager : MonoBehaviour
     {
         if (disableGameOver) return;
 
-        gameOverScreen.SetActive(true);
-        SoundManager.instance.PlaySound(gameOverSound);
+        if (gameOverScreen != null)
+            gameOverScreen.SetActive(true);
+
+        Time.timeScale = 0f;
+
+        if (gameOverSound != null && SoundManager.instance != null)
+            SoundManager.instance.PlaySound(gameOverSound);
+    }
+    #endregion
+
+    #region Victory
+    public void Victory()
+    {
+        if (disableGameOver) return;
+
+        if (winScreen != null)
+            winScreen.SetActive(true);
+
+        Time.timeScale = 0f;
+
+        if (winSound != null && SoundManager.instance != null)
+            SoundManager.instance.PlaySound(winSound);
     }
 
     //Restart level
@@ -57,6 +91,17 @@ public class UIManager : MonoBehaviour
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false; //Exits play mode (will only be executed in the editor)
 #endif
+    }
+    #endregion
+
+    #region Boss Health Bar
+    private void EnsureBossHealthBar()
+    {
+        if (FindFirstObjectByType<BossHealthBar>() != null) return;
+
+        var go = new GameObject("BossHealthBarHost");
+        go.transform.SetParent(transform);
+        go.AddComponent<BossHealthBar>();
     }
     #endregion
 

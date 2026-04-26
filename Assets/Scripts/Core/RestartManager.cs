@@ -8,6 +8,9 @@ using System.Collections;
 /// </summary>
 public class RestartManager : MonoBehaviour
 {
+    [Tooltip("Enable during ML training for automatic episode restarts. Disable for builds.")]
+    [SerializeField] private bool trainingMode = true;
+
     [SerializeField] private float deathResetDelay = 2f;
 
     [Header("Spawn Points")]
@@ -18,6 +21,7 @@ public class RestartManager : MonoBehaviour
     private PlayerController player;
     private Health playerHealth;
     private MLBrain mlBrain;
+    private UIManager uiManager;
 
     private bool IsMLActive => mlBrain != null && mlBrain.isActiveAndEnabled && mlBrain.IsModelLoaded;
 
@@ -29,6 +33,7 @@ public class RestartManager : MonoBehaviour
             Debug.LogWarning("[RestartManager] Could not find a BossController in the scene! Reset will not work.");
 
         mlBrain = boss != null ? boss.GetComponent<MLBrain>() : null;
+        uiManager = FindFirstObjectByType<UIManager>();
     }
 
     private void Start()
@@ -122,7 +127,14 @@ public class RestartManager : MonoBehaviour
 
     private void OnBossDied()
     {
-        Debug.Log("[RestartManager] Boss died — scheduling reset.");
+        Debug.Log("[RestartManager] Boss died.");
+        if (!trainingMode)
+        {
+            if (uiManager != null) uiManager.Victory();
+            return;
+        }
+
+        Debug.Log("[RestartManager] Training mode — scheduling reset.");
         if (IsMLActive)
         {
             try   { mlBrain.OnFightLost(); }
@@ -141,6 +153,13 @@ public class RestartManager : MonoBehaviour
     private void OnPlayerDamaged(float damage)
     {
         if (playerHealth == null || playerHealth.currentHealth > 0f) return;
+
+        if (!trainingMode)
+        {
+            if (uiManager != null) uiManager.GameOver();
+            return;
+        }
+
         if (IsMLActive) mlBrain.OnFightWon();
         else StartCoroutine(DelayedReset());
     }
