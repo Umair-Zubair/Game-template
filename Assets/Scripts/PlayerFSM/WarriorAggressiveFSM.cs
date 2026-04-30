@@ -3,120 +3,104 @@ using UnityEngine;
 // ============================================================================
 // WARRIOR AGGRESSIVE FSM
 //
-// Rushes the boss, hesitates briefly to size up, then commits to a melee
-// pattern: a single chop, a full two-hit combo, or a jump attack.  Choice is
-// stamina-aware — if we can't afford the move we back off and recover.
-// Reacts to boss attacks and artillery the whole way through.
+// Closes distance fast, commits to short melee bursts, then slips out before
+// re-engaging. It stays aggressive without standing in the boss's face until
+// stamina is gone.
+// Unlike HunterAggressiveFSM this bot wants to live inside melee range, not hold
+// a shooting lane. Stamina is checked only to avoid exhausting the warrior into
+// helpless whiffs; MeleeAttack still owns exact attack costs/cooldowns.
 //
-// States: Chase → Hesitate → Attack → BriefPull → Chase
-//         Any state → Evade (when boss attacks in range or artillery fires)
+// States: Press → Commit → Strike → Disengage → Press (or Breather)
+//         Any state → Evade (artillery or boss attack at close range)
 // ============================================================================
 public class WarriorAggressiveFSM : PlayerFSMController
 {
     [Header("Warrior Aggressive — Tuning")]
-    [SerializeField] private float attackRange         = 2.0f;
-    [SerializeField] private float jumpHeightThreshold = 1.5f;
+    [SerializeField] private float attackRange           = 3.0f;
+    [SerializeField] private float stickRange            = 1.2f;
+    [SerializeField] private float comboProbability      = 0.85f;
+    [SerializeField] private float jumpHeightThreshold   = 1.8f;
+    [SerializeField] private float jumpCheckInterval     = 1.4f;
+    [SerializeField] private float counterEvadeChance    = 0.85f;
+    [SerializeField] private float pressureAfterEvade    = 0.25f;
+    [SerializeField] private float disengageMinTime      = 0.28f;
+    [SerializeField] private float disengageMaxTime      = 0.55f;
+    [SerializeField] private float reengageDistance      = 2.8f;
 
-    [Header("Pattern Weights")]
-    [Tooltip("When stamina allows everything, relative odds of picking a full two-hit combo.")]
-    [Range(0f, 1f)] [SerializeField] private float comboWeight       = 0.55f;
-    [Tooltip("Relative odds of just chopping once and disengaging.")]
-    [Range(0f, 1f)] [SerializeField] private float singleWeight      = 0.25f;
-    [Tooltip("Relative odds of leaping in for an air attack.")]
-    [Range(0f, 1f)] [SerializeField] private float jumpAttackWeight  = 0.20f;
+    [Header("Stamina")]
+    [SerializeField] private float minAttackStaminaRatio = 0.35f;
+    [SerializeField] private float reengageStaminaRatio  = 0.55f;
 
-    [Header("Stamina Gate")]
-    [Tooltip("Extra stamina kept in reserve on top of the chosen pattern's cost (so we don't get caught empty).")]
-    [SerializeField] private float staminaReserve = 5f;
+    public WA_Press    PressState    { get; private set; }
+    public WA_Commit   CommitState   { get; private set; }
+    public WA_Strike   StrikeState   { get; private set; }
+    public WA_Disengage DisengageState { get; private set; }
+    public WA_Evade    EvadeState    { get; private set; }
+    public WA_Breather BreatherState { get; private set; }
 
-    public WA_Chase     ChaseState     { get; private set; }
-    public WA_Hesitate  HesitateState  { get; private set; }
-    public WA_Attack    AttackState    { get; private set; }
-    public WA_BriefPull BriefPullState { get; private set; }
-    public WA_Evade     EvadeState     { get; private set; }
+    public bool IsExhaustedStamina => Stamina != null && Stamina.IsExhausted;
+    private bool ReadyToAttack     => !IsExhaustedStamina && StaminaRatio() >= minAttackStaminaRatio;
 
-    /// <summary>Available melee patterns, ordered roughly by stamina demand.</summary>
-    public enum AttackPattern { None, Single, Combo, JumpAttack }
+    private Collider2D ownCollider;
+    private Collider2D targetCollider;
 
     protected override void InitializeStates()
     {
-        ChaseState     = new WA_Chase();
-        HesitateState  = new WA_Hesitate();
-        AttackState    = new WA_Attack();
-        BriefPullState = new WA_BriefPull();
-        EvadeState     = new WA_Evade();
+        PressState    = new WA_Press();
+        CommitState   = new WA_Commit();
+        StrikeState   = new WA_Strike();
+        DisengageState = new WA_Disengage();
+        EvadeState    = new WA_Evade();
+        BreatherState = new WA_Breather();
     }
 
-    protected override void StartFSM() => FSM.Initialize(ChaseState, this);
+    protected override void StartFSM() => FSM.Initialize(PressState, this);
 
-    // ── Stamina helpers ────────────────────────────────────────────────────
-
-    private float AttackCost     => Stamina != null ? Stamina.Data.attackCost      : 0f;
-    private float ComboCost      => Stamina != null ? Stamina.Data.comboAttackCost : 0f;
-    private float JumpCost       => Stamina != null ? Stamina.Data.jumpCost        : 0f;
-    private float AirAttackCost  => Stamina != null ? Stamina.Data.airAttackCost   : 0f;
-
-    /// <summary>Total cost for a full two-hit combo (first swing + queued second).</summary>
-    public float FullComboCost      => AttackCost + ComboCost      + staminaReserve;
-    /// <summary>Cost of one chop with a small reserve.</summary>
-    public float SingleCost         => AttackCost                  + staminaReserve;
-    /// <summary>Cost of jumping then swinging in the air.</summary>
-    public float JumpAttackTotalCost => JumpCost + AirAttackCost   + staminaReserve;
-
-    public bool  CanAffordAnyAttack => Stamina == null
-        || (!Stamina.IsExhausted && Stamina.CurrentStamina >= SingleCost);
-
-    /// <summary>
-    /// Picks the next melee pattern based on what stamina can support.  Returns
-    /// AttackPattern.None when nothing is affordable — caller should retreat
-    /// and recover instead of committing to a swing it can't pay for.
-    /// </summary>
-    public AttackPattern PickAttackPattern()
+    private float MeleeDistanceToTarget()
     {
-        if (Stamina != null && Stamina.IsExhausted) return AttackPattern.None;
+        if (Target == null) return Mathf.Infinity;
 
-        float current = Stamina != null ? Stamina.CurrentStamina : Mathf.Infinity;
+        if (ownCollider == null)
+            ownCollider = PC != null && PC.Collider != null ? PC.Collider : GetComponent<Collider2D>();
 
-        bool canCombo  = current >= FullComboCost;
-        bool canJump   = current >= JumpAttackTotalCost && IsGrounded();
-        bool canSingle = current >= SingleCost;
+        if (targetCollider == null || !targetCollider.transform.IsChildOf(Target))
+            targetCollider = FindTargetCollider();
 
-        if (!canSingle) return AttackPattern.None;
+        if (ownCollider != null && targetCollider != null)
+            return Mathf.Max(0f, ownCollider.Distance(targetCollider).distance);
 
-        // Build a weighted roll over only the patterns we can actually afford
-        float wCombo   = canCombo  ? comboWeight       : 0f;
-        float wJump    = canJump   ? jumpAttackWeight  : 0f;
-        float wSingle  =             singleWeight;
-
-        // If we can't afford the heavier options, lean fully on what's left
-        float total = wCombo + wJump + wSingle;
-        if (total <= 0.0001f) return AttackPattern.Single;
-
-        float roll = Random.value * total;
-        if (roll < wCombo)              return AttackPattern.Combo;
-        roll -= wCombo;
-        if (roll < wJump)               return AttackPattern.JumpAttack;
-        return AttackPattern.Single;
+        // Fallback for targets without a usable collider: melee only cares about horizontal reach.
+        return Mathf.Abs(Target.position.x - transform.position.x);
     }
 
-    // ==========================================================================
-    // CHASE — Rush toward boss. Reacts to artillery immediately.
-    // Backs off if boss is already mid-swing on approach. If we don't have
-    // stamina for any attack at all, we hold a respectful distance instead of
-    // walking right onto the boss with nothing to throw.
-    // ==========================================================================
-    public class WA_Chase : IPlayerFSMState
+    private Collider2D FindTargetCollider()
     {
-        private float jumpCheckTimer;
+        if (Target == null) return null;
 
-        public void OnEnter(PlayerFSMController ctrl)
+        Collider2D[] colliders = Target.GetComponentsInChildren<Collider2D>();
+        foreach (Collider2D col in colliders)
         {
-            jumpCheckTimer = Random.Range(0.8f, 2.0f);
+            if (col != null && col.enabled && !col.isTrigger)
+                return col;
         }
+
+        return colliders.Length > 0 ? colliders[0] : null;
+    }
+
+    // ==========================================================================
+    // PRESS — Sprint into melee range. Aggressive still respects active boss
+    // swings, but it dodges briefly and immediately returns to pressure.
+    // ==========================================================================
+    public class WA_Press : IPlayerFSMState
+    {
+        private float jumpTimer;
+
+        public void OnEnter(PlayerFSMController ctrl) => jumpTimer = 0f;
 
         public void OnUpdate(PlayerFSMController ctrl)
         {
             var wa = (WarriorAggressiveFSM)ctrl;
+            float dist = wa.MeleeDistanceToTarget();
 
             if (ctrl.ArtilleryEvadeRequested)
             {
@@ -126,60 +110,53 @@ public class WarriorAggressiveFSM : PlayerFSMController
                 return;
             }
 
-            if (ctrl.BossIsAttacking && ctrl.DistanceToTarget() < wa.dangerRange)
+            if (ctrl.BossIsAttacking && dist < wa.dangerRange)
             {
                 wa.FSM.ChangeState(wa.EvadeState, ctrl);
                 return;
             }
 
-            // No stamina for any swing — don't crowd the boss, let it recover
-            if (!wa.CanAffordAnyAttack)
+            if (!wa.ReadyToAttack)
             {
-                float dist = ctrl.DistanceToTarget();
-                ctrl.FaceTarget();
-                if (dist < wa.attackRange * 1.6f) ctrl.MoveAway();
-                else                              ctrl.StopMoving();
+                wa.FSM.ChangeState(wa.BreatherState, ctrl);
                 return;
             }
 
-            ctrl.MoveToward();
             ctrl.FaceTarget();
 
-            jumpCheckTimer -= Time.deltaTime;
-            if (jumpCheckTimer <= 0f && ctrl.IsGrounded())
+            jumpTimer -= Time.deltaTime;
+            if (jumpTimer <= 0f && ctrl.IsGrounded())
             {
-                jumpCheckTimer = Random.Range(0.8f, 2.2f);
-                bool bossElevated = ctrl.HeightDifferenceToTarget() > wa.jumpHeightThreshold;
-                bool randomJump   = Random.value < 0.20f;
-                // Don't burn the jump cost if it'd kill our attack budget
-                if ((bossElevated || randomJump)
-                    && ctrl.Stamina != null
-                    && ctrl.Stamina.CurrentStamina >= wa.JumpCost + wa.SingleCost)
-                {
-                    ctrl.RequestJump(Random.Range(0.2f, 0.35f));
-                }
+                jumpTimer = Random.Range(wa.jumpCheckInterval * 0.7f, wa.jumpCheckInterval * 1.3f);
+                if (ctrl.HeightDifferenceToTarget() > wa.jumpHeightThreshold)
+                    ctrl.RequestJump(Random.Range(0.22f, 0.32f));
             }
 
-            if (ctrl.DistanceToTarget() <= wa.attackRange)
-                wa.FSM.ChangeState(wa.HesitateState, ctrl);
+            if (dist <= wa.attackRange)
+                wa.FSM.ChangeState(wa.CommitState, ctrl);
+            else
+                ctrl.MoveToward();
         }
 
-        public void OnExit(PlayerFSMController ctrl) { }
+        public void OnExit(PlayerFSMController ctrl) => ctrl.StopMoving();
     }
 
     // ==========================================================================
-    // HESITATE — Stops before committing to the attack. If the boss starts
-    // swinging during this window, abort — don't walk into it. Also bails
-    // if we suddenly can't afford any swing (e.g. exhausted from a jump).
+    // COMMIT — Tiny lining-up window, shorter than balanced warrior. If the boss
+    // winds up, the aggressive bot usually evades, sometimes trades into it.
     // ==========================================================================
-    public class WA_Hesitate : IPlayerFSMState
+    public class WA_Commit : IPlayerFSMState
     {
         private float timer;
+        private bool  willTrade;
 
         public void OnEnter(PlayerFSMController ctrl)
         {
+            var wa = (WarriorAggressiveFSM)ctrl;
             ctrl.StopMoving();
-            timer = Random.Range(0.10f, 0.28f);
+            ctrl.FaceTarget();
+            timer     = Random.Range(0.04f, 0.12f);
+            willTrade = Random.value > wa.counterEvadeChance;
         }
 
         public void OnUpdate(PlayerFSMController ctrl)
@@ -195,67 +172,56 @@ public class WarriorAggressiveFSM : PlayerFSMController
                 return;
             }
 
-            if (ctrl.BossIsAttacking)
+            if (!wa.ReadyToAttack)
+            {
+                wa.FSM.ChangeState(wa.BreatherState, ctrl);
+                return;
+            }
+
+            float dist = wa.MeleeDistanceToTarget();
+            if (dist > wa.attackRange * 1.25f)
+            {
+                wa.FSM.ChangeState(wa.PressState, ctrl);
+                return;
+            }
+
+            if (ctrl.BossIsAttacking && !willTrade && dist < wa.dangerRange)
             {
                 wa.FSM.ChangeState(wa.EvadeState, ctrl);
-                return;
-            }
-
-            if (!wa.CanAffordAnyAttack)
-            {
-                wa.FSM.ChangeState(wa.BriefPullState, ctrl);
-                return;
-            }
-
-            if (ctrl.DistanceToTarget() > wa.attackRange * 1.3f)
-            {
-                wa.FSM.ChangeState(wa.ChaseState, ctrl);
                 return;
             }
 
             timer -= Time.deltaTime;
             if (timer <= 0f)
-                wa.FSM.ChangeState(wa.AttackState, ctrl);
+                wa.FSM.ChangeState(wa.StrikeState, ctrl);
         }
 
         public void OnExit(PlayerFSMController ctrl) { }
     }
 
     // ==========================================================================
-    // ATTACK — Picks one pattern (single chop, full two-hit combo, or a leap
-    // attack) and sees it through.  Combo specifically queues the second hit
-    // during the animation's combo window — that's what makes it actually
-    // land both swings instead of looking like a spammy single chop.
+    // STRIKE — Fires a melee attack, may queue one combo, then exits into a
+    // short disengage instead of looping attacks until stamina is empty.
     // ==========================================================================
-    public class WA_Attack : IPlayerFSMState
+    public class WA_Strike : IPlayerFSMState
     {
-        private AttackPattern pattern;
-        private bool  firstHitFired;
-        private bool  comboQueued;
-        private bool  jumpInitiated;
-        private bool  airHitFired;
-        private float patternTimeout;
-        private float postSwingDelay;
+        private float timer;
+        private bool  attemptCombo;
 
         public void OnEnter(PlayerFSMController ctrl)
         {
             var wa = (WarriorAggressiveFSM)ctrl;
             ctrl.StopMoving();
             ctrl.FaceTarget();
-
-            firstHitFired   = false;
-            comboQueued     = false;
-            jumpInitiated   = false;
-            airHitFired     = false;
-            postSwingDelay  = 0f;
-            patternTimeout  = 1.8f;
-
-            pattern = wa.PickAttackPattern();
+            ctrl.RequestAttack();
+            attemptCombo = Random.value < wa.comboProbability;
+            timer        = Random.Range(0.35f, 0.55f);
         }
 
         public void OnUpdate(PlayerFSMController ctrl)
         {
             var wa = (WarriorAggressiveFSM)ctrl;
+            float dist = wa.MeleeDistanceToTarget();
             ctrl.FaceTarget();
 
             if (ctrl.ArtilleryEvadeRequested)
@@ -266,163 +232,64 @@ public class WarriorAggressiveFSM : PlayerFSMController
                 return;
             }
 
-            // Boss counters mid-pattern — bail rather than eat the hit
-            if (ctrl.BossIsAttacking && ctrl.DistanceToTarget() < wa.dangerRange)
+            if (ctrl.BossIsAttacking && dist < wa.dangerRange && Random.value < wa.counterEvadeChance)
             {
                 wa.FSM.ChangeState(wa.EvadeState, ctrl);
                 return;
             }
 
-            if (ctrl.RecentlyHurt && ctrl.HealthRatio() < 0.45f)
+            if (attemptCombo && wa.MeleeAttack != null && wa.MeleeAttack.ComboWindowOpen)
+                ctrl.RequestAttack();
+
+            if (wa.MeleeAttack != null && wa.MeleeAttack.IsInAttackSequence)
             {
-                wa.FSM.ChangeState(wa.BriefPullState, ctrl);
+                ctrl.StopMoving();
                 return;
             }
 
-            // Stamina check failed at OnEnter — back off and recover
-            if (pattern == AttackPattern.None)
+            if (!wa.ReadyToAttack)
             {
-                wa.FSM.ChangeState(wa.BriefPullState, ctrl);
+                wa.FSM.ChangeState(wa.DisengageState, ctrl);
                 return;
             }
 
-            patternTimeout -= Time.deltaTime;
-            if (patternTimeout <= 0f)
+            if (dist > wa.attackRange * 1.35f)
             {
-                wa.FSM.ChangeState(wa.BriefPullState, ctrl);
+                wa.FSM.ChangeState(wa.PressState, ctrl);
                 return;
             }
 
-            // Drift slightly forward when just out of range so the swing connects
-            float dist = ctrl.DistanceToTarget();
-            if (dist > wa.attackRange * 1.05f && pattern != AttackPattern.JumpAttack)
+            if (dist > wa.stickRange)
                 ctrl.MoveTowardAt(0.55f);
             else
                 ctrl.StopMoving();
 
-            switch (pattern)
-            {
-                case AttackPattern.Single:     UpdateSingle(wa, ctrl);    break;
-                case AttackPattern.Combo:      UpdateCombo(wa, ctrl);     break;
-                case AttackPattern.JumpAttack: UpdateJumpAttack(wa, ctrl); break;
-            }
-        }
-
-        // One swing, then back off.
-        private void UpdateSingle(WarriorAggressiveFSM wa, PlayerFSMController ctrl)
-        {
-            var melee = wa.MeleeAttack;
-            if (melee == null) { wa.FSM.ChangeState(wa.BriefPullState, ctrl); return; }
-
-            if (!firstHitFired)
-            {
-                if (melee.CanAttack && !melee.IsInAttackSequence)
-                {
-                    ctrl.RequestAttack();
-                    firstHitFired = true;
-                }
-                return;
-            }
-
-            // Wait for the swing to play out, then pull back
-            if (!melee.IsInAttackSequence)
-            {
-                postSwingDelay += Time.deltaTime;
-                if (postSwingDelay >= 0.08f)
-                    wa.FSM.ChangeState(wa.BriefPullState, ctrl);
-            }
-        }
-
-        // Full two-hit combo — fire the first swing, then explicitly request
-        // the second hit while the combo window is open.  MeleeAttack queues
-        // it and ComboAttack() fires on the closing animation event.
-        private void UpdateCombo(WarriorAggressiveFSM wa, PlayerFSMController ctrl)
-        {
-            var melee = wa.MeleeAttack;
-            if (melee == null) { wa.FSM.ChangeState(wa.BriefPullState, ctrl); return; }
-
-            if (!firstHitFired)
-            {
-                if (melee.CanAttack && !melee.IsInAttackSequence)
-                {
-                    ctrl.RequestAttack();
-                    firstHitFired = true;
-                }
-                return;
-            }
-
-            // Queue the second swing while the window is open
-            if (!comboQueued && melee.ComboWindowOpen)
-            {
-                ctrl.RequestAttack();
-                comboQueued = true;
-            }
-
-            // After the second swing finishes (or window closed without us)
-            if (!melee.IsInAttackSequence && !melee.ComboWindowOpen)
-            {
-                postSwingDelay += Time.deltaTime;
-                if (postSwingDelay >= 0.10f)
-                    wa.FSM.ChangeState(wa.BriefPullState, ctrl);
-            }
-        }
-
-        // Leap up and chop down. Uses airAttackCost via MeleeAttack.
-        private void UpdateJumpAttack(WarriorAggressiveFSM wa, PlayerFSMController ctrl)
-        {
-            var melee = wa.MeleeAttack;
-            if (melee == null) { wa.FSM.ChangeState(wa.BriefPullState, ctrl); return; }
-
-            if (!jumpInitiated)
-            {
-                ctrl.RequestJump(Random.Range(0.18f, 0.28f));
-                jumpInitiated = true;
-                return;
-            }
-
-            // Swing once we're airborne and near the apex — gives the boss less time to step out
-            if (!airHitFired && !ctrl.IsGrounded())
-            {
-                bool nearApex = ctrl.PC != null && ctrl.PC.RB != null
-                                && ctrl.PC.RB.linearVelocity.y < 1.5f;
-                if (nearApex && melee.CanAttack && !melee.IsInAttackSequence)
-                {
-                    ctrl.RequestAttack();
-                    airHitFired = true;
-                }
-                return;
-            }
-
-            // Land, let the swing settle, then pull back
-            if (airHitFired && ctrl.IsGrounded() && !melee.IsInAttackSequence)
-            {
-                postSwingDelay += Time.deltaTime;
-                if (postSwingDelay >= 0.08f)
-                    wa.FSM.ChangeState(wa.BriefPullState, ctrl);
-            }
+            timer -= Time.deltaTime;
+            if (timer <= 0f)
+                wa.FSM.ChangeState(wa.DisengageState, ctrl);
         }
 
         public void OnExit(PlayerFSMController ctrl) => ctrl.StopMoving();
     }
 
     // ==========================================================================
-    // BRIEF PULL — Steps back after a pattern. If hurt/low-HP we stay back; if
-    // boss is mid-swing we evade; otherwise probabilistic re-engage. Stamina
-    // is the gate: we don't dive back in until we can afford another swing.
+    // DISENGAGE — Takes a small step out after a hit/combo so the boss gets a
+    // chance to whiff. This is the main difference from the all-in face-tank loop.
     // ==========================================================================
-    public class WA_BriefPull : IPlayerFSMState
+    public class WA_Disengage : IPlayerFSMState
     {
         private float timer;
 
         public void OnEnter(PlayerFSMController ctrl)
         {
-            timer = Random.Range(0.20f, 0.95f);
+            var wa = (WarriorAggressiveFSM)ctrl;
+            timer = Random.Range(wa.disengageMinTime, wa.disengageMaxTime);
         }
 
         public void OnUpdate(PlayerFSMController ctrl)
         {
             var wa = (WarriorAggressiveFSM)ctrl;
-            ctrl.MoveAway();
+            float dist = wa.MeleeDistanceToTarget();
 
             if (ctrl.ArtilleryEvadeRequested)
             {
@@ -432,46 +299,24 @@ public class WarriorAggressiveFSM : PlayerFSMController
                 return;
             }
 
-            timer -= Time.deltaTime;
-            if (timer > 0f) return;
+            ctrl.FaceTarget();
 
-            if (ctrl.RecentlyHurt && ctrl.HealthRatio() < 0.35f)
-            {
-                wa.FSM.ChangeState(wa.ChaseState, ctrl);
-                return;
-            }
-
-            if (ctrl.BossIsAttacking && ctrl.DistanceToTarget() < wa.dangerRange * 1.5f)
-            {
-                wa.FSM.ChangeState(wa.EvadeState, ctrl);
-                return;
-            }
-
-            // Need stamina before pressing again — extend the pull a bit longer
-            if (!wa.CanAffordAnyAttack)
-            {
-                timer = Random.Range(0.20f, 0.40f);
-                ctrl.StopMoving();
-                return;
-            }
-
-            bool stillClose = ctrl.DistanceToTarget() <= wa.attackRange * 1.4f;
-            float roll = Random.value;
-
-            if (stillClose && roll < 0.40f)
-                wa.FSM.ChangeState(wa.HesitateState, ctrl);
-            else if (stillClose && roll < 0.55f)
-                wa.FSM.ChangeState(wa.BriefPullState, ctrl);
+            if (dist < wa.reengageDistance || ctrl.BossIsAttacking)
+                ctrl.MoveAway();
             else
-                wa.FSM.ChangeState(wa.ChaseState, ctrl);
+                ctrl.StopMoving();
+
+            timer -= Time.deltaTime;
+            if (timer <= 0f && dist >= wa.reengageDistance * 0.8f)
+                wa.FSM.ChangeState(wa.ReadyToAttack ? (IPlayerFSMState)wa.PressState : wa.BreatherState, ctrl);
         }
 
         public void OnExit(PlayerFSMController ctrl) => ctrl.StopMoving();
     }
 
     // ==========================================================================
-    // EVADE — Triggered by boss attack or artillery. Jumps or dashes away.
-    // After evading, reassesses based on health before going back in.
+    // EVADE — Brief dash/jump away from a close boss attack or artillery, then
+    // immediately turns back in. This is a slip, not a defensive retreat.
     // ==========================================================================
     public class WA_Evade : IPlayerFSMState
     {
@@ -480,31 +325,67 @@ public class WarriorAggressiveFSM : PlayerFSMController
 
         public void OnEnter(PlayerFSMController ctrl)
         {
+            var wa = (WarriorAggressiveFSM)ctrl;
             ctrl.ConsumeArtilleryEvade();
-
-            jumped = ctrl.IsGrounded() && Random.value < 0.55f;
+            jumped = ctrl.IsGrounded() && Random.value < 0.60f;
             if (jumped)
-                ctrl.RequestJump(Random.Range(0.20f, 0.32f));
-
-            timer = Random.Range(0.35f, 0.65f);
+                ctrl.RequestJump(Random.Range(0.18f, 0.28f));
+            timer = Random.Range(0.25f, 0.45f);
+            if (ctrl.RecentlyHurt)
+                timer += wa.pressureAfterEvade;
         }
 
         public void OnUpdate(PlayerFSMController ctrl)
         {
             var wa = (WarriorAggressiveFSM)ctrl;
             ctrl.FaceTarget();
-
-            if (!jumped)
-                ctrl.MoveAway();
+            ctrl.MoveAway();
 
             timer -= Time.deltaTime;
             if (timer <= 0f)
+                wa.FSM.ChangeState(wa.ReadyToAttack ? (IPlayerFSMState)wa.PressState : wa.BreatherState, ctrl);
+        }
+
+        public void OnExit(PlayerFSMController ctrl) => ctrl.StopMoving();
+    }
+
+    // ==========================================================================
+    // BREATHER — Stamina is too low to keep swinging. Hold just outside danger,
+    // face the boss, then re-enter as soon as the warrior can attack again.
+    // ==========================================================================
+    public class WA_Breather : IPlayerFSMState
+    {
+        public void OnEnter(PlayerFSMController ctrl) => ctrl.StopMoving();
+
+        public void OnUpdate(PlayerFSMController ctrl)
+        {
+            var wa = (WarriorAggressiveFSM)ctrl;
+
+            if (ctrl.ArtilleryEvadeRequested)
             {
-                if (ctrl.RecentlyHurt && ctrl.HealthRatio() < 0.40f)
-                    wa.FSM.ChangeState(wa.BriefPullState, ctrl);
-                else
-                    wa.FSM.ChangeState(wa.ChaseState, ctrl);
+                ctrl.ConsumeArtilleryEvade();
+                ctrl.RequestJump(Random.Range(0.25f, 0.35f));
+                wa.FSM.ChangeState(wa.EvadeState, ctrl);
+                return;
             }
+
+            ctrl.FaceTarget();
+            float dist = wa.MeleeDistanceToTarget();
+            if (ctrl.BossIsAttacking && dist < wa.dangerRange)
+            {
+                wa.FSM.ChangeState(wa.EvadeState, ctrl);
+                return;
+            }
+
+            if (dist < wa.dangerRange * 1.15f)
+                ctrl.MoveAway();
+            else if (dist > wa.attackRange * 1.6f)
+                ctrl.MoveTowardAt(0.45f);
+            else
+                ctrl.StopMoving();
+
+            if (!wa.IsExhaustedStamina && ctrl.StaminaRatio() >= wa.reengageStaminaRatio)
+                wa.FSM.ChangeState(wa.PressState, ctrl);
         }
 
         public void OnExit(PlayerFSMController ctrl) => ctrl.StopMoving();

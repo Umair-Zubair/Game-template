@@ -1431,8 +1431,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterManager
   playerPrefabs:
-  - {fileID: 5536329845775654271, guid: 876ccb7512133544e82e544c241ac2c4, type: 3}
   - {fileID: 5963178899783550497, guid: 577e1bd8d75c0a648be516ea4b64a3e2, type: 3}
+  - {fileID: 5536329845775654271, guid: 876ccb7512133544e82e544c241ac2c4, type: 3}
   spawnPoint: {fileID: 271092032}
   healthBar: {fileID: 27520355}
   staminaBar: {fileID: 2031141652}
@@ -2502,7 +2502,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &555522151
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3033,7 +3033,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameOverScreen: {fileID: 1840033165}
   gameOverSound: {fileID: 8300000, guid: 363a938ca73b3584db2b4669a1d37e27, type: 3}
-  disableGameOver: 0
+  disableGameOver: 1
   winScreen: {fileID: 1098667007}
   winSound: {fileID: 0}
   pauseScreen: {fileID: 555522150}
@@ -5163,7 +5163,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1098667008
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5232,7 +5232,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c41bea398ac4454a86235c3719f6203, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RestartManager
-  trainingMode: 0
+  trainingMode: 1
   deathResetDelay: 2
   bossSpawnPoint: {fileID: 1314204303}
   playerSpawnPoint: {fileID: 271092032}
@@ -5906,7 +5906,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9210189640734394756, guid: 0cd5ddff8b596404182275a636514347, type: 3}
       propertyPath: enableCultistSpawning
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9210189640734394756, guid: 0cd5ddff8b596404182275a636514347, type: 3}
       propertyPath: artilleryAnchorPosition.x
@@ -6240,7 +6240,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -8}
+  m_AnchoredPosition: {x: 0, y: -7.9999084}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1305240361
@@ -7798,7 +7798,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c8dfd3ab033c2d428b4d9a62faf04b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AIDecisionEngine
-  isTrainingMode: 0
+  isTrainingMode: 1
   enableL1: 1
   enableL2: 1
   enableL3: 1
@@ -7864,7 +7864,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: fcdfd6e4c2b20b04bacfeec11584e175, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 2
+  m_BehaviorType: 0
   m_BehaviorName: VoidbornBoss
   TeamId: 0
   m_UseChildSensors: 1
@@ -8600,7 +8600,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1840033166
 RectTransform:
   m_ObjectHideFlags: 0

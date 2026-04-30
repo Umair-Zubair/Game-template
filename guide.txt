@@ -71,7 +71,7 @@ Select the Boss GameObject and verify these exact settings:
 
 [ ] BEHAVIOR PARAMETERS (Native Component)
     - Behavior Name: VoidbornBoss (Must match your .yaml config exactly)
-    - Vector Observation > Space Size: 15
+    - Vector Observation > Space Size: 13
     - Actions > Discrete Branches: Size 1
     - Branch 0 Size: 3
     - Model: EMPTY (None)

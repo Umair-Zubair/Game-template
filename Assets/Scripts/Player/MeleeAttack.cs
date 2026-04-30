@@ -119,6 +119,12 @@ public class MeleeAttack : MonoBehaviour
         attackSequenceTimer = 0.85f;
         OnAttackPerformed?.Invoke("melee");
 
+        if (attackPoint == null)
+        {
+            Debug.LogWarning("[MeleeAttack] attackPoint is NULL — no damage dealt. Assign AttackPoint in Inspector.");
+            return;
+        }
+
         DealDamage(damage);
     }
 
@@ -198,19 +204,35 @@ public class MeleeAttack : MonoBehaviour
     private void DealDamage(int dmg)
     {
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayer);
+
+        if (hitEnemies.Length == 0)
+        {
+            Debug.LogWarning($"[MeleeAttack] WHIFF — OverlapCircle at {attackPoint.position}, radius={attackRange}, " +
+                             $"enemyLayer={enemyLayer.value} found 0 colliders. Is the boss on layer {LayerFromMask(enemyLayer)}?");
+        }
+
         foreach (Collider2D enemy in hitEnemies)
         {
-            if (enemy.GetComponent<Health>() != null)
+            Health h = enemy.GetComponent<Health>() ?? enemy.GetComponentInParent<Health>();
+            if (h != null)
             {
-                enemy.GetComponent<Health>().TakeDamage(dmg);
+                h.TakeDamage(dmg);
                 OnDamageDealt?.Invoke(dmg);
+                Debug.Log($"[MeleeAttack] HIT {enemy.name} for {dmg} dmg (HP now {h.currentHealth})");
             }
-            else if (enemy.GetComponentInParent<Health>() != null)
+            else
             {
-                enemy.GetComponentInParent<Health>().TakeDamage(dmg);
-                OnDamageDealt?.Invoke(dmg);
+                Debug.LogWarning($"[MeleeAttack] OverlapCircle hit {enemy.name} but no Health component found.");
             }
         }
+    }
+
+    private static int LayerFromMask(LayerMask mask)
+    {
+        int bits = mask.value;
+        for (int i = 0; i < 32; i++)
+            if ((bits & (1 << i)) != 0) return i;
+        return -1;
     }
 
     private bool IsGrounded()

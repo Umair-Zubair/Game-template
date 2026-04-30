@@ -345,7 +345,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5963178899783550497}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1b6e2ee898c28ce4abd5656c92f63568, type: 3}
   m_Name: 
@@ -361,4 +361,14 @@ MonoBehaviour:
   MeleeAttack: {fileID: 0}
   RangedAttack: {fileID: 0}
   attackRange: 2
-  jumpHeightThreshold: 1.5
+  stickRange: 1.2
+  comboProbability: 0.6
+  jumpHeightThreshold: 1.8
+  jumpCheckInterval: 1.4
+  counterEvadeChance: 0.85
+  pressureAfterEvade: 0.25
+  disengageMinTime: 0.28
+  disengageMaxTime: 0.55
+  reengageDistance: 2.8
+  minAttackStaminaRatio: 0.35
+  reengageStaminaRatio: 0.55
