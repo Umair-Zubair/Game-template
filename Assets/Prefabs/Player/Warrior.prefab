@@ -51,6 +51,7 @@ GameObject:
   - component: {fileID: 7537724188964175649}
   - component: {fileID: 8481082117813233341}
   - component: {fileID: -5923013886691296237}
+  - component: {fileID: 4933516322791009352}
   m_Layer: 10
   m_Name: Warrior
   m_TagString: Player
@@ -252,7 +253,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8e26f534ea637349a0bc6f44b578ba9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
-  startingHealth: 6
+  startingHealth: 12
   components: []
 --- !u!114 &8049873378223907268
 MonoBehaviour:
@@ -267,9 +268,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MeleeAttack
   attackCooldown: 0.25
-  attackRange: 2
-  damage: 1
-  comboDamage: 1
+  attackRange: 0.8
+  damage: 2
+  comboDamage: 3
   comboAttackSound: {fileID: 8300000, guid: 578108a7e37e5294286b02a60ab13f99, type: 3}
   attackPoint: {fileID: 467937805776351918}
   enemyLayer:
@@ -345,7 +346,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5963178899783550497}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1b6e2ee898c28ce4abd5656c92f63568, type: 3}
   m_Name: 
@@ -360,8 +361,8 @@ MonoBehaviour:
   Health: {fileID: 0}
   MeleeAttack: {fileID: 0}
   RangedAttack: {fileID: 0}
-  attackRange: 2
-  stickRange: 1.2
+  attackRange: 0.65
+  stickRange: 0.3
   comboProbability: 0.6
   jumpHeightThreshold: 1.8
   jumpCheckInterval: 1.4
@@ -369,6 +370,39 @@ MonoBehaviour:
   pressureAfterEvade: 0.25
   disengageMinTime: 0.28
   disengageMaxTime: 0.55
-  reengageDistance: 2.8
+  reengageDistance: 1.6
   minAttackStaminaRatio: 0.35
   reengageStaminaRatio: 0.55
+--- !u!114 &4933516322791009352
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5963178899783550497}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0769bc262ba78ca44a0021997e26007c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WarriorBalancedFSM
+  targetTag: Enemy
+  inputSmoothSpeed: 6
+  dangerRange: 3
+  reactionDelayMin: 0.07
+  reactionDelayMax: 0.23
+  PC: {fileID: 0}
+  Stamina: {fileID: 0}
+  Health: {fileID: 0}
+  MeleeAttack: {fileID: 0}
+  RangedAttack: {fileID: 0}
+  engageRange: 0.75
+  staminaThresholdRatio: 0.23
+  comboProbability: 0.6
+  jumpHeightThreshold: 2.8
+  jumpCheckInterval: 3.5
+  allowApproachJumps: 0
+  artilleryJumpChance: 0.08
+  evadeJumpChance: 0.02
+  lowHealthThreshold: 0.35
+  highHealthThreshold: 0.65
+  bossLowHealthThreshold: 0.45

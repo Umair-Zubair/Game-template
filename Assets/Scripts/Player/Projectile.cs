@@ -3,6 +3,7 @@ using UnityEngine;
 public class Projectile : MonoBehaviour
 {
     [SerializeField] private float speed;
+    [SerializeField] private float damage;
     private float direction;
     private bool hit;
     private float lifetime;
@@ -45,7 +46,7 @@ public class Projectile : MonoBehaviour
         }
 
         if (collision.tag == "Enemy")
-            collision.GetComponent<Health>()?.TakeDamage(1);
+            collision.GetComponent<Health>()?.TakeDamage(damage);
         
         // Deactivate immediately after hit (or after animation if you add one later)
         Deactivate();
