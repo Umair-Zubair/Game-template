@@ -1,16 +1,23 @@
+using System.Collections.Generic;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
+using Unity.MLAgents.Policies;
 using Unity.MLAgents.Sensors;
 using Unity.Barracuda;
 using UnityEngine;
 
 /// <summary>
-/// Meta-controller ML-Agents agent that learns when to switch between two
-/// pre-trained ONNX combat brains for the boss.
+/// Meta-controller ML-Agents agent that learns when to switch between
+/// N pre-trained ONNX combat brains for the boss.
 ///
 /// This agent does NOT make combat decisions itself — it only decides WHICH
-/// of the two existing brains should be active at any given moment. The active
+/// of the configured brains should be active at any given moment. The active
 /// brain then makes the actual Chase / Melee / Artillery decisions through MLBrain.
+///
+/// The list of brains is fully configurable via the inspector. Empty (null)
+/// slots are skipped at startup, and the action / observation space is sized
+/// to match the count of valid entries. You can add or remove brains freely
+/// without touching BehaviorParameters — they are reconfigured at Awake().
 ///
 /// Place on a SEPARATE empty GameObject (not on the boss) so its BehaviorParameters
 /// does not conflict with MLBrain's BehaviorParameters on the boss.
@@ -20,31 +27,30 @@ using UnityEngine;
 ///   2. Add this component (auto-adds BehaviorParameters)
 ///   3. BehaviorParameters on BrainController:
 ///        • Behavior Name  = "ControllerForTrain"
-///        • Vector Observation Size = 22
-///        • Discrete Branches = 1 branch of size 2
-///        • Behavior Type = Default (training) or InferenceOnly (play)
-///   4. Drag both ONNX files from "Onnx Folder" into brainA / brainB
+///        • Behavior Type  = Default (training) or InferenceOnly (play)
+///        • VectorObservationSize / BranchSizes are overwritten at Awake()
+///   4. Populate the "brains" list with ONNX models from "Onnx Files"
 ///   5. On the boss's MLBrain BehaviorParameters:
 ///        • Behavior Type = InferenceOnly  (NOT Default)
 ///   6. On the boss's AIDecisionEngine:
 ///        • isTrainingMode = true
 ///
 /// ─── Training ──────────────────────────────────────────────────────────
-///   mlagents-learn controller_config.yaml --run-id=controller_v1
+///   mlagents-learn controller_config.yaml --run-id=controller_v2
+///   Note: any previously trained ControllerForTrain.onnx is shape-incompatible
+///   once the brain count changes — retrain from scratch.
 ///
-/// ─── Observations (22 floats) ──────────────────────────────────────────
-///   [0-2]   Boss HP, Player HP, Distance
-///   [3-5]   Feasibility (inRange, canMelee, canArtillery)
-///   [6-10]  Player profile (aggression, blockRate, ranged, melee, jumpAttack)
-///   [11]    Active brain index (0 or 1)
-///   [12-13] Per-brain net score (damage dealt − taken, normalized)
-///   [14-15] Per-brain time allocation ratio
-///   [16-17] Health deltas since last controller decision
-///   [18-19] Switch dynamics (time since switch, stagnation timer)
-///   [20-21] Episode progress (switch count, time elapsed)
+/// ─── Observations (18 + 2*N floats) ────────────────────────────────────
+///   [0-2]      Boss HP, Player HP, Distance
+///   [3-5]      Feasibility (inRange, canMelee, canArtillery)
+///   [6-10]     Player profile (aggression, blockRate, ranged, melee, jumpAttack)
+///   [11]       Active brain index, normalized to [0,1]
+///   [12..11+N] Per-brain net score (damage dealt − taken, normalized)
+///   [12+N..]   Per-brain time allocation ratio (N values)
+///   then       Health deltas (2), switch dynamics (2), episode progress (2)
 ///
 /// ─── Actions ───────────────────────────────────────────────────────────
-///   1 discrete branch, size 2:  0 = Brain A,  1 = Brain B
+///   1 discrete branch of size N:  index → brains[index]
 ///
 /// ─── Reward Signals ────────────────────────────────────────────────────
 ///   • Damage dealt to player        → positive (scaled)
@@ -54,7 +60,7 @@ using UnityEngine;
 ///   • Timeout                       → +timeoutReward
 ///   • Each brain switch             → switchPenalty (small negative)
 ///   • Damage dealt shortly after switch → postSwitchBonus (validates switch)
-///   • No damage dealt for too long  → stagnationPenalty (encourages trying other brain)
+///   • No damage dealt for too long  → stagnationPenalty (encourages trying another brain)
 /// </summary>
 public class ControllerForTrain : Agent
 {
@@ -62,11 +68,11 @@ public class ControllerForTrain : Agent
     // Inspector
     // ════════════════════════════════════════════════════════════════════
 
-    [Header("Brain Models (drag ONNX files from 'Onnx Folder')")]
-    [Tooltip("First pre-trained ONNX brain")]
-    [SerializeField] private NNModel brainA;
-    [Tooltip("Second pre-trained ONNX brain")]
-    [SerializeField] private NNModel brainB;
+    [Header("Brain Models (drag ONNX files from 'Onnx Files'; empty slots are ignored)")]
+    [Tooltip("Configurable list of pre-trained ONNX brains. The agent's discrete " +
+             "action space and observation size are sized to match the count of " +
+             "non-null entries at Awake().")]
+    [SerializeField] private List<NNModel> brains = new List<NNModel>();
 
     [Header("References (auto-found if left empty)")]
     [SerializeField] private MLBrain mlBrain;
@@ -112,10 +118,14 @@ public class ControllerForTrain : Agent
     private float evalTimer;
     private bool  episodeEnding;
 
-    // Per-brain performance within the current episode
-    private readonly float[] brainDamageDealt = new float[2];
-    private readonly float[] brainDamageTaken = new float[2];
-    private readonly float[] brainActiveTime  = new float[2];
+    // Filtered (non-null) view of the inspector list. Populated in Awake().
+    private List<NNModel> activeBrains;
+    private int BrainCount => activeBrains?.Count ?? 0;
+
+    // Per-brain performance within the current episode (sized to BrainCount).
+    private float[] brainDamageDealt;
+    private float[] brainDamageTaken;
+    private float[] brainActiveTime;
 
     // Switch tracking
     private int   switchCount;
@@ -148,11 +158,60 @@ public class ControllerForTrain : Agent
     // ════════════════════════════════════════════════════════════════════
 
     public int    ActiveBrainIndex => activeBrainIndex;
-    public string ActiveBrainName  => activeBrainIndex == 0 ? "BrainA" : "BrainB";
+    public string ActiveBrainName  =>
+        (activeBrains != null && activeBrainIndex >= 0 && activeBrainIndex < activeBrains.Count
+         && activeBrains[activeBrainIndex] != null)
+            ? $"Brain[{activeBrainIndex}] ({activeBrains[activeBrainIndex].name})"
+            : $"Brain[{activeBrainIndex}]";
 
     // ════════════════════════════════════════════════════════════════════
     // ML-Agents Lifecycle
     // ════════════════════════════════════════════════════════════════════
+
+    private void Awake()
+    {
+        if (!BuildActiveBrainList())
+        {
+            Debug.LogError("[ControllerForTrain] No NNModel assigned in the 'brains' " +
+                           "list — disabling agent. Populate the list in the inspector.");
+            enabled = false;
+            return;
+        }
+
+        ConfigureBehaviorParameters();
+    }
+
+    private bool BuildActiveBrainList()
+    {
+        activeBrains = new List<NNModel>();
+        if (brains == null) return false;
+
+        for (int i = 0; i < brains.Count; i++)
+        {
+            if (brains[i] != null)
+                activeBrains.Add(brains[i]);
+        }
+
+        return activeBrains.Count > 0;
+    }
+
+    private void ConfigureBehaviorParameters()
+    {
+        var behaviorParameters = GetComponent<BehaviorParameters>();
+        if (behaviorParameters == null)
+        {
+            Debug.LogError("[ControllerForTrain] BehaviorParameters component missing " +
+                           "on this GameObject.");
+            return;
+        }
+
+        behaviorParameters.BrainParameters.VectorObservationSize = 18 + 2 * BrainCount;
+        behaviorParameters.BrainParameters.ActionSpec = ActionSpec.MakeDiscrete(BrainCount);
+
+        if (DebugMode)
+            Debug.Log($"[ControllerForTrain] Configured BehaviorParameters: " +
+                      $"obs={18 + 2 * BrainCount}, discrete branch size={BrainCount}");
+    }
 
     public override void Initialize()
     {
@@ -172,6 +231,11 @@ public class ControllerForTrain : Agent
         bossHealth     = mlBrain.GetComponent<Health>();
         restartManager = FindFirstObjectByType<RestartManager>();
 
+        // Size per-brain arrays now that we know the brain count.
+        brainDamageDealt = new float[BrainCount];
+        brainDamageTaken = new float[BrainCount];
+        brainActiveTime  = new float[BrainCount];
+
         FindPlayerHealth();
         CacheMaxHP();
     }
@@ -182,9 +246,12 @@ public class ControllerForTrain : Agent
         evalTimer     = 0f;
         episodeEnding = false;
 
-        brainDamageDealt[0] = brainDamageDealt[1] = 0f;
-        brainDamageTaken[0] = brainDamageTaken[1] = 0f;
-        brainActiveTime[0]  = brainActiveTime[1]  = 0f;
+        for (int i = 0; i < BrainCount; i++)
+        {
+            brainDamageDealt[i] = 0f;
+            brainDamageTaken[i] = 0f;
+            brainActiveTime[i]  = 0f;
+        }
 
         switchCount             = 0;
         timeSinceLastSwitch     = 0f;
@@ -215,10 +282,10 @@ public class ControllerForTrain : Agent
         pendingBrainSwitch = 0;
 
         if (DebugMode)
-            Debug.Log("[ControllerForTrain] Episode begin — starting with BrainA");
+            Debug.Log($"[ControllerForTrain] Episode begin — starting with {ActiveBrainName}");
     }
 
-    /// <summary>22 observations for the brain-selection network.</summary>
+    /// <summary>(18 + 2*N) observations for the brain-selection network.</summary>
     public override void CollectObservations(VectorSensor sensor)
     {
         GameContext ctx = decisionEngine != null
@@ -243,20 +310,24 @@ public class ControllerForTrain : Agent
         sensor.AddObservation(Mathf.Clamp01(p.meleeRatio));                       // 9
         sensor.AddObservation(Mathf.Clamp01(p.jumpAttackRatio));                  // 10
 
-        // ── Active brain (1) ────────────────────────────────────────
-        sensor.AddObservation((float)activeBrainIndex);                           // 11
+        // ── Active brain (1) — normalized to [0,1] across N brains ──
+        float activeNorm = BrainCount > 1
+            ? activeBrainIndex / (float)(BrainCount - 1)
+            : 0f;
+        sensor.AddObservation(activeNorm);                                        // 11
 
-        // ── Per-brain net performance: (dealt − taken) / playerMaxHP (2) ─
+        // ── Per-brain net performance: (dealt − taken) / playerMaxHP (N) ─
         float pMax = Mathf.Max(playerMaxHP, 1f);
-        float netA = (brainDamageDealt[0] - brainDamageTaken[0]) / pMax;
-        float netB = (brainDamageDealt[1] - brainDamageTaken[1]) / pMax;
-        sensor.AddObservation(Mathf.Clamp(netA, -1f, 1f));                       // 12
-        sensor.AddObservation(Mathf.Clamp(netB, -1f, 1f));                       // 13
+        for (int i = 0; i < BrainCount; i++)
+        {
+            float net = (brainDamageDealt[i] - brainDamageTaken[i]) / pMax;
+            sensor.AddObservation(Mathf.Clamp(net, -1f, 1f));
+        }
 
-        // ── Per-brain time allocation (2) ───────────────────────────
+        // ── Per-brain time allocation (N) ───────────────────────────
         float totalTime = Mathf.Max(episodeTimer, 0.1f);
-        sensor.AddObservation(Mathf.Clamp01(brainActiveTime[0] / totalTime));     // 14
-        sensor.AddObservation(Mathf.Clamp01(brainActiveTime[1] / totalTime));     // 15
+        for (int i = 0; i < BrainCount; i++)
+            sensor.AddObservation(Mathf.Clamp01(brainActiveTime[i] / totalTime));
 
         // ── Health deltas since last controller decision (2) ────────
         float curBossHP = bossHealth != null
@@ -279,7 +350,9 @@ public class ControllerForTrain : Agent
 
     public override void OnActionReceived(ActionBuffers actions)
     {
-        int chosen = Mathf.Clamp(actions.DiscreteActions[0], 0, 1);
+        if (BrainCount == 0) return;
+
+        int chosen = Mathf.Clamp(actions.DiscreteActions[0], 0, BrainCount - 1);
 
         if (chosen != activeBrainIndex)
         {
@@ -293,8 +366,11 @@ public class ControllerForTrain : Agent
             postSwitchTimer         = 0f;
 
             if (DebugMode)
-                Debug.Log($"[ControllerForTrain] Switched → Brain" +
-                          $"{(chosen == 0 ? "A" : "B")} (switch #{switchCount})");
+            {
+                string name = activeBrains[chosen] != null ? activeBrains[chosen].name : "<null>";
+                Debug.Log($"[ControllerForTrain] Switched → Brain[{chosen}] ({name}) " +
+                          $"(switch #{switchCount})");
+            }
         }
 
         // Snapshot HP for delta tracking on the NEXT observation
@@ -307,8 +383,8 @@ public class ControllerForTrain : Agent
     public override void Heuristic(in ActionBuffers actionsOut)
     {
         int action = activeBrainIndex;
-        if (Input.GetKeyDown(KeyCode.B))
-            action = 1 - activeBrainIndex;
+        if (BrainCount > 0 && Input.GetKeyDown(KeyCode.B))
+            action = (activeBrainIndex + 1) % BrainCount;
         actionsOut.DiscreteActions.Array[0] = action;
     }
 
@@ -429,8 +505,7 @@ public class ControllerForTrain : Agent
 
         if (DebugMode)
             Debug.Log($"[ControllerForTrain] Boss died (lose). " +
-                      $"Active: {ActiveBrainName} | " +
-                      $"A dealt={brainDamageDealt[0]:F0} B dealt={brainDamageDealt[1]:F0}");
+                      $"Active: {ActiveBrainName} | {BuildPerBrainSummary()}");
 
         EndEpisode();
     }
@@ -463,8 +538,7 @@ public class ControllerForTrain : Agent
 
             if (DebugMode)
                 Debug.Log($"[ControllerForTrain] Player died (win). " +
-                          $"Active: {ActiveBrainName} | " +
-                          $"A dealt={brainDamageDealt[0]:F0} B dealt={brainDamageDealt[1]:F0}");
+                          $"Active: {ActiveBrainName} | {BuildPerBrainSummary()}");
 
             EndEpisode();
             return;
@@ -495,14 +569,20 @@ public class ControllerForTrain : Agent
 
     private void ApplyBrainSelection(int brainIndex)
     {
+        if (brainIndex < 0 || brainIndex >= BrainCount)
+        {
+            Debug.LogWarning($"[ControllerForTrain] Brain index {brainIndex} out of range " +
+                             $"[0, {BrainCount - 1}].");
+            return;
+        }
+
         activeBrainIndex = brainIndex;
-        NNModel selected = brainIndex == 0 ? brainA : brainB;
+        NNModel selected = activeBrains[brainIndex];
 
         if (selected == null)
         {
-            Debug.LogWarning($"[ControllerForTrain] Brain " +
-                             $"{(brainIndex == 0 ? "A" : "B")} model is null! " +
-                             "Drag the ONNX file into the inspector slot.");
+            Debug.LogWarning($"[ControllerForTrain] Brain[{brainIndex}] model is null! " +
+                             "Re-check the inspector list.");
             return;
         }
 
@@ -512,7 +592,7 @@ public class ControllerForTrain : Agent
         {
             mlBrain.SetModel("VoidbornBoss", selected);
             if (DebugMode)
-                Debug.Log($"[ControllerForTrain] Model set → Brain{(brainIndex == 0 ? "A" : "B")} ({selected.name})");
+                Debug.Log($"[ControllerForTrain] Model set → Brain[{brainIndex}] ({selected.name})");
         }
         catch (System.Exception e)
         {
@@ -523,6 +603,19 @@ public class ControllerForTrain : Agent
     // ════════════════════════════════════════════════════════════════════
     // Helpers
     // ════════════════════════════════════════════════════════════════════
+
+    private string BuildPerBrainSummary()
+    {
+        if (BrainCount == 0) return "no brains";
+        var sb = new System.Text.StringBuilder();
+        for (int i = 0; i < BrainCount; i++)
+        {
+            if (i > 0) sb.Append(", ");
+            string name = activeBrains[i] != null ? activeBrains[i].name : "<null>";
+            sb.Append($"[{i}] {name} dealt={brainDamageDealt[i]:F0} taken={brainDamageTaken[i]:F0}");
+        }
+        return sb.ToString();
+    }
 
     private void CancelDeathSequences()
     {
