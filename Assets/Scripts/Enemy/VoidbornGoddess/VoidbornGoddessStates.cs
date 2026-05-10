@@ -250,10 +250,10 @@ public class VoidbornMeleeAttackState : IBossState
         // ── Fire the trigger for the current swipe ───────────────────────────
         if (!swipeInitialized)
         {
+            goddess.PlaySwipeSound(currentSwipeIndex);
             BeginSwipe(anim, currentSwipeIndex);
             return;
         }
-
         // ── Fallback hit timer ───────────────────────────────────────────────
         if (FALLBACK_HIT_DELAY > 0f && !hitLanded)
         {
@@ -465,6 +465,7 @@ public class VoidbornArtilleryState : IBossState
             case Phase.DespawnFromArena:
                 if (!phaseInitialized)
                 {
+                    goddess.PlayArtilleryTeleportUpSound();
                     BeginPhase(anim, "despawn");
                     return;
                 }
@@ -514,6 +515,7 @@ public class VoidbornArtilleryState : IBossState
             case Phase.Despawn2:
                 if (!phaseInitialized)
                 {
+                    goddess.PlayArtilleryTeleportBackSound();
                     BeginPhase(anim, "despawn2");
                     return;
                 }

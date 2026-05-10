@@ -11,6 +11,13 @@ using UnityEngine;
 /// </summary>
 public class VoidbornArtilleryProjectile : MonoBehaviour
 {
+    [Header("Sounds")]
+    [Tooltip("Played when the projectile finishes forming and starts falling.")]
+    [SerializeField] private AudioClip descendSound;
+
+    [Tooltip("Played when the projectile explodes on impact (player or ground).")]
+    [SerializeField] private AudioClip explosionSound;
+
     [Header("Projectile Settings")]
     [Tooltip("How long the projectile stays suspended while forming")]
     [SerializeField] private float formDuration = 0.8f;
@@ -125,6 +132,8 @@ public class VoidbornArtilleryProjectile : MonoBehaviour
                     currentState = ProjectileState.Falling;
                     if (rb != null)
                         rb.linearVelocity = Vector2.down * fallSpeed;
+                    if (descendSound != null && SoundManager.instance != null)
+                        SoundManager.instance.PlaySound(descendSound);
                 }
                 break;
 
@@ -203,6 +212,9 @@ public class VoidbornArtilleryProjectile : MonoBehaviour
     {
         currentState = ProjectileState.Exploding;
 
+        if (explosionSound != null && SoundManager.instance != null)
+            SoundManager.instance.PlaySound(explosionSound);
+
         if (rb != null)
             rb.linearVelocity = Vector2.zero;
 
@@ -210,13 +222,9 @@ public class VoidbornArtilleryProjectile : MonoBehaviour
             boxCollider.enabled = false;
 
         if (anim != null)
-        {
             anim.SetTrigger("explode");
-        }
         else
-        {
             Destroy(gameObject);
-        }
     }
 
     /// <summary>

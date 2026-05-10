@@ -7,6 +7,24 @@ using UnityEngine;
 /// </summary>
 public class VoidbornGoddessController : BossController
 {
+    [Header("Voidborn - Sounds")]
+    [Tooltip("Played when SpawnCultist() instantiates a cultist.")]
+    [SerializeField] private AudioClip cultistSpawnSound;
+
+    [Tooltip("Played when the artillery 'hand' projectile is summoned above the player.")]
+    [SerializeField] private AudioClip artillerySpawnSound;
+
+    [Header("Voidborn - Melee Swipe Sounds (one per slash)")]
+    [SerializeField] private AudioClip swipeSound1;
+    [SerializeField] private AudioClip swipeSound2;
+    [SerializeField] private AudioClip swipeSound3;
+    [SerializeField] private AudioClip swipeSound4;
+    [Tooltip("Played when the goddess teleports UP to the artillery anchor (start of the artillery attack).")]
+    [SerializeField] private AudioClip artilleryTeleportUpSound;
+
+    [Tooltip("Played when the goddess teleports BACK to the arena after the artillery cast.")]
+    [SerializeField] private AudioClip artilleryTeleportBackSound;
+
     [Header("Voidborn Settings")]
     public float chaseSpeed = 3f;
     public float meleeAttackCooldown = 2.5f;
@@ -239,6 +257,11 @@ public class VoidbornGoddessController : BossController
     /// </summary>
     public void SpawnArtilleryProjectile()
     {
+            if (Player == null) return;
+        OnArtilleryLaunched?.Invoke();
+
+        if (artillerySpawnSound != null)
+            SoundManager.instance.PlaySound(artillerySpawnSound);
         if (Player == null) return;
         OnArtilleryLaunched?.Invoke();
 
@@ -272,6 +295,8 @@ public class VoidbornGoddessController : BossController
     public void SpawnCultist()
     {
         if (cultistPrefab == null) return;
+        if (cultistSpawnSound != null)
+            SoundManager.instance.PlaySound(cultistSpawnSound);
         float side = FacingDirection == 0 ? 1f : FacingDirection;
         Vector3 spawnPos = transform.position + new Vector3(side * cultistSpawnOffset, 0f, 0f);
         Instantiate(cultistPrefab, spawnPos, Quaternion.identity);
@@ -299,6 +324,37 @@ public class VoidbornGoddessController : BossController
         gameObject.SetActive(false);
     }
 
+    
+    public void PlaySwipeSound(int swipeIndex)
+    {
+        /// <summary>
+        /// Plays the slash sound for a given swipe index (0-3). Called by VoidbornMeleeAttackState
+        /// at the start of each swipe so each slash gets its own clip.
+        /// </summary>
+        AudioClip clip = swipeIndex switch
+        {
+            0 => swipeSound1,
+            1 => swipeSound2,
+            2 => swipeSound3,
+            3 => swipeSound4,
+            _ => null
+        };
+        if (clip != null)
+            SoundManager.instance.PlaySound(clip);
+    }
+
+    public void PlayArtilleryTeleportUpSound()
+    {
+        if (artilleryTeleportUpSound != null)
+            SoundManager.instance.PlaySound(artilleryTeleportUpSound);
+    }
+
+    public void PlayArtilleryTeleportBackSound()
+    {
+        if (artilleryTeleportBackSound != null)
+            SoundManager.instance.PlaySound(artilleryTeleportBackSound);
+    }
+    
     private void OnDrawGizmosSelected()
     {
         // Detection range

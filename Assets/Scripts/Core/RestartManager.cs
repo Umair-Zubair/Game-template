@@ -22,18 +22,19 @@ public class RestartManager : MonoBehaviour
     private Health playerHealth;
     private MLBrain mlBrain;
     private UIManager uiManager;
+    private CharacterManager characterManager;
 
     private bool IsMLActive => mlBrain != null && mlBrain.isActiveAndEnabled && mlBrain.IsModelLoaded;
 
     private void Awake()
     {
-        // Find the boss in Awake — it is always a scene object so it exists at Awake time.
         boss = FindFirstObjectByType<BossController>();
         if (boss == null)
             Debug.LogWarning("[RestartManager] Could not find a BossController in the scene! Reset will not work.");
 
         mlBrain = boss != null ? boss.GetComponent<MLBrain>() : null;
         uiManager = FindFirstObjectByType<UIManager>();
+        characterManager = FindFirstObjectByType<CharacterManager>(); // NEW
     }
 
     private void Start()
@@ -117,13 +118,28 @@ public class RestartManager : MonoBehaviour
         else
             Debug.LogWarning("[RestartManager] ResetEncounter: boss is null — cannot respawn boss.");
 
-        if (player != null)
+        // When the AI-training randomize toggle is ON, fully re-instantiate the player so
+        // each episode can roll a different character. Otherwise just Respawn() the existing
+        // instance (cheaper, preserves any persistent state on the player).
+        if (characterManager != null && characterManager.IsRandomizing)
+        {
+            characterManager.SpawnFreshCharacter();
+            // SpawnFreshCharacter() calls InitPlayer() on us, so `player` is now updated.
+            // Move it to the spawn point in case CharacterManager's spawn point differs.
+            if (player != null && playerSpawnPoint != null)
+                player.Respawn(playerSpawnPoint.position);
+        }
+        else if (player != null)
+        {
             player.Respawn(playerSpawnPoint != null ? playerSpawnPoint.position : player.transform.position);
+        }
         else
+        {
             Debug.LogWarning("[RestartManager] ResetEncounter: player is null — cannot respawn player.");
+        }
 
         Debug.Log("[RestartManager] Encounter reset.");
-    }
+    } 
 
     private void OnBossDied()
     {

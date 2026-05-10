@@ -10,19 +10,43 @@ public class CharacterManager : MonoBehaviour
     [SerializeField] private Healthbar healthBar;
     [SerializeField] private StaminaBar staminaBar;
 
+    [Header("AI Training")]
+    [Tooltip("When ON, ignores the player's selection and picks a random character on every spawn/reset.")]
+    [SerializeField] private bool randomizeCharacterForAITraining = false;
+
+    [Tooltip("When ON, randomly enables ONE PlayerFSMController on the spawned player and disables the rest. Turn OFF to use whatever FSM enable state is set on the prefab.")]
+    [SerializeField] private bool randomizeFSMForAITraining = false;
+
     private const string SELECTED_CHARACTER_KEY = "SelectedCharacter";
     private const int BLOB_RANGED_INDEX = 0;
     private const int BLOB_MELEE_INDEX = 1;
 
-    private void Awake()
-    {
-    }
+    private GameObject currentPlayer;
+
+    public bool IsRandomizing => randomizeCharacterForAITraining;
+    public bool IsRandomizingFSM => randomizeFSMForAITraining;
+
+    private void Awake() { }
 
     private void Start()
     {
+        SpawnFreshCharacter();
+    }
+
+    public void SpawnFreshCharacter()
+    {
         if (playerPrefabs == null || playerPrefabs.Length == 0) return;
 
-        int selected = PlayerPrefs.GetInt(SELECTED_CHARACTER_KEY, BLOB_RANGED_INDEX);
+        if (currentPlayer != null)
+        {
+            Destroy(currentPlayer);
+            currentPlayer = null;
+        }
+
+        int selected = randomizeCharacterForAITraining
+            ? Random.Range(0, playerPrefabs.Length)
+            : PlayerPrefs.GetInt(SELECTED_CHARACTER_KEY, BLOB_RANGED_INDEX);
+
         SpawnCharacter(selected);
     }
 
@@ -34,19 +58,21 @@ public class CharacterManager : MonoBehaviour
         if (prefabToSpawn == null) return;
 
         GameObject newPlayer = Instantiate(prefabToSpawn, spawnPoint.position, Quaternion.identity);
+        currentPlayer = newPlayer;
 
-        // We use GetComponentInChildren just in case the Health script is on a child object
+        // Randomize which FSM is active BEFORE other wiring so the FSM's OnEnable
+        // (which sets IsAIControlled etc.) fires in a clean state.
+        if (randomizeFSMForAITraining)
+            RandomizeActiveFSM(newPlayer);
+
         Health playerHealth = newPlayer.GetComponentInChildren<Health>();
 
-        // Ensure the UI follows the player
         if (healthBar != null)
         {
             healthBar.SetPlayer(playerHealth);
         }
         else
         {
-            // If No direct reference, find all bars and force them to the player.
-            // This stops them from accidentally 'finding' the Boss health instead of yours.
             var allBars = Object.FindObjectsByType<Healthbar>(FindObjectsSortMode.None);
             foreach (var bar in allBars)
                 bar.SetPlayer(playerHealth);
@@ -55,11 +81,24 @@ public class CharacterManager : MonoBehaviour
         if (staminaBar != null)
             staminaBar.SetPlayer(newPlayer.GetComponent<PlayerStamina>());
 
-        // Tell RestartManager about the freshly-spawned player so it can subscribe to its
-        // Health.OnDamageTaken event — this is necessary because RestartManager.Start()
-        // may run before CharacterManager.Start() instantiates the player.
         var restartManager = Object.FindFirstObjectByType<RestartManager>();
         if (restartManager != null)
             restartManager.InitPlayer(newPlayer.GetComponent<PlayerController>());
+    }
+
+    private static void RandomizeActiveFSM(GameObject player)
+    {
+        // includeInactive: true so we see FSMs that are disabled in the prefab.
+        var fsms = player.GetComponentsInChildren<PlayerFSMController>(true);
+        if (fsms == null || fsms.Length == 0) return;
+
+        // Disable all first to guarantee a clean single-active state regardless of
+        // how the prefab was authored.
+        foreach (var f in fsms) f.enabled = false;
+
+        int chosen = Random.Range(0, fsms.Length);
+        fsms[chosen].enabled = true;
+
+        Debug.Log($"[CharacterManager] Randomized FSM → {fsms[chosen].GetType().Name} (out of {fsms.Length}).");
     }
 }

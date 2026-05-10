@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class TwistedCultistController : BossController
 {
+    [Header("Twisted Cultist - Sounds")]
+    [SerializeField] private AudioClip attackSound;
+    [SerializeField] private AudioClip deathSound;
     [Header("Twisted Cultist - Combat")]
     [Min(0f)] public float pressSpeed = 2.6f;
     [Min(0f)] public float evadeSpeed = 2.8f;
@@ -154,6 +157,8 @@ public class TwistedCultistController : BossController
 
     private void OnDeathAnimation()
     {
+        if (deathSound != null)
+            SoundManager.instance.PlaySound(deathSound);
         SetWalking(false);
         Anim?.SetTrigger("death");
     }
@@ -209,6 +214,8 @@ public class TwistedCultistController : BossController
 
     public void TriggerAttackAnimation()
     {
+        if (attackSound != null)
+            SoundManager.instance.PlaySound(attackSound);
         if (Anim != null) Anim.SetTrigger("attack");
     }
 
