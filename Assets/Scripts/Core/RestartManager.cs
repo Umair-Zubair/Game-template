@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using Unity.MLAgents.Policies;
 
 /// <summary>
 /// Single coordinator for all encounter resets.
@@ -24,7 +25,20 @@ public class RestartManager : MonoBehaviour
     private UIManager uiManager;
     private CharacterManager characterManager;
 
-    private bool IsMLActive => mlBrain != null && mlBrain.isActiveAndEnabled && mlBrain.IsModelLoaded;
+    // True when MLBrain exists and is configured to talk to the trainer or run inference.
+    // Crucially, this stays TRUE during training (when Model is intentionally null) so that
+    // OnBossDied / OnPlayerDamaged route through mlBrain.OnFightLost/OnFightWon — those
+    // call CancelDeathSequences() synchronously and EndEpisode(), giving us a 1-frame
+    // reset instead of the 2-second DelayedReset path.
+    private bool IsMLActive
+    {
+        get
+        {
+            if (mlBrain == null || !mlBrain.isActiveAndEnabled) return false;
+            var bp = mlBrain.GetComponent<BehaviorParameters>();
+            return bp != null && bp.BehaviorType != BehaviorType.HeuristicOnly;
+        }
+    }
 
     private void Awake()
     {

@@ -16,6 +16,12 @@ public class Health : MonoBehaviour
     private Animator anim;
     private bool dead;
 
+    [Header("Death")]
+    [Tooltip("When false, the GameObject is NOT disabled after the death animation. " +
+            "Set false on agents that get respawned by ML-Agents episode resets so " +
+            "the boss never visually disappears mid-training.")]
+    [SerializeField] private bool disableOnDeath = true;
+
     [Header("Components")]
     [SerializeField] private Behaviour[] components; 
 
@@ -110,7 +116,8 @@ public class Health : MonoBehaviour
                     playerShield.enabled = false;
                 }
 
-                StartCoroutine(DeactivateAfterDeath());
+                if (disableOnDeath)
+                    StartCoroutine(DeactivateAfterDeath());
             }
         }
     }
