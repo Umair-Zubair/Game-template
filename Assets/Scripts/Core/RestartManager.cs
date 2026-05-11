@@ -128,9 +128,16 @@ public class RestartManager : MonoBehaviour
         CleanupProjectiles();
 
         if (boss != null)
-            boss.Respawn(bossSpawnPoint != null ? bossSpawnPoint.position : boss.transform.position);
+        {
+            if (bossSpawnPoint != null)
+                boss.Respawn(bossSpawnPoint.position);
+            else
+                boss.Respawn();
+        }
         else
+        {
             Debug.LogWarning("[RestartManager] ResetEncounter: boss is null — cannot respawn boss.");
+        }
 
         // When the AI-training randomize toggle is ON, fully re-instantiate the player so
         // each episode can roll a different character. Otherwise just Respawn() the existing

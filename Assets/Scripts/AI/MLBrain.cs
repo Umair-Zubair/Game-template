@@ -68,7 +68,7 @@ public class MLBrain : Agent, IBossDecisionModule
             restartManager.ResetEncounter();
         else
         {
-            GetComponent<BossController>()?.Respawn(transform.position);
+            GetComponent<BossController>()?.Respawn();
             var p = FindFirstObjectByType<PlayerController>();
             p?.Respawn(p.transform.position);
         }

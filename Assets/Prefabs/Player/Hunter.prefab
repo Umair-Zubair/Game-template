@@ -274,8 +274,8 @@ MonoBehaviour:
   projectilePrefab: {fileID: 6017856592061896820, guid: 41571b5ffa2442b4183b938a1475861a, type: 3}
   jumpProjectilePrefab: {fileID: 6017856592061896820, guid: 41571b5ffa2442b4183b938a1475861a, type: 3}
   poolSize: 10
-  projectileSound: {fileID: 0}
-  jumpProjectileSound: {fileID: 0}
+  projectileSound: {fileID: 8300000, guid: f10dcf2344b8f3e42be2846bdd4e2404, type: 3}
+  jumpProjectileSound: {fileID: 8300000, guid: f10dcf2344b8f3e42be2846bdd4e2404, type: 3}
   maxAmmo: 3
   reloadTime: 1
   reloadSound: {fileID: 0}
@@ -294,6 +294,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
   startingHealth: 10
+  disableOnDeath: 1
   components: []
 --- !u!114 &5739552593001750824
 MonoBehaviour:
@@ -368,7 +369,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5536329845775654271}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c6a6cac896718b9468c8a853834771fb, type: 3}
   m_Name: 

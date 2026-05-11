@@ -20,6 +20,11 @@ public abstract class BossController : MonoBehaviour
     public LayerMask groundLayer;
     public LayerMask playerDamageLayer;
 
+    [Header("Spawn")]
+    [Tooltip("Optional Transform used as the boss's respawn position. If empty, the boss respawns at its current position.")]
+    [SerializeField] private Transform spawnPoint;
+    public Transform SpawnPoint => spawnPoint;
+
     // Core Components
     [HideInInspector] public Rigidbody2D RB;
     [HideInInspector] public Animator Anim;
@@ -101,6 +106,15 @@ public abstract class BossController : MonoBehaviour
 
     /// <summary>Fired once when the boss dies. Used by AISessionLogger to end the fight record.</summary>
     public event System.Action OnDied;
+
+    /// <summary>
+    /// Convenience overload: respawns at the serialized <see cref="SpawnPoint"/> if set,
+    /// otherwise at the boss's current position.
+    /// </summary>
+    public void Respawn()
+    {
+        Respawn(spawnPoint != null ? spawnPoint.position : transform.position);
+    }
 
     /// <summary>
     /// Resets the boss for a new ML-Agents episode: full health, zero velocity,

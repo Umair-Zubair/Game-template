@@ -28,7 +28,7 @@ public class UIManager : MonoBehaviour
 
         EnsureBossHealthBar();
     }
-    private bool IsEndScreenActive =>
+    public bool IsEndScreenActive =>
         (gameOverScreen != null && gameOverScreen.activeInHierarchy) ||
         (winScreen != null && winScreen.activeInHierarchy);
 

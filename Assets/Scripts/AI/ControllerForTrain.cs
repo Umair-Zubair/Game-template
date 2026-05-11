@@ -269,7 +269,7 @@ public class ControllerForTrain : Agent
         if (restartManager != null)
             restartManager.ResetEncounter();
         else if (bossController != null)
-            bossController.Respawn(bossController.transform.position);
+            bossController.Respawn();
 
         decisionEngine?.ResetForNewEpisode();
 

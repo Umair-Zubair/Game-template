@@ -254,6 +254,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
   startingHealth: 12
+  disableOnDeath: 1
   components: []
 --- !u!114 &8049873378223907268
 MonoBehaviour:
@@ -380,7 +381,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5963178899783550497}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0769bc262ba78ca44a0021997e26007c, type: 3}
   m_Name: 

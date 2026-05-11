@@ -18,6 +18,7 @@ public class BossHealthBar : MonoBehaviour
     [SerializeField] private Color panelColor = new Color(0.05f, 0.05f, 0.05f, 0.75f);
 
     private Health bossHealth;
+    private UIManager uiManager;
     private GameObject panelGO;
     private RectTransform fillRT;
     private bool wasActive;
@@ -26,6 +27,7 @@ public class BossHealthBar : MonoBehaviour
     private void Start()
     {
         TryAcquireBoss();
+        uiManager = FindFirstObjectByType<UIManager>();
         BuildUI();
     }
 
@@ -36,10 +38,16 @@ public class BossHealthBar : MonoBehaviour
         if (bossController == null || bossHealth == null)
             TryAcquireBoss();
 
+        if (uiManager == null)
+            uiManager = FindFirstObjectByType<UIManager>();
+
+        bool endScreenActive = uiManager != null && uiManager.IsEndScreenActive;
+
         bool shouldShow = bossController != null
                           && bossHealth != null
                           && !bossController.IsDead
-                          && bossHealth.currentHealth > 0;
+                          && bossHealth.currentHealth > 0
+                          && !endScreenActive;
 
         if (shouldShow != wasActive)
         {

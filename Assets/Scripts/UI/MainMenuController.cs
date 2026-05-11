@@ -93,7 +93,7 @@ public class MainMenuController : MonoBehaviour
 
         // Prevent double-loading
         isLoading = true;
-        SceneManager.LoadScene("Level1");
+        SceneManager.LoadScene("BiggerLevel");
     }
 
     public void ShowCharacterSelect()

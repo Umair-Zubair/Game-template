@@ -31,7 +31,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3637007278329730629}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &2810714375831478803
+--- !u!1 &1981862591895300716
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -39,25 +39,25 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1231775565006839676}
-  m_Layer: 11
-  m_Name: spawnpoint
+  - component: {fileID: 4485334365684581378}
+  m_Layer: 0
+  m_Name: SpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1231775565006839676
+--- !u!4 &4485334365684581378
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2810714375831478803}
+  m_GameObject: {fileID: 1981862591895300716}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.204, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.042051636, y: -0.07591167, z: 0}
+  m_LocalScale: {x: -0.16666667, y: 0.16666667, z: 0.16666667}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3637007278329730629}
@@ -109,6 +109,12 @@ GameObject:
   - component: {fileID: 163554101761554095}
   - component: {fileID: 1720379048511637555}
   - component: {fileID: 9210189640734394756}
+  - component: {fileID: 1074146886457600766}
+  - component: {fileID: 613593036669675604}
+  - component: {fileID: 7235473481021093090}
+  - component: {fileID: 3264475570627832073}
+  - component: {fileID: 7345731275384327572}
+  - component: {fileID: 3762326958104785345}
   m_Layer: 11
   m_Name: VoidbornGoddess
   m_TagString: Enemy
@@ -125,13 +131,13 @@ Transform:
   m_GameObject: {fileID: 4303414237555634310}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.34, y: -1.48, z: 0}
-  m_LocalScale: {x: 6, y: 6, z: 6}
+  m_LocalPosition: {x: 6.26, y: 0.14, z: 0}
+  m_LocalScale: {x: -6, y: 6, z: 6}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6178199018294719981}
   - {fileID: 8911680581464627095}
-  - {fileID: 1231775565006839676}
+  - {fileID: 4485334365684581378}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &7781098245552850649
@@ -178,8 +184,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 960489153
-  m_SortingLayer: 5
+  m_SortingLayerID: 193736679
+  m_SortingLayer: 6
   m_SortingOrder: 0
   m_Sprite: {fileID: 8161392755375268392, guid: 43874630a328bf743a4b2da6c2e65a3c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -272,8 +278,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8e26f534ea637349a0bc6f44b578ba9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
-  startingHealth: 5
+  startingHealth: 15
+  disableOnDeath: 1
   components:
+  - {fileID: 9210189640734394756}
   - {fileID: 0}
 --- !u!114 &163554101761554095
 MonoBehaviour:
@@ -327,7 +335,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 912d3aa5ce863ba478a2977072b3db45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VoidbornGoddessController
-  detectionRange: 10
+  detectionRange: 17
   attackRange: 2.75
   retreatRange: 2
   gravityScale: 2
@@ -342,12 +350,21 @@ MonoBehaviour:
   playerDamageLayer:
     serializedVersion: 2
     m_Bits: 1024
+  spawnPoint: {fileID: 4485334365684581378}
   RB: {fileID: 0}
   Anim: {fileID: 0}
   Collider: {fileID: 0}
   Health: {fileID: 0}
   StunTimer: 0
   DebugMode: 1
+  cultistSpawnSound: {fileID: 8300000, guid: d5dd9f063d935a349a79ad15baa3b7ba, type: 3}
+  artillerySpawnSound: {fileID: 8300000, guid: a153d67a8e38d1c40af74843a5936b64, type: 3}
+  swipeSound1: {fileID: 8300000, guid: 5f467f38d74ca3e4bb1b52882af75c28, type: 3}
+  swipeSound2: {fileID: 8300000, guid: 5f467f38d74ca3e4bb1b52882af75c28, type: 3}
+  swipeSound3: {fileID: 8300000, guid: 5f467f38d74ca3e4bb1b52882af75c28, type: 3}
+  swipeSound4: {fileID: 8300000, guid: 5f467f38d74ca3e4bb1b52882af75c28, type: 3}
+  artilleryTeleportUpSound: {fileID: 8300000, guid: 4df8292995b743d4e8e9f94d3a178736, type: 3}
+  artilleryTeleportBackSound: {fileID: 8300000, guid: 4df8292995b743d4e8e9f94d3a178736, type: 3}
   chaseSpeed: 2
   meleeAttackCooldown: 2.5
   dashSpeed: 10
@@ -359,9 +376,127 @@ MonoBehaviour:
   artillerySpawnHeight: 5
   artilleryDamage: 2
   artilleryCooldown: 6
-  enableCultistSpawning: 0
-  cultistPrefab: {fileID: 0}
-  cultistSpawnOffset: 3
+  enableCultistSpawning: 1
+  cultistPrefab: {fileID: 7588782773994181271, guid: d983f24482c95794db4b03a291952898, type: 3}
+  cultistSpawnOffset: 5
   cultistSpawnCooldown: 30
   cultistSpawnDuration: 1.5
   maxLivingCultists: 2
+--- !u!114 &1074146886457600766
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4303414237555634310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c41d119917ca6549a1475df6c284a25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VoidbornAdaptationManager
+  evaluationInterval: 3
+  transitionDuration: 1
+  aggressiveThreshold: 0.5
+  passiveThreshold: 0.2
+  aerialThreshold: 0.4
+  rangedThreshold: 0.5
+  DebugMode: 1
+  currentStyle: 0
+--- !u!114 &613593036669675604
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4303414237555634310}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 419cecac1877669499fc10954292d099, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossAIDebugHUD
+  offset: {x: 10, y: 10}
+  panelWidth: 300
+--- !u!114 &7235473481021093090
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4303414237555634310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c8dfd3ab033c2d428b4d9a62faf04b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIDecisionEngine
+  isTrainingMode: 0
+  enableL1: 1
+  enableL2: 1
+  enableL3: 1
+  enableFairnessGuardian: 1
+  evaluationInterval: 0.3
+  confidenceThreshold: 0.4
+  persistWeights: 1
+  mlBrain: {fileID: 3762326958104785345}
+  mlConfidenceThreshold: 0.6
+  DebugMode: 1
+--- !u!114 &3264475570627832073
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4303414237555634310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6b14e7e802bd5e4283cd50b8a5da479, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AISessionLogger
+  aiCondition: 2
+  DebugMode: 1
+--- !u!114 &7345731275384327572
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4303414237555634310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.ML-Agents::Unity.MLAgents.Policies.BehaviorParameters
+  m_BrainParameters:
+    VectorObservationSize: 15
+    NumStackedVectorObservations: 1
+    m_ActionSpec:
+      m_NumContinuousActions: 0
+      BranchSizes: 03000000
+    VectorActionSize: 03000000
+    VectorActionDescriptions: []
+    VectorActionSpaceType: 0
+    hasUpgradedBrainParametersWithActionSpec: 1
+  m_Model: {fileID: 5022602860645237092, guid: 01640bb6a6dfc5846b29bddc3fb6de8f, type: 3}
+  m_InferenceDevice: 0
+  m_BehaviorType: 2
+  m_BehaviorName: VoidbornBoss
+  TeamId: 0
+  m_UseChildSensors: 1
+  m_UseChildActuators: 1
+  m_ObservableAttributeHandling: 0
+--- !u!114 &3762326958104785345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4303414237555634310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ad4e8d79f921c7478997397b9040329, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MLBrain
+  agentParameters:
+    maxStep: 0
+  hasUpgradedFromAgentParameters: 1
+  MaxStep: 0
+  maxEpisodeDuration: 120
