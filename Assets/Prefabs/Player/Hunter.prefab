@@ -52,6 +52,7 @@ GameObject:
   - component: {fileID: -8182996424340938370}
   - component: {fileID: 7391054212139527422}
   - component: {fileID: 6830410306596466865}
+  - component: {fileID: 3140450271099486542}
   m_Layer: 10
   m_Name: Hunter
   m_TagString: Player
@@ -293,7 +294,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8e26f534ea637349a0bc6f44b578ba9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
-  startingHealth: 10
+  startingHealth: 25
   disableOnDeath: 1
   components: []
 --- !u!114 &5739552593001750824
@@ -389,6 +390,36 @@ MonoBehaviour:
   retreatTriggerDistance: 2
   reloadThresholdRatio: 0.2
   jumpShootChance: 0.5
+  lowStaminaThreshold: 0.3
+  lowStaminaRangeBuffer: 1.5
+  reengageStaminaRatio: 0.35
+--- !u!114 &3140450271099486542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5536329845775654271}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6a6cac896718b9468c8a853834771fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HunterBalancedFSM
+  targetTag: Enemy
+  inputSmoothSpeed: 6
+  dangerRange: 3
+  reactionDelayMin: 0.1
+  reactionDelayMax: 0.26
+  PC: {fileID: 0}
+  Stamina: {fileID: 0}
+  Health: {fileID: 0}
+  MeleeAttack: {fileID: 0}
+  RangedAttack: {fileID: 0}
+  preferredRange: 4.5
+  rangeTolerance: 0.8
+  retreatTriggerDistance: 2
+  reloadThresholdRatio: 0.5
+  jumpShootChance: 0.3
   lowStaminaThreshold: 0.3
   lowStaminaRangeBuffer: 1.5
   reengageStaminaRatio: 0.35

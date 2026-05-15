@@ -41,8 +41,8 @@ public class CharacterSelectPanel : MonoBehaviour
     [SerializeField] private MainMenuController mainMenuController;
 
     private const string SELECTED_CHARACTER_KEY = "SelectedCharacter";
-    private const int BLOB_RANGED_INDEX = 0;
-    private const int BLOB_MELEE_INDEX = 1;
+    private const int HUNTER_INDEX = 0;
+    private const int WARRIOR_INDEX = 1;
 
     private float lastInteractionTime = 0f;
     private const float INTERACTION_COOLDOWN = 0.15f;
@@ -151,8 +151,8 @@ public class CharacterSelectPanel : MonoBehaviour
 
     public void SelectBlobMelee()
     {
-        Debug.Log($"<color=green>[CharacterSelectPanel] Saving Melee Selection (Index: {BLOB_MELEE_INDEX})</color>");
-        PlayerPrefs.SetInt(SELECTED_CHARACTER_KEY, BLOB_MELEE_INDEX);
+        Debug.Log($"<color=green>[CharacterSelectPanel] Saving Hunter Selection (Index: {HUNTER_INDEX})</color>");
+        PlayerPrefs.SetInt(SELECTED_CHARACTER_KEY, HUNTER_INDEX);
         PlayerPrefs.Save();
 
         PlayInteractSound();
@@ -161,8 +161,8 @@ public class CharacterSelectPanel : MonoBehaviour
 
     public void SelectBlobRanged()
     {
-        Debug.Log($"<color=green>[CharacterSelectPanel] Saving Ranged Selection (Index: {BLOB_RANGED_INDEX})</color>");
-        PlayerPrefs.SetInt(SELECTED_CHARACTER_KEY, BLOB_RANGED_INDEX);
+        Debug.Log($"<color=green>[CharacterSelectPanel] Saving Warrior Selection (Index: {WARRIOR_INDEX})</color>");
+        PlayerPrefs.SetInt(SELECTED_CHARACTER_KEY, WARRIOR_INDEX);
         PlayerPrefs.Save();
 
         PlayInteractSound();
@@ -190,7 +190,7 @@ public class CharacterSelectPanel : MonoBehaviour
             {
                 selectionArrow.gameObject.SetActive(true);
                 Vector2 arrowPos = selectionArrow.anchoredPosition;
-                arrowPos.y = selected == BLOB_MELEE_INDEX ? blobMeleeArrowY : blobRangedArrowY;
+                arrowPos.y = selected == HUNTER_INDEX ? blobMeleeArrowY : blobRangedArrowY;
                 selectionArrow.anchoredPosition = arrowPos;
             }
             else
@@ -200,16 +200,16 @@ public class CharacterSelectPanel : MonoBehaviour
         }
 
         if (blobMeleeSelectedIndicator != null)
-            blobMeleeSelectedIndicator.SetActive(selected == BLOB_MELEE_INDEX);
+            blobMeleeSelectedIndicator.SetActive(selected == HUNTER_INDEX);
 
         if (blobRangedSelectedIndicator != null)
-            blobRangedSelectedIndicator.SetActive(selected == BLOB_RANGED_INDEX);
+            blobRangedSelectedIndicator.SetActive(selected == WARRIOR_INDEX);
 
         if (blobRangedPreviewImage != null)
             blobRangedPreviewImage.color = blobRangedColor;
 
-        UpdateButtonVisual(blobMeleeButton, blobMeleeOriginalScale, selected == BLOB_MELEE_INDEX);
-        UpdateButtonVisual(blobRangedButton, blobRangedOriginalScale, selected == BLOB_RANGED_INDEX);
+        UpdateButtonVisual(blobMeleeButton, blobMeleeOriginalScale, selected == HUNTER_INDEX);
+        UpdateButtonVisual(blobRangedButton, blobRangedOriginalScale, selected == WARRIOR_INDEX);
     }
 
     private void UpdateButtonVisual(Button button, Vector3 originalScale, bool isSelected)

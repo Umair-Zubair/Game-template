@@ -18,8 +18,8 @@ public class CharacterManager : MonoBehaviour
     [SerializeField] private bool randomizeFSMForAITraining = false;
 
     private const string SELECTED_CHARACTER_KEY = "SelectedCharacter";
-    private const int BLOB_RANGED_INDEX = 0;
-    private const int BLOB_MELEE_INDEX = 1;
+    private const int HUNTER_INDEX = 0;
+    private const int WARRIOR_INDEX = 1;
 
     private GameObject currentPlayer;
 
@@ -45,7 +45,7 @@ public class CharacterManager : MonoBehaviour
 
         int selected = randomizeCharacterForAITraining
             ? Random.Range(0, playerPrefabs.Length)
-            : PlayerPrefs.GetInt(SELECTED_CHARACTER_KEY, BLOB_RANGED_INDEX);
+            : PlayerPrefs.GetInt(SELECTED_CHARACTER_KEY, HUNTER_INDEX);
 
         SpawnCharacter(selected);
     }
@@ -55,7 +55,11 @@ public class CharacterManager : MonoBehaviour
         if (index < 0 || index >= playerPrefabs.Length) return;
 
         GameObject prefabToSpawn = playerPrefabs[index];
-        if (prefabToSpawn == null) return;
+        if (prefabToSpawn == null)
+        {
+            Debug.LogError($"[CharacterManager] playerPrefabs[{index}] is null — assign the prefab in the Inspector.");
+            return;
+        }
 
         GameObject newPlayer = Instantiate(prefabToSpawn, spawnPoint.position, Quaternion.identity);
         currentPlayer = newPlayer;

@@ -91,7 +91,6 @@ public class MainMenuController : MonoBehaviour
             return;
         }
 
-        // Prevent double-loading
         isLoading = true;
         SceneManager.LoadScene("BiggerLevel");
     }

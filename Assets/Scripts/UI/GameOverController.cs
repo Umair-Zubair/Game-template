@@ -3,7 +3,7 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Controls the Game Over screen.
-/// Handles Restart (reload Level1) and Quit.
+/// Handles Restart (reload current scene) and Quit.
 /// </summary>
 public class GameOverController : MonoBehaviour
 {
@@ -26,7 +26,7 @@ public class GameOverController : MonoBehaviour
 
         PlayButtonSound();
         Time.timeScale = 1f;
-        SceneManager.LoadScene("Level1");
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void QuitGame()
